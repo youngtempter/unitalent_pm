@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>UniTalent – Employer Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="font-sans bg-slate-950 text-slate-100">
+  <!-- Background gradient blobs -->
+  <div class="pointer-events-none fixed inset-0 -z-10">
+    <div class="absolute -top-40 -left-32 h-72 w-72 rounded-full bg-indigo-500/40 blur-3xl"></div>
+    <div class="absolute top-40 -right-20 h-80 w-80 rounded-full bg-emerald-500/30 blur-3xl"></div>
+  </div>
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="flex h-9 w-9 items-center justify-center rounded-2xl bg-indigo-500 text-lg font-bold shadow-lg shadow-indigo-500/40">
+          U
+        </div>
+        <div class="leading-tight">
+          <p class="text-base font-semibold tracking-tight">UniTalent</p>
+          <p class="text-[11px] text-slate-400">Student Career Platform</p>
+        </div>
+      </a>
+
+      <!-- Desktop menu -->
+      <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
+        <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
+        <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
+        <a href="student-login.html" class="hover:text-indigo-300">For students</a>
+        <a href="employer-login.html" class="text-indigo-300">For employers</a>
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+      </div>
+
+      <!-- Employer identity -->
+      <div class="hidden items-center gap-3 md:flex">
+        <span class="text-xs text-slate-400">Logged in as</span>
+        <span class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100">
+          BrightCode · Employer
+        </span>
+      </div>
+
+      <!-- Mobile menu button (visual only) -->
+      <button class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
+        <span class="sr-only">Open menu</span>
+        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+             viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- MAIN -->
+  <main class="mx-auto max-w-6xl px-4 pb-16 pt-6 md:pt-8">
+    <!-- Breadcrumb -->
+    <div class="mb-4 text-xs text-slate-400">
+      <a href="index.html" class="hover:text-indigo-300">Home</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <a href="employer-login.html" class="hover:text-indigo-300">Employer login</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <span class="text-slate-300">Dashboard</span>
+    </div>
+
+    <!-- Header -->
+    <section class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div class="space-y-1">
+        <p class="text-xs text-slate-400">Employer dashboard</p>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
+          Welcome, BrightCode 👋
+        </h1>
+        <p class="text-sm text-slate-400">
+          Manage your job posts and review student applications in one place.
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-3 text-xs">
+        <div class="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2">
+          <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
+            BC
+          </div>
+          <div class="leading-tight">
+            <p class="font-semibold text-slate-100">BrightCode</p>
+            <p class="text-[11px] text-slate-400">IT · Almaty · Hiring frontend interns</p>
+          </div>
+        </div>
+        <button
+          class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400">
+          Edit company profile
+        </button>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="mt-6 grid gap-4 text-xs md:grid-cols-3">
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+          Active job posts
+        </p>
+        <p class="mt-2 text-2xl font-bold text-slate-50">3</p>
+        <p class="mt-1 text-[11px] text-slate-400">
+          1 role closing this week
+        </p>
+      </div>
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+          Total applications
+        </p>
+        <p class="mt-2 text-2xl font-bold text-slate-50">24</p>
+        <p class="mt-1 text-[11px] text-slate-400">
+          5 new applications in the last 7 days
+        </p>
+      </div>
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+          Interviews scheduled
+        </p>
+        <p class="mt-2 text-2xl font-bold text-slate-50">3</p>
+        <p class="mt-1 text-[11px] text-emerald-300">
+          Next: Thu, 15:00 · Zoom
+        </p>
+      </div>
+    </section>
+
+    <!-- Main layout -->
+    <section class="mt-8 grid gap-6 md:grid-cols-[minmax(0,1.7fr),minmax(0,1fr)]">
+      <!-- LEFT: job posts & applications -->
+      <div class="space-y-4">
+        <!-- Header row -->
+        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 class="text-sm font-semibold text-slate-50">My job posts</h2>
+            <p class="text-xs text-slate-400">
+              Manage roles, status and see how many students applied.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-2 text-xs">
+            <button
+              class="rounded-full bg-indigo-500 px-4 py-2 text-[11px] font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
+              + Post new job
+            </button>
+            <button
+              class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400">
+              View all applicants
+            </button>
+          </div>
+        </div>
+
+        <!-- Job posts list -->
+        <div class="space-y-3 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
+          <!-- Job 1 -->
+          <article class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p class="text-[11px] uppercase tracking-wide text-emerald-400">Active · Internship · IT</p>
+              <h3 class="mt-1 text-sm font-semibold text-slate-50">
+                Junior Frontend Developer
+              </h3>
+              <p class="text-[11px] text-slate-400">
+                Almaty · Hybrid · 120 000 ₸ / month · 6 months
+              </p>
+              <p class="mt-1 text-[11px] text-slate-300">
+                Looking for students with basic HTML, CSS and JavaScript. React is a plus.
+              </p>
+            </div>
+            <div class="flex flex-col items-end gap-1 text-[11px]">
+              <p class="text-slate-300">
+                <span class="font-semibold text-slate-100">12</span> applications
+              </p>
+              <p class="text-slate-400">3 in review · 1 shortlisted</p>
+              <div class="mt-1 flex gap-2">
+                <button class="rounded-full bg-indigo-500 px-3 py-1.5 font-semibold text-white hover:bg-indigo-400">
+                  View applicants
+                </button>
+                <button class="rounded-full bg-slate-900 px-3 py-1.5 text-slate-200 ring-1 ring-slate-700 hover:ring-indigo-400">
+                  Edit
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Job 2 -->
+          <article class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p class="text-[11px] uppercase tracking-wide text-emerald-400">Active · Part-time · Marketing</p>
+              <h3 class="mt-1 text-sm font-semibold text-slate-50">
+                Social Media Content Assistant
+              </h3>
+              <p class="text-[11px] text-slate-400">
+                Remote · Student-friendly schedule
+              </p>
+              <p class="mt-1 text-[11px] text-slate-300">
+                Supports social media campaigns for student audiences on Instagram and TikTok.
+              </p>
+            </div>
+            <div class="flex flex-col items-end gap-1 text-[11px]">
+              <p class="text-slate-300">
+                <span class="font-semibold text-slate-100">7</span> applications
+              </p>
+              <p class="text-slate-400">1 interview scheduled</p>
+              <div class="mt-1 flex gap-2">
+                <button class="rounded-full bg-indigo-500 px-3 py-1.5 font-semibold text-white hover:bg-indigo-400">
+                  View applicants
+                </button>
+                <button class="rounded-full bg-slate-900 px-3 py-1.5 text-slate-200 ring-1 ring-slate-700 hover:ring-indigo-400">
+                  Edit
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Job 3 -->
+          <article class="flex flex-col gap-3 text-xs md:flex-row md:items-center md:justify-between">
+            <div>
+              <p class="text-[11px] uppercase tracking-wide text-slate-500">Closed · Internship · Data</p>
+              <h3 class="mt-1 text-sm font-semibold text-slate-50">
+                Data Analytics Intern
+              </h3>
+              <p class="text-[11px] text-slate-400">
+                Astana · On-site
+              </p>
+              <p class="mt-1 text-[11px] text-slate-300">
+                Position filled · Job post closed 2 weeks ago.
+              </p>
+            </div>
+            <div class="flex flex-col items-end gap-1 text-[11px]">
+              <p class="text-slate-300">
+                <span class="font-semibold text-slate-100">5</span> total applications
+              </p>
+              <div class="mt-1 flex gap-2">
+                <button class="rounded-full bg-slate-900 px-3 py-1.5 text-slate-200 ring-1 ring-slate-700 hover:ring-indigo-400">
+                  View summary
+                </button>
+                <button class="rounded-full bg-slate-900 px-3 py-1.5 text-slate-400 ring-1 ring-slate-800 hover:bg-slate-800">
+                  Duplicate post
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- Recent activity -->
+        <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-slate-50">Recent activity</h2>
+            <span class="text-[11px] text-slate-400">Last 7 days</span>
+          </div>
+          <ul class="mt-3 space-y-2 text-[11px] text-slate-300">
+            <li>• New application for <span class="text-slate-100">Junior Frontend Developer</span> from <span class="text-indigo-200">Aruzhan · SDU</span>.</li>
+            <li>• Interview scheduled for <span class="text-slate-100">Social Media Content Assistant</span> with <span class="text-indigo-200">Nurbek · KBTU</span>.</li>
+            <li>• Job post <span class="text-slate-100">Data Analytics Intern</span> was closed.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- RIGHT: candidates & hiring tips -->
+      <aside class="space-y-4">
+        <!-- Candidate spotlight -->
+        <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
+          <div class="flex items-center justify-between">
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+              Candidate spotlight
+            </p>
+            <button class="text-[11px] text-indigo-300 hover:text-indigo-200">
+              View CV
+            </button>
+          </div>
+          <div class="mt-3 flex items-start gap-3">
+            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
+              AY
+            </div>
+            <div class="space-y-1">
+              <p class="text-sm font-semibold text-slate-50">
+                Aruzhan Y. · 2nd year CS
+              </p>
+              <p class="text-[11px] text-slate-400">
+                SDU · Interested in frontend internships · Applied to Junior Frontend Developer.
+              </p>
+              <div class="mt-1 flex flex-wrap gap-1 text-[10px] text-slate-200">
+                <span class="rounded-full bg-slate-800 px-2 py-0.5">HTML/CSS</span>
+                <span class="rounded-full bg-slate-800 px-2 py-0.5">JavaScript</span>
+                <span class="rounded-full bg-slate-800 px-2 py-0.5">React basics</span>
+                <span class="rounded-full bg-slate-800 px-2 py-0.5">Figma</span>
+              </div>
+            </div>
+          </div>
+          <button
+            class="mt-3 w-full rounded-full bg-indigo-500 px-4 py-2 text-[11px] font-semibold text-white hover:bg-indigo-400">
+            Shortlist candidate
+          </button>
+        </div>
+
+        <!-- Simple funnel overview -->
+        <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
+          <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+            Hiring funnel overview
+          </p>
+          <div class="mt-3 space-y-3">
+            <div class="flex items-center justify-between">
+              <span>Applications received</span>
+              <span class="font-semibold text-slate-100">24</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>In review</span>
+              <span class="font-semibold text-slate-100">8</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>Interviews</span>
+              <span class="font-semibold text-slate-100">3</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>Offers made</span>
+              <span class="font-semibold text-slate-100">1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hiring tips -->
+        <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 text-xs text-slate-300 shadow-xl shadow-slate-900/70">
+          <p class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
+            Tip for better student hires
+          </p>
+          <p class="mt-1">
+            Be explicit about what students will learn, not only what they must already know. Clear growth opportunities attract stronger applications.
+          </p>
+          <ul class="mt-2 space-y-1.5">
+            <li>• Mention tech stack and mentorship.</li>
+            <li>• Keep assignments short and fair for students.</li>
+            <li>• Provide feedback when possible.</li>
+          </ul>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800 bg-slate-950/90">
+    <div class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
+      <p>© 2025 UniTalent. All rights reserved.</p>
+      <div class="flex flex-wrap gap-4">
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
+        <span>Terms · Privacy</span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

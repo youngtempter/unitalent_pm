@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>UniTalent – Student Career Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Font (optional) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="font-sans bg-slate-950 text-slate-100">
+  <!-- Background gradient blobs -->
+  <div class="pointer-events-none fixed inset-0 -z-10">
+    <div class="absolute -top-40 -left-32 h-72 w-72 rounded-full bg-indigo-500/40 blur-3xl"></div>
+    <div class="absolute top-40 -right-20 h-80 w-80 rounded-full bg-emerald-500/30 blur-3xl"></div>
+  </div>
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="flex h-9 w-9 items-center justify-center rounded-2xl bg-indigo-500 text-lg font-bold shadow-lg shadow-indigo-500/40">
+          U
+        </div>
+        <div class="leading-tight">
+          <p class="text-base font-semibold tracking-tight">UniTalent</p>
+          <p class="text-[11px] text-slate-400">Student Career Platform</p>
+        </div>
+      </a>
+
+      <!-- Desktop menu -->
+      <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
+        <a href="#how" class="hover:text-indigo-300">How it works</a>
+        <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
+        <a href="student-login.html" class="hover:text-indigo-300">For students</a>
+        <a href="employer-login.html" class="hover:text-indigo-300">For employers</a>
+        <a href="#about" class="hover:text-indigo-300">About</a>
+      </div>
+
+      <!-- Auth buttons -->
+      <div class="hidden items-center gap-3 md:flex">
+        <a href="student-login.html" class="text-sm font-medium text-slate-200 hover:text-indigo-300">
+          Log in
+        </a>
+        <a href="student-login.html"
+           class="rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
+          Sign up
+        </a>
+      </div>
+
+      <!-- Mobile menu button (visual only) -->
+      <button class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
+        <span class="sr-only">Open menu</span>
+        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+             viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 pb-16 pt-8 md:pt-12">
+    <!-- HERO -->
+    <section id="hero" class="grid gap-10 py-6 md:grid-cols-2 md:items-center md:py-12">
+      <!-- Left -->
+      <div class="space-y-6">
+        <div class="inline-flex items-center gap-2 rounded-full border border-indigo-500/50 bg-indigo-500/10 px-3 py-1 text-xs font-medium text-indigo-200">
+          <span class="inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+          New: Platform for university talents
+        </div>
+
+        <div class="space-y-3">
+          <h1 class="text-3xl font-extrabold tracking-tight text-slate-50 sm:text-4xl lg:text-5xl">
+            Kickstart your career with <span class="text-indigo-400">real opportunities</span>.
+          </h1>
+          <p class="max-w-xl text-sm text-slate-300 md:text-base">
+            UniTalent connects students and fresh graduates with internships and entry-level jobs
+            from trusted companies—starting from your university.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <a href="student-login.html"
+             class="inline-flex items-center justify-center rounded-full bg-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400">
+            Get started as student
+          </a>
+          <a href="employer-login.html"
+             class="inline-flex items-center justify-center rounded-full border border-slate-600 bg-slate-900/70 px-5 py-2.5 text-sm font-semibold text-slate-100 hover:border-indigo-400 hover:text-indigo-200">
+            Post a job as employer
+          </a>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-6 pt-2 text-xs text-slate-400 md:text-sm">
+          <div>
+            <p class="font-semibold text-slate-200">500+ students</p>
+            <p>already exploring opportunities</p>
+          </div>
+          <div>
+            <p class="font-semibold text-slate-200">100+ companies</p>
+            <p>ready to hire young talent</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Image / mock UI -->
+      <div class="relative">
+        <div class="absolute -top-8 -right-6 h-24 w-24 rounded-full bg-emerald-400/40 blur-3xl"></div>
+        <div class="relative rounded-3xl bg-slate-900/70 p-4 shadow-2xl shadow-slate-900/80 ring-1 ring-slate-700/80">
+          <!-- Main picture -->
+          <div class="overflow-hidden rounded-2xl">
+            <img
+              src="https://images.pexels.com/photos/1181633/pexels-photo-1181633.jpeg?auto=compress&cs=tinysrgb&w=1200"
+              alt="Students collaborating on laptops"
+              class="h-48 w-full object-cover md:h-56"
+            />
+          </div>
+
+          <!-- Overlay student + job cards -->
+          <div class="mt-4 grid gap-4 md:grid-cols-2">
+            <div class="rounded-2xl border border-slate-700 bg-slate-900/80 p-3">
+              <div class="flex items-center gap-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-sm font-semibold">
+                  AY
+                </div>
+                <div class="text-xs">
+                  <p class="font-semibold text-slate-100">Aruzhan Y.</p>
+                  <p class="text-slate-400">2nd year · Computer Science</p>
+                </div>
+              </div>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <span class="rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-200">Frontend</span>
+                <span class="rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-200">React</span>
+                <span class="rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-200">Internship ready</span>
+              </div>
+            </div>
+
+            <!-- Job card -->
+            <div class="rounded-2xl border border-slate-700 bg-slate-900/80 p-3">
+              <div class="flex items-start justify-between gap-2">
+                <div class="text-xs">
+                  <p class="text-[11px] uppercase tracking-wide text-emerald-400">New internship</p>
+                  <p class="mt-1 text-sm font-semibold text-slate-100">Junior Frontend Developer</p>
+                  <p class="text-xs text-slate-400">Almaty · Hybrid</p>
+                </div>
+                <span class="rounded-full bg-emerald-500/15 px-2 py-1 text-[11px] font-medium text-emerald-300">
+                  Internship
+                </span>
+              </div>
+              <p class="mt-2 line-clamp-2 text-xs text-slate-400">
+                Work with modern web stacks, build real features and grow with a supportive mentor.
+              </p>
+              <a href="jobs.html"
+                 class="mt-3 block w-full rounded-full bg-indigo-500 px-3 py-1.5 text-center text-xs font-semibold text-white hover:bg-indigo-400">
+                View details
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how" class="mt-16 space-y-8">
+      <div class="text-center">
+        <h2 class="text-2xl font-bold tracking-tight text-slate-50 md:text-3xl">
+          How UniTalent works
+        </h2>
+        <p class="mt-2 text-sm text-slate-400 md:text-base">
+          A simple three-step journey from profile to your first offer.
+        </p>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-3">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-900/60">
+          <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500/20">
+            <span class="text-lg">📄</span>
+          </div>
+          <h3 class="text-sm font-semibold text-slate-50">Create your profile</h3>
+          <p class="mt-2 text-sm text-slate-400">
+            Add your education, skills and interests. Show employers who you are in a clean student-friendly profile.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-900/60">
+          <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/15">
+            <span class="text-lg">🔍</span>
+          </div>
+          <h3 class="text-sm font-semibold text-slate-50">Browse opportunities</h3>
+          <p class="mt-2 text-sm text-slate-400">
+            Filter internships and entry-level roles by city, field and work mode: on-site, hybrid or remote.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-900/60">
+          <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500/20">
+            <span class="text-lg">✅</span>
+          </div>
+          <h3 class="text-sm font-semibold text-slate-50">Apply & track progress</h3>
+          <p class="mt-2 text-sm text-slate-400">
+            Apply in one click and keep all your applications, interviews and offers in one clear dashboard.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURED JOBS -->
+    <section id="jobs-section" class="mt-16 space-y-8">
+      <div class="flex flex-col items-start justify-between gap-3 md:flex-row md:items-end">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight text-slate-50 md:text-3xl">
+            Featured opportunities
+          </h2>
+          <p class="mt-2 text-sm text-slate-400 md:text-base">
+            A snapshot of the kind of roles students can find on UniTalent.
+          </p>
+        </div>
+        <a href="jobs.html"
+           class="text-xs font-semibold text-indigo-300 hover:text-indigo-200">
+          View all jobs →
+        </a>
+      </div>
+
+      <div class="grid gap-5 md:grid-cols-3">
+        <!-- Job 1 -->
+        <article class="flex flex-col rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/60">
+          <header class="flex items-start justify-between gap-2">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-emerald-400">Internship · IT</p>
+              <h3 class="mt-1 text-sm font-semibold text-slate-50">
+                Junior Frontend Developer
+              </h3>
+              <p class="text-xs text-slate-400">Almaty · Hybrid · 120 000 ₸ / month</p>
+            </div>
+            <span class="rounded-full bg-emerald-500/15 px-2 py-1 text-[11px] font-medium text-emerald-300">
+              Open
+            </span>
+          </header>
+          <p class="mt-3 line-clamp-3 text-xs text-slate-400">
+            Join a fast-growing startup and build interfaces used by thousands of students. Perfect for those who know basic HTML, CSS, and JavaScript.
+          </p>
+          <footer class="mt-4 flex items-center justify-between text-xs text-slate-500">
+            <span>Posted 2 days ago</span>
+            <a href="jobs.html"
+               class="rounded-full bg-indigo-500 px-3 py-1 text-[11px] font-semibold text-white hover:bg-indigo-400">
+              View details
+            </a>
+          </footer>
+        </article>
+
+        <!-- Job 2 -->
+        <article class="flex flex-col rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/60">
+          <header class="flex items-start justify-between gap-2">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-emerald-400">Part-time · Marketing</p>
+              <h3 class="mt-1 text-sm font-semibold text-slate-50">
+                Social Media Assistant
+              </h3>
+              <p class="text-xs text-slate-400">Online · Remote friendly</p>
+            </div>
+            <span class="rounded-full bg-indigo-500/15 px-2 py-1 text-[11px] font-medium text-indigo-200">
+              Popular
+            </span>
+          </header>
+          <p class="mt-3 line-clamp-3 text-xs text-slate-400">
+            Help brands communicate with students on Instagram, TikTok and LinkedIn. Ideal for creative profiles who like writing and visuals.
+          </p>
+          <footer class="mt-4 flex items-center justify-between text-xs text-slate-500">
+            <span>Posted 5 days ago</span>
+            <a href="jobs.html"
+               class="rounded-full bg-indigo-500 px-3 py-1 text-[11px] font-semibold text-white hover:bg-indigo-400">
+              View details
+            </a>
+          </footer>
+        </article>
+
+        <!-- Job 3 -->
+        <article class="flex flex-col rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/60">
+          <header class="flex items-start justify-between gap-2">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-emerald-400">Full-time · Finance</p>
+              <h3 class="mt-1 text-sm font-semibold text-slate-50">
+                Junior Data Analyst
+              </h3>
+              <p class="text-xs text-slate-400">Astana · On-site</p>
+            </div>
+            <span class="rounded-full bg-slate-800 px-2 py-1 text-[11px] font-medium text-slate-200">
+              Graduate
+            </span>
+          </header>
+          <p class="mt-3 line-clamp-3 text-xs text-slate-400">
+            Work with real datasets, dashboards and reports. Perfect for fresh graduates with basic Python, Excel or SQL knowledge.
+          </p>
+          <footer class="mt-4 flex items-center justify-between text-xs text-slate-500">
+            <span>Posted 1 week ago</span>
+            <a href="jobs.html"
+               class="rounded-full bg-indigo-500 px-3 py-1 text-[11px] font-semibold text-white hover:bg-indigo-400">
+              View details
+            </a>
+          </footer>
+        </article>
+      </div>
+    </section>
+
+    <!-- STUDENTS / EMPLOYERS SPLIT -->
+    <section class="mt-16 grid gap-6 md:grid-cols-2">
+      <!-- For Students -->
+      <div class="flex flex-col rounded-3xl border border-slate-800 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-950 p-6 shadow-xl shadow-indigo-500/20">
+        <h2 class="text-lg font-semibold text-slate-50">
+          For students
+        </h2>
+        <p class="mt-2 text-sm text-slate-200">
+          Build a profile that looks professional even if you’re just getting started.
+        </p>
+        <ul class="mt-4 space-y-2 text-sm text-slate-200">
+          <li>• Show your university, skills and side projects.</li>
+          <li>• Discover internships and entry-level roles made for you.</li>
+          <li>• Save favorite jobs and track every application.</li>
+        </ul>
+        <a href="student-login.html"
+           class="mt-5 w-fit rounded-full bg-slate-950/70 px-4 py-2 text-xs font-semibold text-slate-50 ring-1 ring-slate-600 hover:bg-slate-900">
+          Explore student experience
+        </a>
+        <div class="mt-5 overflow-hidden rounded-2xl">
+          <img
+            src="https://images.pexels.com/photos/3861964/pexels-photo-3861964.jpeg?auto=compress&cs=tinysrgb&w=1200"
+            alt="Student using laptop"
+            class="h-40 w-full object-cover"
+          />
+        </div>
+      </div>
+
+      <!-- For Employers -->
+      <div class="flex flex-col rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl shadow-slate-900/70">
+        <h2 class="text-lg font-semibold text-slate-50">
+          For employers
+        </h2>
+        <p class="mt-2 text-sm text-slate-300">
+          Reach motivated young talent from universities with one focused platform.
+        </p>
+        <ul class="mt-4 space-y-2 text-sm text-slate-200">
+          <li>• Post internships and junior roles in minutes.</li>
+          <li>• Filter candidates by skills, major and graduation year.</li>
+          <li>• Manage all student applications in a clean dashboard.</li>
+        </ul>
+        <a href="employer-login.html"
+           class="mt-5 w-fit rounded-full bg-indigo-500 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
+          Post a job
+        </a>
+        <div class="mt-5 overflow-hidden rounded-2xl">
+          <img
+            src="https://images.pexels.com/photos/1181352/pexels-photo-1181352.jpeg?auto=compress&cs=tinysrgb&w=1200"
+            alt="Employer interviewing student"
+            class="h-40 w-full object-cover"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="mt-16 rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl shadow-slate-900/70">
+      <div class="grid gap-6 md:grid-cols-[1.2fr,1fr] md:items-center">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-emerald-400">
+            Student stories
+          </p>
+          <h2 class="mt-2 text-xl font-bold text-slate-50 md:text-2xl">
+            “I found my first internship through UniTalent before graduation.”
+          </h2>
+          <p class="mt-3 text-sm text-slate-300">
+            “As a 3rd year student, I didn’t know where to start. UniTalent helped me create a profile,
+            filter relevant internships and keep track of applications. Two interviews later, I got an offer.”
+          </p>
+          <p class="mt-4 text-sm font-semibold text-slate-100">
+            Aigerim · SDU · Information Systems
+          </p>
+        </div>
+        <div class="space-y-3 rounded-2xl border border-slate-800 bg-slate-950/70 p-4 text-xs text-slate-300">
+          <p>Why students choose UniTalent:</p>
+          <ul class="mt-2 space-y-1">
+            <li>• Local focus on universities and early careers.</li>
+            <li>• Clear UI made for students, not senior professionals.</li>
+            <li>• One place to manage CV, jobs and applications.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT & CONTACT -->
+    <section id="about" class="mt-16 grid gap-8 md:grid-cols-[1.3fr,1fr]">
+      <!-- About -->
+      <div class="space-y-4">
+        <h2 class="text-2xl font-bold tracking-tight text-slate-50 md:text-3xl">
+          Built by students, for students.
+        </h2>
+        <p class="text-sm text-slate-300">
+          UniTalent started as a university project to make it easier for students to find internships and junior roles.
+          We focus on clear interfaces, relevant opportunities and simple communication between students and employers.
+        </p>
+        <div class="grid gap-4 text-sm text-slate-200 md:grid-cols-2">
+          <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
+            <p class="text-xs font-semibold text-slate-400">Our mission</p>
+            <p class="mt-1">
+              Help every student get a fair chance to show their skills and land their first real-world experience.
+            </p>
+          </div>
+          <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
+            <p class="text-xs font-semibold text-slate-400">Our focus</p>
+            <p class="mt-1">
+              Universities, internships, junior roles and projects that match what students actually study.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div id="contact" class="rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl shadow-slate-900/70">
+        <h3 class="text-sm font-semibold text-slate-50">Contact us</h3>
+        <p class="mt-1 text-xs text-slate-400">
+          Have questions or want to partner with UniTalent? Send us a message.
+        </p>
+        <form class="mt-3 space-y-3 text-xs">
+          <div>
+            <label class="mb-1 block text-slate-300">Name</label>
+            <input
+              type="text"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
+              placeholder="Your name"
+            />
+          </div>
+          <div>
+            <label class="mb-1 block text-slate-300">Email</label>
+            <input
+              type="email"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
+              placeholder="you@example.com"
+            />
+          </div>
+          <div>
+            <label class="mb-1 block text-slate-300">Message</label>
+            <textarea
+              rows="3"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
+              placeholder="Tell us how we can help..."
+            ></textarea>
+          </div>
+          <button
+            type="button"
+            class="w-full rounded-full bg-indigo-500 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-400"
+          >
+            Send message
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800 bg-slate-950/90">
+    <div class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
+      <p>© 2025 UniTalent. All rights reserved.</p>
+      <div class="flex flex-wrap gap-4">
+        <a href="#about" class="hover:text-indigo-300">About</a>
+        <a href="#contact" class="hover:text-indigo-300">Contact</a>
+        <span>Terms · Privacy</span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
