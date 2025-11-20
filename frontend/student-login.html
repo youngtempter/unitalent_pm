@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>UniTalent – Student Login</title>
@@ -22,6 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
+
 <body class="font-sans bg-slate-950 text-slate-100">
   <!-- Background gradient blobs -->
   <div class="pointer-events-none fixed inset-0 -z-10">
@@ -34,14 +36,16 @@
     <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
       <!-- Logo -->
       <a href="index.html" class="flex items-center gap-2">
-        <div class="flex h-9 w-9 items-center justify-center rounded-2xl bg-indigo-500 text-lg font-bold shadow-lg shadow-indigo-500/40">
-          U
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
+          <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
         </div>
         <div class="leading-tight">
           <p class="text-base font-semibold tracking-tight">UniTalent</p>
           <p class="text-[11px] text-slate-400">Student Career Platform</p>
         </div>
       </a>
+
 
       <!-- Desktop menu -->
       <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
@@ -58,18 +62,17 @@
           Log in
         </a>
         <a href="student-signup.html"
-           class="rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
+          class="rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
           Sign up
         </a>
       </div>
 
       <!-- Mobile menu button (visual only) -->
-      <button class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
+      <button
+        class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
         <span class="sr-only">Open menu</span>
-        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
-             viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                d="M4 6h16M4 12h16M4 18h16" />
+        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
     </nav>
@@ -99,21 +102,11 @@
         </p>
 
         <!-- Login form -->
-        <form
-          action="student-dashboard.html"
-          method="get"
-          class="mt-5 space-y-4 text-xs sm:text-sm"
-        >
+        <form action="student-dashboard.html" method="get" class="mt-5 space-y-4 text-xs sm:text-sm">
           <div>
             <label for="email" class="mb-1 block text-slate-200">University email</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              placeholder="you@university.kz"
-              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm"
-            />
+            <input id="email" name="email" type="email" required placeholder="you@university.kz"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
           </div>
 
           <div>
@@ -123,31 +116,21 @@
                 Forgot password?
               </button>
             </div>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              placeholder="••••••••"
-              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm"
-            />
+            <input id="password" name="password" type="password" required placeholder="••••••••"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
           </div>
 
           <div class="flex items-center justify-between text-[11px] text-slate-400 sm:text-xs">
             <label class="inline-flex items-center gap-2">
-              <input
-                type="checkbox"
-                class="h-3 w-3 rounded border-slate-600 bg-slate-900 text-indigo-500 focus:ring-indigo-500"
-              />
+              <input type="checkbox"
+                class="h-3 w-3 rounded border-slate-600 bg-slate-900 text-indigo-500 focus:ring-indigo-500" />
               <span>Keep me signed in</span>
             </label>
             <span>Student access only</span>
           </div>
 
-          <button
-            type="submit"
-            class="mt-2 w-full rounded-full bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 sm:text-sm"
-          >
+          <button type="submit"
+            class="mt-2 w-full rounded-full bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 sm:text-sm">
             Log in
           </button>
         </form>
@@ -165,7 +148,8 @@
 
       <!-- Right: info / illustration -->
       <div class="hidden flex-col gap-4 md:flex">
-        <div class="rounded-3xl border border-slate-800 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-950 p-5 shadow-xl shadow-indigo-500/30">
+        <div
+          class="rounded-3xl border border-slate-800 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-950 p-5 shadow-xl shadow-indigo-500/30">
           <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-300">
             Why create a profile?
           </p>
@@ -184,11 +168,8 @@
         </div>
 
         <div class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-slate-900/70">
-          <img
-            src="https://images.pexels.com/photos/1181359/pexels-photo-1181359.jpeg?auto=compress&cs=tinysrgb&w=1200"
-            alt="Students studying together"
-            class="h-40 w-full object-cover"
-          />
+          <img src="https://images.pexels.com/photos/1181359/pexels-photo-1181359.jpeg?auto=compress&cs=tinysrgb&w=1200"
+            alt="Students studying together" class="h-40 w-full object-cover" />
           <div class="p-4 text-xs">
             <p class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
               UniTalent tip
@@ -207,7 +188,8 @@
 
   <!-- FOOTER -->
   <footer class="border-t border-slate-800 bg-slate-950/90">
-    <div class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
+    <div
+      class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
       <p>© 2025 UniTalent. All rights reserved.</p>
       <div class="flex flex-wrap gap-4">
         <a href="index.html#about" class="hover:text-indigo-300">About</a>
@@ -217,4 +199,5 @@
     </div>
   </footer>
 </body>
+
 </html>
