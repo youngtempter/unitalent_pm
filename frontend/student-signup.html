@@ -46,7 +46,6 @@
                 </div>
             </a>
 
-
             <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
                 <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
                 <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
@@ -96,63 +95,42 @@
                     Create your student profile
                 </h1>
                 <p class="mt-2 text-xs text-slate-400 sm:text-sm">
-                    Sign up with your university email to track applications, save jobs and showcase your skills.
-                    This is a front-end mockup – real registration will be connected to backend later.
+                    Sign up with your basic details. The form will send data to the UniTalent
+                    backend via API using <code>firstName, lastName, username, email, password</code>.
                 </p>
 
-                <form action="student-dashboard.html" method="get" class="mt-5 space-y-4 text-xs sm:text-sm">
+                <!-- FORM (only fields needed for DTO) -->
+                <form id="studentSignupForm" class="mt-5 space-y-4 text-xs sm:text-sm">
                     <div class="grid gap-3 sm:grid-cols-2">
                         <div>
-                            <label for="fullName" class="mb-1 block text-slate-200">Full name</label>
-                            <input id="fullName" type="text" required placeholder="Aruzhan Yeskendir"
+                            <label for="firstName" class="mb-1 block text-slate-200">First name</label>
+                            <input id="firstName" type="text" required placeholder="Aruzhan"
                                 class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
                         </div>
                         <div>
-                            <label for="university" class="mb-1 block text-slate-200">University</label>
-                            <input id="university" type="text" required placeholder="SDU, KBTU, etc."
+                            <label for="lastName" class="mb-1 block text-slate-200">Last name</label>
+                            <input id="lastName" type="text" required placeholder="Yeskendir"
                                 class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                        </div>
-                    </div>
-
-                    <div class="grid gap-3 sm:grid-cols-2">
-                        <div>
-                            <label for="major" class="mb-1 block text-slate-200">Major</label>
-                            <input id="major" type="text" required placeholder="Information Systems"
-                                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                        </div>
-                        <div>
-                            <label for="year" class="mb-1 block text-slate-200">Year of study</label>
-                            <select id="year" required
-                                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 focus:outline-none sm:text-sm">
-                                <option value="">Select</option>
-                                <option>1st year</option>
-                                <option>2nd year</option>
-                                <option>3rd year</option>
-                                <option>4th year</option>
-                                <option>Graduate</option>
-                            </select>
                         </div>
                     </div>
 
                     <div>
-                        <label for="studentEmail" class="mb-1 block text-slate-200">University email</label>
+                        <label for="username" class="mb-1 block text-slate-200">Username</label>
+                        <input id="username" type="text" required placeholder="aruzhan.yeska"
+                            class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
+                    </div>
+
+                    <div>
+                        <label for="studentEmail" class="mb-1 block text-slate-200">Email</label>
                         <input id="studentEmail" type="email" required placeholder="name@university.kz"
                             class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
                     </div>
 
-                    <div class="grid gap-3 sm:grid-cols-2">
-                        <div>
-                            <label for="password" class="mb-1 block text-slate-200">Password</label>
-                            <input id="password" type="password" required placeholder="••••••••"
-                                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                        </div>
-                        <div>
-                            <label for="confirmPassword" class="mb-1 block text-slate-200">Confirm password</label>
-                            <input id="confirmPassword" type="password" required placeholder="••••••••"
-                                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                        </div>
+                    <div>
+                        <label for="password" class="mb-1 block text-slate-200">Password</label>
+                        <input id="password" type="password" required placeholder="••••••••"
+                            class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
                     </div>
-
 
                     <div class="flex items-start gap-2 text-[11px] text-slate-400 sm:text-xs">
                         <input id="agree" type="checkbox"
@@ -163,6 +141,9 @@
                             version of UniTalent.
                         </label>
                     </div>
+
+                    <!-- Messages -->
+                    <p id="formMessage" class="mt-1 text-[11px] sm:text-xs"></p>
 
                     <button type="submit"
                         class="mt-2 w-full rounded-full bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 sm:text-sm">
@@ -230,6 +211,90 @@
             </div>
         </div>
     </footer>
+
+    <!-- JS: send form to backend with JWT handling -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('studentSignupForm');
+            const messageEl = document.getElementById('formMessage');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                messageEl.textContent = '';
+                messageEl.className = 'mt-1 text-[11px] sm:text-xs';
+
+                const firstName = document.getElementById('firstName').value.trim();
+                const lastName = document.getElementById('lastName').value.trim();
+                const username = document.getElementById('username').value.trim();
+                const email = document.getElementById('studentEmail').value.trim();
+                const password = document.getElementById('password').value;
+
+                // DTO exactly like in Swagger
+                const payload = {
+                    firstName: firstName,
+                    lastName: lastName,
+                    username: username,
+                    email: email,
+                    password: password
+                };
+
+                try {
+                    messageEl.textContent = 'Signing up...';
+                    messageEl.classList.add('text-slate-300');
+
+                    const response = await fetch('http://localhost:8080/api/auth/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const rawBody = await response.text();
+
+                    if (!response.ok) {
+                        let errMsg = 'Registration failed';
+                        try {
+                            const errJson = JSON.parse(rawBody);
+                            if (errJson.message) errMsg = errJson.message;
+                            if (errJson.error) errMsg = errJson.error;
+                        } catch (_) {
+                            if (rawBody) errMsg = rawBody;
+                        }
+
+                        messageEl.textContent = 'Error: ' + errMsg;
+                        messageEl.classList.remove('text-slate-300');
+                        messageEl.classList.add('text-red-400');
+                        return;
+                    }
+
+                    let data = null;
+                    try {
+                        data = JSON.parse(rawBody);
+                    } catch (_) {
+                        data = null;
+                    }
+
+                    if (data && data.token) {
+                        localStorage.setItem('unitalent_token', data.token);
+                    }
+
+                    messageEl.textContent = 'Registration successful! Redirecting...';
+                    messageEl.classList.remove('text-red-400');
+                    messageEl.classList.add('text-emerald-400');
+
+                    setTimeout(() => {
+                        window.location.href = 'student-dashboard.html';
+                    }, 800);
+                } catch (err) {
+                    console.error(err);
+                    messageEl.textContent = 'Network error. Check if backend is running.';
+                    messageEl.classList.remove('text-slate-300');
+                    messageEl.classList.add('text-red-400');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

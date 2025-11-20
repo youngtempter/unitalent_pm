@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <title>UniTalent – Employer Sign Up</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -17,12 +18,16 @@
             }
         }
     </script>
+    <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 </head>
 
 <body class="font-sans bg-slate-950 text-slate-100">
+    <!-- Background blobs -->
     <div class="pointer-events-none fixed inset-0 -z-10">
         <div class="absolute -top-40 -left-32 h-72 w-72 rounded-full bg-indigo-500/40 blur-3xl"></div>
         <div class="absolute top-40 -right-20 h-80 w-80 rounded-full bg-emerald-500/30 blur-3xl"></div>
@@ -42,7 +47,6 @@
                     <p class="text-[11px] text-slate-400">Student Career Platform</p>
                 </div>
             </a>
-
 
             <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
                 <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
@@ -73,7 +77,9 @@
     </header>
 
     <!-- MAIN -->
-    <main class="mx-auto flex min-h-[calc(100vh-72px-60px)] max-w-6xl flex-col items-center justify-center px-4 py-10">
+    <main
+        class="mx-auto flex min-h-[calc(100vh-72px-60px)] max-w-6xl flex-col items-center justify-center px-4 py-10">
+        <!-- Breadcrumb -->
         <div class="mb-6 w-full max-w-md text-xs text-slate-400">
             <a href="index.html" class="hover:text-indigo-300">Home</a>
             <span class="mx-1 text-slate-500">/</span>
@@ -92,18 +98,23 @@
                     Create your employer account
                 </h1>
                 <p class="mt-2 text-xs text-slate-400 sm:text-sm">
-                    Register your company to post internships and junior roles, and manage student applications.
-                    Backend verification and authentication will be added later.
+                    Register your company to post internships and junior roles. Your data will be verified
+                    and stored via UniTalent backend API.
                 </p>
 
-                <form action="employer-dashboard.html" method="get" class="mt-5 space-y-4 text-xs sm:text-sm">
+                <!-- ФОРМА: отправка на backend -->
+                <form id="employerSignupForm" class="mt-5 space-y-4 text-xs sm:text-sm">
                     <div class="grid gap-3 sm:grid-cols-2">
                         <div>
                             <label for="companyName" class="mb-1 block text-slate-200">Company name</label>
                             <input id="companyName" type="text" required placeholder="BrightCode"
                                 class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
                         </div>
-
+                        <div>
+                            <label for="bin" class="mb-1 block text-slate-200">BIN (БИН)</label>
+                            <input id="bin" type="text" required placeholder="123456789012"
+                                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
+                        </div>
                     </div>
 
                     <div class="grid gap-3 sm:grid-cols-2">
@@ -153,6 +164,9 @@
                             agree to the terms of UniTalent.
                         </label>
                     </div>
+
+                    <!-- Сообщение об ошибке / успехе -->
+                    <p id="empFormMessage" class="mt-1 text-[11px] sm:text-xs"></p>
 
                     <button type="submit"
                         class="mt-2 w-full rounded-full bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 sm:text-sm">
@@ -207,6 +221,7 @@
         </div>
     </main>
 
+    <!-- FOOTER -->
     <footer class="border-t border-slate-800 bg-slate-950/90">
         <div
             class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
@@ -218,6 +233,89 @@
             </div>
         </div>
     </footer>
+
+    <!-- JS: отправка формы на backend -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('employerSignupForm');
+            const messageEl = document.getElementById('empFormMessage');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                messageEl.textContent = '';
+                messageEl.className = 'mt-1 text-[11px] sm:text-xs';
+
+                const companyName = document.getElementById('companyName').value.trim();
+                const bin = document.getElementById('bin').value.trim();
+                const city = document.getElementById('city').value.trim();
+                const companySize = document.getElementById('companySize').value;
+                const email = document.getElementById('employerEmail').value.trim();
+                const password = document.getElementById('empPassword').value;
+                const password2 = document.getElementById('empPassword2').value;
+
+                if (password !== password2) {
+                    messageEl.textContent = 'Passwords do not match.';
+                    messageEl.classList.add('text-red-400');
+                    return;
+                }
+
+                if (bin.length !== 12) {
+                    messageEl.textContent = 'BIN should be 12 digits (demo validation).';
+                    messageEl.classList.add('text-red-400');
+                    return;
+                }
+
+                // 👇 Настрой эти поля под твой EmployerRegisterRequest DTO из Swagger
+                const payload = {
+                    companyName: companyName,
+                    bin: bin,
+                    city: city,
+                    companySize: companySize,
+                    email: email,
+                    password: password
+                };
+
+                try {
+                    messageEl.textContent = 'Creating employer account...';
+                    messageEl.classList.add('text-slate-300');
+
+                    // 👇 ПОМЕНЯЙ URL НА ТОТ, КОТОРЫЙ В SWAGGER
+                    const response = await fetch('http://localhost:8080/api/v1/auth/register-employer', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errText = await response.text().catch(() => '');
+                        messageEl.textContent = 'Error: ' + (errText || 'Registration failed');
+                        messageEl.classList.remove('text-slate-300');
+                        messageEl.classList.add('text-red-400');
+                        return;
+                    }
+
+                    // Если бэк возвращает токен/объект компании, можно сохранить токен в localStorage
+                    // const data = await response.json();
+                    // localStorage.setItem('token', data.token);
+
+                    messageEl.textContent = 'Employer registered successfully! Redirecting...';
+                    messageEl.classList.remove('text-red-400');
+                    messageEl.classList.add('text-emerald-400');
+
+                    setTimeout(() => {
+                        window.location.href = 'employer-dashboard.html';
+                    }, 800);
+                } catch (err) {
+                    console.error(err);
+                    messageEl.textContent = 'Network error. Check if backend is running and CORS is configured.';
+                    messageEl.classList.remove('text-slate-300');
+                    messageEl.classList.add('text-red-400');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
