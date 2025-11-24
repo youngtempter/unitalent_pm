@@ -23,6 +23,81 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('unitalent_token');
+
+    // Если не залогинен — на страницу логина
+    if (!token) {
+      window.location.href = 'student-login.html';
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:8080/api/students/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!res.ok) {
+        console.error('Failed to load profile', res.status);
+        // Если токен битый, выкидываем на логин
+        window.location.href = 'student-login.html';
+        return;
+      }
+
+      const data = await res.json();
+      // ожидаемый формат ответа:
+      // {
+      //   firstName, lastName, username, email,
+      //   university, major, yearOfStudy, headline ...
+      // }
+
+      const fullName = (data.firstName || '') + ' ' + (data.lastName || '');
+      const initials =
+        ((data.firstName || 'S')[0] || 'S').toUpperCase() +
+        ((data.lastName || 'T')[0] || 'T').toUpperCase();
+
+      // Заголовок "Welcome back"
+      const titleEl = document.getElementById('dashboard-title');
+      if (titleEl) {
+        titleEl.textContent = `Welcome back, ${data.firstName || 'Student'} 👋`;
+      }
+
+      // Пилюля в navbar
+      const pillEl = document.getElementById('nav-user-pill');
+      if (pillEl) {
+        pillEl.textContent = `${fullName || data.username || 'Student'} · Student`;
+      }
+
+      // Карточка профиля
+      const avatarEl = document.getElementById('profile-avatar-initials');
+      if (avatarEl) avatarEl.textContent = initials;
+
+      const line1El = document.getElementById('profile-line-1');
+      if (line1El) {
+        // Если с бэка придёт info — используй её, иначе простой текст
+        const year = data.yearOfStudy ? `${data.yearOfStudy} year` : 'Student';
+        const major = data.major || 'Information Systems';
+        line1El.textContent = `${year} · ${major}`;
+      }
+
+      const line2El = document.getElementById('profile-line-2');
+      if (line2El) {
+        const uni = data.university || 'SDU';
+        const headline = data.headline || 'Looking for internship';
+        line2El.textContent = `${uni} · ${headline}`;
+      }
+
+    } catch (err) {
+      console.error(err);
+      window.location.href = 'student-login.html';
+    }
+  });
+</script>
 
 <body class="font-sans bg-slate-950 text-slate-100">
   <!-- Background gradient blobs -->
@@ -59,10 +134,11 @@
       <!-- Auth buttons -->
       <div class="hidden items-center gap-3 md:flex">
         <span class="text-xs text-slate-400">Logged in as</span>
-        <span class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100">
-          Aruzhan · Student
+        <span id="nav-user-pill" class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100">
+          Loading...
         </span>
       </div>
+
 
       <!-- Mobile menu button (visual only) -->
       <button
@@ -90,23 +166,30 @@
     <section class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div class="space-y-1">
         <p class="text-xs text-slate-400">Student dashboard</p>
-        <h1 class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
-          Welcome back, Aruzhan 👋
+        <h1 id="dashboard-title" class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
+          Welcome back 👋
         </h1>
+
         <p class="text-sm text-slate-400">
           Here’s a snapshot of your applications and opportunities you might like.
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-3 text-xs">
         <div class="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2">
-          <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
-            AY
+          <div id="profile-avatar-initials"
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
+            ST
           </div>
           <div class="leading-tight">
-            <p class="font-semibold text-slate-100">2nd year · Computer Science</p>
-            <p class="text-[11px] text-slate-400">SDU · Looking for frontend internship</p>
+            <p id="profile-line-1" class="font-semibold text-slate-100">
+              Student · Major
+            </p>
+            <p id="profile-line-2" class="text-[11px] text-slate-400">
+              University · looking for...
+            </p>
           </div>
         </div>
+
         <button
           class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400">
           Edit profile
