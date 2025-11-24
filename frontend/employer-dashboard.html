@@ -46,7 +46,6 @@
         </div>
       </a>
 
-
       <!-- Desktop menu -->
       <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
         <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
@@ -59,7 +58,8 @@
       <!-- Employer identity -->
       <div class="hidden items-center gap-3 md:flex">
         <span class="text-xs text-slate-400">Logged in as</span>
-        <span class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100">
+        <span id="nav-employer-pill"
+          class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100">
           BrightCode · Employer
         </span>
       </div>
@@ -90,7 +90,7 @@
     <section class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div class="space-y-1">
         <p class="text-xs text-slate-400">Employer dashboard</p>
-        <h1 class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
+        <h1 id="employer-dashboard-title" class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
           Welcome, BrightCode 👋
         </h1>
         <p class="text-sm text-slate-400">
@@ -99,15 +99,18 @@
       </div>
       <div class="flex flex-wrap items-center gap-3 text-xs">
         <div class="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2">
-          <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
+          <div id="employer-avatar-initials"
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
             BC
           </div>
           <div class="leading-tight">
-            <p class="font-semibold text-slate-100">BrightCode</p>
-            <p class="text-[11px] text-slate-400">IT · Almaty · Hiring frontend interns</p>
+            <p id="employer-name-line" class="font-semibold text-slate-100">BrightCode</p>
+            <p id="employer-subtitle-line" class="text-[11px] text-slate-400">
+              IT · Almaty · Hiring frontend interns
+            </p>
           </div>
         </div>
-        <button
+        <button id="btn-edit-company"
           class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400">
           Edit company profile
         </button>
@@ -158,11 +161,11 @@
             </p>
           </div>
           <div class="flex flex-wrap gap-2 text-xs">
-            <button
+            <button id="btn-post-job"
               class="rounded-full bg-indigo-500 px-4 py-2 text-[11px] font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
               + Post new job
             </button>
-            <button
+            <button id="btn-view-all-applicants"
               class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400">
               View all applicants
             </button>
@@ -193,7 +196,9 @@
               </p>
               <p class="text-slate-400">3 in review · 1 shortlisted</p>
               <div class="mt-1 flex gap-2">
-                <button class="rounded-full bg-indigo-500 px-3 py-1.5 font-semibold text-white hover:bg-indigo-400">
+                <button
+                  class="js-view-applicants rounded-full bg-indigo-500 px-3 py-1.5 font-semibold text-white hover:bg-indigo-400"
+                  data-job-id="1">
                   View applicants
                 </button>
                 <button
@@ -225,7 +230,9 @@
               </p>
               <p class="text-slate-400">1 interview scheduled</p>
               <div class="mt-1 flex gap-2">
-                <button class="rounded-full bg-indigo-500 px-3 py-1.5 font-semibold text-white hover:bg-indigo-400">
+                <button
+                  class="js-view-applicants rounded-full bg-indigo-500 px-3 py-1.5 font-semibold text-white hover:bg-indigo-400"
+                  data-job-id="2">
                   View applicants
                 </button>
                 <button
@@ -315,7 +322,7 @@
               </div>
             </div>
           </div>
-          <button
+          <button id="btn-shortlist-candidate"
             class="mt-3 w-full rounded-full bg-indigo-500 px-4 py-2 text-[11px] font-semibold text-white hover:bg-indigo-400">
             Shortlist candidate
           </button>
@@ -378,6 +385,71 @@
       </div>
     </div>
   </footer>
+
+  <!-- JS: employer dashboard behaviour -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // токен работодателя (будет установлен на login)
+      const token = localStorage.getItem('unitalent_employer_token');
+
+      // Если хочешь жёстко кикать неавторизованных с дашборда – раскомментируй:
+      // if (!token) {
+      //   window.location.href = 'employer-login.html';
+      //   return;
+      // }
+
+      function notify(msg) {
+        alert(msg); // потом можно заменить на красивый toast
+      }
+
+      // + Post new job
+      const postBtn = document.getElementById('btn-post-job');
+      if (postBtn) {
+        postBtn.addEventListener('click', () => {
+          // здесь будет форма создания вакансии
+          window.location.href = 'employer-new-job.html';
+        });
+      }
+
+      // View all applicants
+      const allApplicantsBtn = document.getElementById('btn-view-all-applicants');
+      if (allApplicantsBtn) {
+        allApplicantsBtn.addEventListener('click', () => {
+          window.location.href = 'employer-applicants.html';
+        });
+      }
+
+      // View applicants for specific job
+      document.querySelectorAll('.js-view-applicants').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const jobId = btn.dataset.jobId;
+          if (!jobId) return;
+          window.location.href = `employer-applicants.html?jobId=${encodeURIComponent(jobId)}`;
+        });
+      });
+
+      // Shortlist candidate demo
+      const shortlistBtn = document.getElementById('btn-shortlist-candidate');
+      if (shortlistBtn) {
+        shortlistBtn.addEventListener('click', () => {
+          // здесь позже можно сделать POST на backend
+          notify('Candidate shortlisted (demo). Connect API позже.');
+        });
+      }
+
+      // Edit company profile demo
+      const editCompanyBtn = document.getElementById('btn-edit-company');
+      if (editCompanyBtn) {
+        editCompanyBtn.addEventListener('click', () => {
+          window.location.href = 'employer-profile.html';
+        });
+      }
+
+      // Если позже backend будет отдавать профиль работодателя,
+      // здесь можно сделать fetch('/api/employers/me') и обновить имя / аватар
+      // по аналогии со student-dashboard.
+    });
+  </script>
 </body>
 
 </html>

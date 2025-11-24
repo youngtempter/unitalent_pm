@@ -232,13 +232,16 @@
                 </div>
                 <div class="flex gap-2">
                   <a href="student-login.html"
-                    class="rounded-full bg-indigo-500 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-indigo-400">
+                    class="js-apply-btn rounded-full bg-indigo-500 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-indigo-400"
+                    data-job-id="1">
                     Apply now
                   </a>
                   <button
-                    class="rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1.5 text-[11px] text-slate-200 hover:border-indigo-400 hover:text-indigo-200">
+                    class="js-save-btn rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1.5 text-[11px] text-slate-200 hover:border-indigo-400 hover:text-indigo-200"
+                    data-job-id="1">
                     Save
                   </button>
+
                 </div>
               </div>
             </div>
@@ -553,6 +556,97 @@
       </div>
     </div>
   </footer>
+  ...
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800 bg-slate-950/90">
+    <!-- твой футер -->
+  </footer>
+
+  <!-- JS: Apply / Save with backend -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('unitalent_token'); // тот же, что ты ставишь при student-login
+
+      function showMessage(text) {
+        // пока просто alert, потом можно заменить на красивый toast
+        alert(text);
+      }
+
+      async function sendRequest(url, method = 'POST') {
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) {
+          headers['Authorization'] = 'Bearer ' + token;
+        }
+
+        const res = await fetch(url, {
+          method,
+          headers
+        });
+
+        if (!res.ok) {
+          const txt = await res.text().catch(() => '');
+          throw new Error(txt || ('Request failed with status ' + res.status));
+        }
+        return res;
+      }
+
+      // APPLY
+      document.querySelectorAll('.js-apply-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          // если нет токена — пусть идёт на student-login.html
+          if (!token) return;
+
+          e.preventDefault();
+          const jobId = btn.dataset.jobId;
+          if (!jobId) return;
+
+          try {
+            // 👇 ПОМЕНЯЙ URL НА СВОЙ ЭНДПОИНТ ИЗ SWAGGER
+            await sendRequest(`http://localhost:8080/api/jobs/${jobId}/apply`, 'POST');
+
+            btn.textContent = 'Applied';
+            btn.classList.remove('bg-indigo-500', 'hover:bg-indigo-400');
+            btn.classList.add('bg-emerald-500');
+            showMessage('Application sent successfully ✅');
+          } catch (err) {
+            console.error(err);
+            showMessage('Error while applying: ' + err.message);
+          }
+        });
+      });
+
+      // SAVE
+      document.querySelectorAll('.js-save-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!token) {
+            // можно тоже редиректить на логин, если хочешь
+            showMessage('Please log in to save jobs.');
+            return;
+          }
+
+          const jobId = btn.dataset.jobId;
+          if (!jobId) return;
+
+          try {
+            // 👇 ПОМЕНЯЙ URL НА СВОЙ ЭНДПОИНТ ИЗ SWAGGER
+            await sendRequest(`http://localhost:8080/api/jobs/${jobId}/save`, 'POST');
+
+            btn.textContent = 'Saved';
+            btn.classList.remove('border-slate-700');
+            btn.classList.add('border-emerald-400', 'text-emerald-300');
+            showMessage('Job saved to your list ⭐');
+          } catch (err) {
+            console.error(err);
+            showMessage('Error while saving job: ' + err.message);
+          }
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
+
 </body>
 
 </html>

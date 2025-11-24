@@ -1,0 +1,38 @@
+body {
+  position: relative;
+  overflow-x: hidden;
+  background: #020617; /* slate-950 */
+}
+
+.animated-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  background: radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
+  overflow: hidden;
+}
+
+.animated-bg::before {
+  content: "";
+  position: absolute;
+  left: -50%;
+  bottom: -40%;
+  width: 200%;
+  height: 200%;
+  background-image: radial-gradient(#64748b 1px, transparent 1px);
+  background-size: 26px 26px;
+  opacity: 0.6;
+  transform-origin: center;
+  transform: perspective(900px) rotateX(72deg) translateY(0);
+  animation: moveGrid 18s linear infinite;
+}
+
+@keyframes moveGrid {
+  0% {
+    transform: perspective(900px) rotateX(72deg) translateY(0);
+  }
+  100% {
+    transform: perspective(900px) rotateX(72deg) translateY(140px);
+  }
+}
