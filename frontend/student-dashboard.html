@@ -24,79 +24,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <script>
-  document.addEventListener('DOMContentLoaded', async () => {
+  document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('unitalent_token');
-    console.log('DASHBOARD TOKEN FROM LOCALSTORAGE:', token);
 
-    // 👇 ВРЕМЕННО не редиректим, если токена нет — чтобы увидеть, что происходит
+    // если нет токена — кидаем на логин
     if (!token) {
-      console.warn('No token found. Normally we would redirect to login.');
-      // window.location.href = 'student-login.html';
-      // return;
+      window.location.href = 'student-login.html';
+      return;
     }
 
-    try {
-      const headers = {
-        'Content-Type': 'application/json'
-      };
-      if (token) {
-        headers['Authorization'] = 'Bearer ' + token;
-      }
-
-      const res = await fetch('http://localhost:8080/api/students/me', {
-        method: 'GET',
-        headers
-      });
-
-      console.log('PROFILE STATUS:', res.status);
-
-      if (!res.ok) {
-        console.error('Failed to load profile', res.status);
-        // Здесь можно показать сообщение, а не сразу редиректить
-        return;
-      }
-
-      const data = await res.json();
-      console.log('PROFILE DATA:', data);
-
-      const fullName = (data.firstName || '') + ' ' + (data.lastName || '');
-      const initials =
-        ((data.firstName || 'S')[0] || 'S').toUpperCase() +
-        ((data.lastName || 'T')[0] || 'T').toUpperCase();
-
-      const titleEl = document.getElementById('dashboard-title');
-      if (titleEl) {
-        titleEl.textContent = `Welcome back, ${data.firstName || 'Student'} 👋`;
-      }
-
-      const pillEl = document.getElementById('nav-user-pill');
-      if (pillEl) {
-        pillEl.textContent = `${fullName || data.username || 'Student'} · Student`;
-      }
-
-      const avatarEl = document.getElementById('profile-avatar-initials');
-      if (avatarEl) avatarEl.textContent = initials;
-
-      const line1El = document.getElementById('profile-line-1');
-      if (line1El) {
-        const year = data.yearOfStudy ? `${data.yearOfStudy} year` : 'Student';
-        const major = data.major || 'Information Systems';
-        line1El.textContent = `${year} · ${major}`;
-      }
-
-      const line2El = document.getElementById('profile-line-2');
-      if (line2El) {
-        const uni = data.university || 'SDU';
-        const headline = data.headline || 'Looking for internship';
-        line2El.textContent = `${uni} · ${headline}`;
-      }
-
-    } catch (err) {
-      console.error('ERROR LOADING PROFILE:', err);
-      // window.location.href = 'student-login.html';
-    }
+    // пока ничего не грузим с бэка,
+    // просто оставляем "Welcome back" и статические данные
+    console.log('Token found, staying on dashboard');
   });
 </script>
+
 
 
 <body class="font-sans bg-slate-950 text-slate-100">
