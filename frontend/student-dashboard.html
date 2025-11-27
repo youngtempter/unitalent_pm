@@ -26,60 +26,59 @@
 <script>
   document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('unitalent_token');
+    console.log('DASHBOARD TOKEN FROM LOCALSTORAGE:', token);
 
-    // Если не залогинен — на страницу логина
+    // 👇 ВРЕМЕННО не редиректим, если токена нет — чтобы увидеть, что происходит
     if (!token) {
-      window.location.href = 'student-login.html';
-      return;
+      console.warn('No token found. Normally we would redirect to login.');
+      // window.location.href = 'student-login.html';
+      // return;
     }
 
     try {
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      if (token) {
+        headers['Authorization'] = 'Bearer ' + token;
+      }
+
       const res = await fetch('http://localhost:8080/api/students/me', {
         method: 'GET',
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Content-Type': 'application/json'
-        }
+        headers
       });
+
+      console.log('PROFILE STATUS:', res.status);
 
       if (!res.ok) {
         console.error('Failed to load profile', res.status);
-        // Если токен битый, выкидываем на логин
-        window.location.href = 'student-login.html';
+        // Здесь можно показать сообщение, а не сразу редиректить
         return;
       }
 
       const data = await res.json();
-      // ожидаемый формат ответа:
-      // {
-      //   firstName, lastName, username, email,
-      //   university, major, yearOfStudy, headline ...
-      // }
+      console.log('PROFILE DATA:', data);
 
       const fullName = (data.firstName || '') + ' ' + (data.lastName || '');
       const initials =
         ((data.firstName || 'S')[0] || 'S').toUpperCase() +
         ((data.lastName || 'T')[0] || 'T').toUpperCase();
 
-      // Заголовок "Welcome back"
       const titleEl = document.getElementById('dashboard-title');
       if (titleEl) {
         titleEl.textContent = `Welcome back, ${data.firstName || 'Student'} 👋`;
       }
 
-      // Пилюля в navbar
       const pillEl = document.getElementById('nav-user-pill');
       if (pillEl) {
         pillEl.textContent = `${fullName || data.username || 'Student'} · Student`;
       }
 
-      // Карточка профиля
       const avatarEl = document.getElementById('profile-avatar-initials');
       if (avatarEl) avatarEl.textContent = initials;
 
       const line1El = document.getElementById('profile-line-1');
       if (line1El) {
-        // Если с бэка придёт info — используй её, иначе простой текст
         const year = data.yearOfStudy ? `${data.yearOfStudy} year` : 'Student';
         const major = data.major || 'Information Systems';
         line1El.textContent = `${year} · ${major}`;
@@ -93,11 +92,12 @@
       }
 
     } catch (err) {
-      console.error(err);
-      window.location.href = 'student-login.html';
+      console.error('ERROR LOADING PROFILE:', err);
+      // window.location.href = 'student-login.html';
     }
   });
 </script>
+
 
 <body class="font-sans bg-slate-950 text-slate-100">
   <!-- Background gradient blobs -->

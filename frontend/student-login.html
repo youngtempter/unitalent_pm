@@ -8,89 +8,81 @@
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-          }
-        }
-      }
-    }
-  </script>
-  <!-- Google Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('studentLoginForm');
-    const messageEl = document.getElementById('loginMessage');
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('studentLoginForm');
+      const messageEl = document.getElementById('loginMessage');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      messageEl.textContent = 'Logging in...';
-      messageEl.className = 'mt-2 text-[11px] sm:text-xs text-slate-300';
+      form.addEventListener('submit', async (e) => {
+        console.log('SUBMIT WORKS');
+        e.preventDefault();
+        messageEl.textContent = 'Logging in...';
+        messageEl.className = 'mt-2 text-[11px] sm:text-xs text-slate-300';
 
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
 
-      const payload = { email, password };
+        const payload = { email, password };
 
-      try {
-        const res = await fetch('http://localhost:8080/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-
-        const rawBody = await res.text();
-
-        if (!res.ok) {
-          let errMsg = 'Login failed';
-          try {
-            const errJson = JSON.parse(rawBody);
-            if (errJson.message) errMsg = errJson.message;
-            if (errJson.error) errMsg = errJson.error;
-          } catch (_) {
-            if (rawBody) errMsg = rawBody;
-          }
-
-          messageEl.textContent = 'Error: ' + errMsg;
-          messageEl.className = 'mt-2 text-[11px] sm:text-xs text-red-400';
-          return;
-        }
-
-        let data = null;
         try {
-          data = JSON.parse(rawBody);
-        } catch (_) {
-          data = null;
+          const res = await fetch('http://localhost:8080/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await res.json().catch(() => null);
+
+          console.log('LOGIN STATUS:', res.status);
+          console.log('LOGIN DATA:', data);
+
+          if (!res.ok) {
+            let errMsg = 'Login failed';
+
+            if (data && typeof data === 'object') {
+              if (data.message) errMsg = data.message;
+              if (data.error) errMsg = data.error;
+            }
+
+            messageEl.textContent = 'Error: ' + errMsg;
+            messageEl.className = 'mt-2 text-[11px] sm:text-xs text-red-400';
+            return;
+          }
+
+          // 🔑 СЮДА ВАЖНО: подстраиваемся под имя поля с токеном
+          const token =
+            data?.token ||        // если бэк возвращает { "token": "..." }
+            data?.accessToken ||  // если { "accessToken": "..." }
+            data?.jwt ||          // если { "jwt": "..." }
+            null;
+
+          if (!token) {
+            messageEl.textContent = 'No token in response, check backend JSON.';
+            messageEl.className = 'mt-2 text-[11px] sm:text-xs text-red-400';
+            console.warn('LOGIN RESPONSE HAS NO TOKEN FIELD:', data);
+            return;
+          }
+
+          localStorage.setItem('unitalent_token', token);
+          console.log('TOKEN SAVED TO LOCALSTORAGE:', token);
+
+          messageEl.textContent = 'Login successful! Redirecting...';
+          messageEl.className = 'mt-2 text-[11px] sm:text-xs text-emerald-400';
+
+          setTimeout(() => {
+            window.location.href = 'student-dashboard.html';
+          }, 800);
+
+        } catch (err) {
+          console.error(err);
+          messageEl.textContent = 'Network error. Check if backend is running.';
+          messageEl.className = 'mt-2 text-[11px] sm:text-xs text-red-400';
         }
-
-        if (data && data.token) {
-          // сохраняем JWT так же, как при регистрации
-          localStorage.setItem('unitalent_token', data.token);
-        }
-
-        messageEl.textContent = 'Login successful! Redirecting...';
-        messageEl.className = 'mt-2 text-[11px] sm:text-xs text-emerald-400';
-
-        setTimeout(() => {
-          window.location.href = 'student-dashboard.html';
-        }, 800);
-
-      } catch (err) {
-        console.error(err);
-        messageEl.textContent = 'Network error. Check if backend is running.';
-        messageEl.className = 'mt-2 text-[11px] sm:text-xs text-red-400';
-      }
+      });
     });
-  });
-</script>
+  </script>
+
 
 
 <body class="font-sans bg-slate-950 text-slate-100">
