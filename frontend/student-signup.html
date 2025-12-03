@@ -2,299 +2,353 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <title>UniTalent – Student Sign Up</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    }
-                }
-            }
+  <meta charset="UTF-8" />
+  <title>UniTalent – Student Sign Up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
         }
-    </script>
-    <!-- Google Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+      }
+    }
+  </script>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Abstract animated background -->
+  <style>
+    body {
+      position: relative;
+      overflow-x: hidden;
+      background: #020617;
+    }
+
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      pointer-events: none;
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
+      overflow: hidden;
+    }
+
+    .animated-bg::before {
+      content: "";
+      position: absolute;
+      left: -50%;
+      bottom: -40%;
+      width: 200%;
+      height: 200%;
+      background-image: radial-gradient(#64748b 1px, transparent 1px);
+      background-size: 26px 26px;
+      opacity: 0.6;
+      transform-origin: center;
+      transform: perspective(900px) rotateX(72deg) translateY(0);
+      animation: moveGrid 18s linear infinite;
+    }
+
+    @keyframes moveGrid {
+      0% {
+        transform: perspective(900px) rotateX(72deg) translateY(0);
+      }
+
+      100% {
+        transform: perspective(900px) rotateX(72deg) translateY(140px);
+      }
+    }
+  </style>
 </head>
 
-<body class="font-sans bg-slate-950 text-slate-100">
-    <!-- Background blobs -->
-    <div class="pointer-events-none fixed inset-0 -z-10">
-        <div class="absolute -top-40 -left-32 h-72 w-72 rounded-full bg-indigo-500/40 blur-3xl"></div>
-        <div class="absolute top-40 -right-20 h-80 w-80 rounded-full bg-emerald-500/30 blur-3xl"></div>
+<body class="font-sans text-slate-100">
+  <!-- Abstract animated background -->
+  <div class="animated-bg"></div>
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-2">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
+          <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
+        </div>
+        <div class="leading-tight">
+          <p class="text-base font-semibold tracking-tight">UniTalent</p>
+          <p class="text-[11px] text-slate-400">Student Career Platform</p>
+        </div>
+      </a>
+
+      <!-- Desktop menu -->
+      <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
+        <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
+        <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
+        <a href="student-login.html" class="text-indigo-300">For students</a>
+        <a href="employer-login.html" class="hover:text-indigo-300">For employers</a>
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+      </div>
+
+      <!-- Auth buttons -->
+      <div class="hidden items-center gap-3 md:flex">
+        <a href="student-login.html" class="text-sm font-medium text-slate-200 hover:text-indigo-300">
+          Log in
+        </a>
+        <a href="student-signup.html"
+          class="rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
+          Sign up
+        </a>
+      </div>
+
+      <!-- Mobile menu button (visual only) -->
+      <button
+        class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
+        <span class="sr-only">Open menu</span>
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- MAIN -->
+  <main class="mx-auto flex min-h-[calc(100vh-72px-60px)] max-w-6xl flex-col items-center justify-center px-4 py-10">
+    <!-- Breadcrumb -->
+    <div class="mb-6 w-full max-w-md text-xs text-slate-400">
+      <a href="index.html" class="hover:text-indigo-300">Home</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <a href="student-login.html" class="hover:text-indigo-300">Student login</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <span class="text-slate-300">Sign up</span>
     </div>
 
-    <!-- NAVBAR -->
-    <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
-        <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
-            <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-2">
-                <div
-                    class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
-                    <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
-                </div>
-                <div class="leading-tight">
-                    <p class="text-base font-semibold tracking-tight">UniTalent</p>
-                    <p class="text-[11px] text-slate-400">Student Career Platform</p>
-                </div>
-            </a>
+    <div class="grid w-full max-w-4xl gap-10 md:grid-cols-[1.1fr,1fr] md:items-center">
+      <!-- Left: form -->
+      <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-slate-900/80">
+        <p class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
+          Student account
+        </p>
+        <h1 class="text-xl font-bold tracking-tight text-slate-50 sm:text-2xl">
+          Create your student profile
+        </h1>
+        <p class="mt-2 text-xs text-slate-400 sm:text-sm">
+          Start with basic details. You can add projects, skills and CV later in your dashboard.
+        </p>
 
-            <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
-                <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
-                <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
-                <a href="student-login.html" class="text-indigo-300">For students</a>
-                <a href="employer-login.html" class="hover:text-indigo-300">For employers</a>
+        <!-- FORM -->
+        <form id="studentSignupForm" class="mt-5 space-y-4 text-xs sm:text-sm">
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label for="firstName" class="mb-1 block text-slate-200">First name</label>
+              <input id="firstName" type="text" required placeholder="Aruzhan"
+                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
             </div>
-
-            <div class="hidden items-center gap-3 md:flex">
-                <a href="student-login.html" class="text-sm font-medium text-slate-200 hover:text-indigo-300">
-                    Log in
-                </a>
-                <a href="student-signup.html"
-                    class="rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
-                    Sign up
-                </a>
+            <div>
+              <label for="lastName" class="mb-1 block text-slate-200">Last name</label>
+              <input id="lastName" type="text" required placeholder="Yeskendir"
+                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
             </div>
+          </div>
 
-            <button
-                class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
-                <span class="sr-only">Open menu</span>
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                        d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
-        </nav>
-    </header>
+          <div>
+            <label for="username" class="mb-1 block text-slate-200">Username</label>
+            <input id="username" type="text" required placeholder="aruzhan.yeska"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
+          </div>
 
-    <!-- MAIN -->
-    <main class="mx-auto flex min-h-[calc(100vh-72px-60px)] max-w-6xl flex-col items-center justify-center px-4 py-10">
-        <!-- Breadcrumb -->
-        <div class="mb-6 w-full max-w-md text-xs text-slate-400">
-            <a href="index.html" class="hover:text-indigo-300">Home</a>
-            <span class="mx-1 text-slate-500">/</span>
-            <a href="student-login.html" class="hover:text-indigo-300">Student login</a>
-            <span class="mx-1 text-slate-500">/</span>
-            <span class="text-slate-300">Sign up</span>
-        </div>
+          <div>
+            <label for="studentEmail" class="mb-1 block text-slate-200">Email</label>
+            <input id="studentEmail" type="email" required placeholder="name@university.kz"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
+          </div>
 
-        <div class="grid w-full max-w-4xl gap-10 md:grid-cols-[1.1fr,1fr] md:items-center">
-            <!-- Left: form -->
-            <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-slate-900/80">
-                <p class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
-                    Student account
-                </p>
-                <h1 class="text-xl font-bold tracking-tight text-slate-50 sm:text-2xl">
-                    Create your student profile
-                </h1>
-                <p class="mt-2 text-xs text-slate-400 sm:text-sm">
-                    Sign up with your basic details. The form will send data to the UniTalent
-                    backend via API using <code>firstName, lastName, username, email, password</code>.
-                </p>
+          <div>
+            <label for="password" class="mb-1 block text-slate-200">Password</label>
+            <input id="password" type="password" required placeholder="••••••••"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
+          </div>
 
-                <!-- FORM (only fields needed for DTO) -->
-                <form id="studentSignupForm" class="mt-5 space-y-4 text-xs sm:text-sm">
-                    <div class="grid gap-3 sm:grid-cols-2">
-                        <div>
-                            <label for="firstName" class="mb-1 block text-slate-200">First name</label>
-                            <input id="firstName" type="text" required placeholder="Aruzhan"
-                                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                        </div>
-                        <div>
-                            <label for="lastName" class="mb-1 block text-slate-200">Last name</label>
-                            <input id="lastName" type="text" required placeholder="Yeskendir"
-                                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                        </div>
-                    </div>
+          <div class="flex items-start gap-2 text-[11px] text-slate-400 sm:text-xs">
+            <input id="agree" type="checkbox"
+              class="mt-[2px] h-3 w-3 rounded border-slate-600 bg-slate-900 text-indigo-500 focus:ring-indigo-500"
+              required />
+            <label for="agree">
+              I agree to the processing of my data and understand this is a demo version of UniTalent.
+            </label>
+          </div>
 
-                    <div>
-                        <label for="username" class="mb-1 block text-slate-200">Username</label>
-                        <input id="username" type="text" required placeholder="aruzhan.yeska"
-                            class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                    </div>
+          <!-- Messages -->
+          <p id="formMessage" class="mt-1 text-[11px] sm:text-xs"></p>
 
-                    <div>
-                        <label for="studentEmail" class="mb-1 block text-slate-200">Email</label>
-                        <input id="studentEmail" type="email" required placeholder="name@university.kz"
-                            class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                    </div>
+          <button type="submit"
+            class="mt-2 w-full rounded-full bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 sm:text-sm">
+            Sign up
+          </button>
 
-                    <div>
-                        <label for="password" class="mb-1 block text-slate-200">Password</label>
-                        <input id="password" type="password" required placeholder="••••••••"
-                            class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                    </div>
+          <p class="mt-3 text-[11px] text-slate-400 sm:text-xs">
+            Already have an account?
+            <a href="student-login.html" class="text-indigo-300 hover:text-indigo-200">Log in</a>
+          </p>
+        </form>
+      </div>
 
-                    <div class="flex items-start gap-2 text-[11px] text-slate-400 sm:text-xs">
-                        <input id="agree" type="checkbox"
-                            class="mt-[2px] h-3 w-3 rounded border-slate-600 bg-slate-900 text-indigo-500 focus:ring-indigo-500"
-                            required />
-                        <label for="agree">
-                            I agree to the processing of my data and understand this is a demo
-                            version of UniTalent.
-                        </label>
-                    </div>
-
-                    <!-- Messages -->
-                    <p id="formMessage" class="mt-1 text-[11px] sm:text-xs"></p>
-
-                    <button type="submit"
-                        class="mt-2 w-full rounded-full bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 sm:text-sm">
-                        Sign up
-                    </button>
-
-                    <p class="mt-3 text-[11px] text-slate-400 sm:text-xs">
-                        Already have an account?
-                        <a href="student-login.html" class="text-indigo-300 hover:text-indigo-200">Log in</a>
-                    </p>
-                </form>
-            </div>
-
-            <!-- Right: info -->
-            <div class="hidden flex-col gap-4 md:flex">
-                <div
-                    class="rounded-3xl border border-slate-800 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-950 p-5 shadow-xl shadow-indigo-500/30">
-                    <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-300">
-                        Why create a profile?
-                    </p>
-                    <h2 class="mt-2 text-sm font-semibold text-slate-50">
-                        Stand out to employers.
-                    </h2>
-                    <p class="mt-2 text-xs text-slate-200">
-                        Your UniTalent profile collects your studies, skills and projects in one place,
-                        so employers can quickly understand your potential.
-                    </p>
-                    <ul class="mt-3 space-y-1.5 text-xs text-slate-200">
-                        <li>• One profile → multiple applications.</li>
-                        <li>• Track where you’ve applied and your status.</li>
-                        <li>• Get recommendations based on your major and interests.</li>
-                    </ul>
-                </div>
-
-                <div
-                    class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-slate-900/70">
-                    <img src="https://images.pexels.com/photos/1181353/pexels-photo-1181353.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                        alt="Student working on laptop" class="h-40 w-full object-cover" />
-                    <div class="p-4 text-xs">
-                        <p class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
-                            Your first internship
-                        </p>
-                        <p class="mt-1 text-slate-200">
-                            Start building your experience while you study.
-                        </p>
-                        <p class="mt-1 text-slate-400">
-                            UniTalent focuses on internships and junior roles specifically for students and recent
-                            graduates.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="border-t border-slate-800 bg-slate-950/90">
+      <!-- Right: info -->
+      <div class="hidden flex-col gap-4 md:flex">
         <div
-            class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
-            <p>© 2025 UniTalent. All rights reserved.</p>
-            <div class="flex flex-wrap gap-4">
-                <a href="index.html#about" class="hover:text-indigo-300">About</a>
-                <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
-                <span>Terms · Privacy</span>
-            </div>
+          class="rounded-3xl border border-slate-800 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-950 p-5 shadow-xl shadow-indigo-500/30">
+          <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-300">
+            Why create a profile?
+          </p>
+          <h2 class="mt-2 text-sm font-semibold text-slate-50">
+            Show more than just grades.
+          </h2>
+          <p class="mt-2 text-xs text-slate-200">
+            Add your studies, skills and side projects in one place so employers see what you can really do.
+          </p>
+          <ul class="mt-3 space-y-1.5 text-xs text-slate-200">
+            <li>• One profile → multiple applications.</li>
+            <li>• Track every role you apply to.</li>
+            <li>• Get recommendations based on your interests.</li>
+          </ul>
         </div>
-    </footer>
 
-    <!-- JS: send form to backend with JWT handling -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('studentSignupForm');
-            const messageEl = document.getElementById('formMessage');
+        <div
+          class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-slate-900/70">
+          <img
+            src="https://images.pexels.com/photos/1181353/pexels-photo-1181353.jpeg?auto=compress&cs=tinysrgb&w=1200"
+            alt="Student working on laptop" class="h-40 w-full object-cover" />
+          <div class="p-4 text-xs">
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
+              Your first internship
+            </p>
+            <p class="mt-1 text-slate-200">
+              Start building experience while you study.
+            </p>
+            <p class="mt-1 text-slate-400">
+              UniTalent focuses on internships and junior roles tailored for students and recent graduates.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                messageEl.textContent = '';
-                messageEl.className = 'mt-1 text-[11px] sm:text-xs';
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800 bg-slate-950/90">
+    <div
+      class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
+      <p>© 2025 UniTalent. All rights reserved.</p>
+      <div class="flex flex-wrap gap-4">
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
+        <span>Terms · Privacy</span>
+      </div>
+    </div>
+  </footer>
 
-                const firstName = document.getElementById('firstName').value.trim();
-                const lastName = document.getElementById('lastName').value.trim();
-                const username = document.getElementById('username').value.trim();
-                const email = document.getElementById('studentEmail').value.trim();
-                const password = document.getElementById('password').value;
+  <!-- JS: send form to backend with JWT handling -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('studentSignupForm');
+      const messageEl = document.getElementById('formMessage');
 
-                // DTO exactly like in Swagger
-                const payload = {
-                    firstName: firstName,
-                    lastName: lastName,
-                    username: username,
-                    email: email,
-                    password: password
-                };
+      if (!form) return;
 
-                try {
-                    messageEl.textContent = 'Signing up...';
-                    messageEl.classList.add('text-slate-300');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        messageEl.textContent = '';
+        messageEl.className = 'mt-1 text-[11px] sm:text-xs';
 
-                    const response = await fetch('http://localhost:8080/api/auth/register', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    });
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const email = document.getElementById('studentEmail').value.trim();
+        const password = document.getElementById('password').value;
 
-                    const rawBody = await response.text();
+        // DTO exactly like in backend: firstName, lastName, username, email, password
+        const payload = {
+          firstName,
+          lastName,
+          username,
+          email,
+          password
+        };
 
-                    if (!response.ok) {
-                        let errMsg = 'Registration failed';
-                        try {
-                            const errJson = JSON.parse(rawBody);
-                            if (errJson.message) errMsg = errJson.message;
-                            if (errJson.error) errMsg = errJson.error;
-                        } catch (_) {
-                            if (rawBody) errMsg = rawBody;
-                        }
+        try {
+          messageEl.textContent = 'Creating your account...';
+          messageEl.classList.add('text-slate-300');
 
-                        messageEl.textContent = 'Error: ' + errMsg;
-                        messageEl.classList.remove('text-slate-300');
-                        messageEl.classList.add('text-red-400');
-                        return;
-                    }
+          const response = await fetch('http://localhost:8080/api/auth/register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
 
-                    let data = null;
-                    try {
-                        data = JSON.parse(rawBody);
-                    } catch (_) {
-                        data = null;
-                    }
+          const rawBody = await response.text();
 
-                    if (data && data.token) {
-                        localStorage.setItem('unitalent_token', data.token);
-                    }
+          if (!response.ok) {
+            let errMsg = 'Registration failed';
+            try {
+              const errJson = JSON.parse(rawBody);
+              if (errJson.message) errMsg = errJson.message;
+              if (errJson.error) errMsg = errJson.error;
+            } catch (_) {
+              if (rawBody) errMsg = rawBody;
+            }
 
-                    messageEl.textContent = 'Registration successful! Redirecting...';
-                    messageEl.classList.remove('text-red-400');
-                    messageEl.classList.add('text-emerald-400');
+            messageEl.textContent = 'Error: ' + errMsg;
+            messageEl.classList.remove('text-slate-300');
+            messageEl.classList.add('text-red-400');
+            return;
+          }
 
-                    setTimeout(() => {
-                        window.location.href = 'student-dashboard.html';
-                    }, 800);
-                } catch (err) {
-                    console.error(err);
-                    messageEl.textContent = 'Network error. Check if backend is running.';
-                    messageEl.classList.remove('text-slate-300');
-                    messageEl.classList.add('text-red-400');
-                }
-            });
-        });
-    </script>
+          let data = null;
+          try {
+            data = JSON.parse(rawBody);
+          } catch (_) {
+            data = null;
+          }
+
+          // если бэк вернёт токен
+          if (data && data.token) {
+            localStorage.setItem('unitalent_token', data.token);
+          }
+
+          // сохраним имя/почту для дашборда
+          if (firstName || lastName) {
+            localStorage.setItem('unitalent_student_name', `${firstName} ${lastName}`.trim());
+          }
+          if (email) {
+            localStorage.setItem('unitalent_student_email', email);
+          }
+
+          messageEl.textContent = 'Registration successful! Redirecting...';
+          messageEl.classList.remove('text-red-400');
+          messageEl.classList.add('text-emerald-400');
+
+          setTimeout(() => {
+            window.location.href = 'student-dashboard.html';
+          }, 800);
+        } catch (err) {
+          console.error(err);
+          messageEl.textContent = 'Network error. Check if backend is running.';
+          messageEl.classList.remove('text-slate-300');
+          messageEl.classList.add('text-red-400');
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

@@ -2,320 +2,366 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <title>UniTalent – Employer Sign Up</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    }
-                }
-            }
+  <meta charset="UTF-8" />
+  <title>UniTalent – Employer Sign Up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
         }
-    </script>
-    <!-- Google Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+      }
+    }
+  </script>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Abstract animated background -->
+  <style>
+    body {
+      position: relative;
+      overflow-x: hidden;
+      background: #020617;
+    }
+
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      pointer-events: none;
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
+      overflow: hidden;
+    }
+
+    .animated-bg::before {
+      content: "";
+      position: absolute;
+      left: -50%;
+      bottom: -40%;
+      width: 200%;
+      height: 200%;
+      background-image: radial-gradient(#64748b 1px, transparent 1px);
+      background-size: 26px 26px;
+      opacity: 0.6;
+      transform-origin: center;
+      transform: perspective(900px) rotateX(72deg) translateY(0);
+      animation: moveGrid 18s linear infinite;
+    }
+
+    @keyframes moveGrid {
+      0% {
+        transform: perspective(900px) rotateX(72deg) translateY(0);
+      }
+
+      100% {
+        transform: perspective(900px) rotateX(72deg) translateY(140px);
+      }
+    }
+  </style>
 </head>
 
-<body class="font-sans bg-slate-950 text-slate-100">
-    <!-- Background blobs -->
-    <div class="pointer-events-none fixed inset-0 -z-10">
-        <div class="absolute -top-40 -left-32 h-72 w-72 rounded-full bg-indigo-500/40 blur-3xl"></div>
-        <div class="absolute top-40 -right-20 h-80 w-80 rounded-full bg-emerald-500/30 blur-3xl"></div>
+<body class="font-sans text-slate-100">
+  <!-- Background -->
+  <div class="animated-bg"></div>
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-2">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
+          <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
+        </div>
+        <div class="leading-tight">
+          <p class="text-base font-semibold tracking-tight">UniTalent</p>
+          <p class="text-[11px] text-slate-400">Student Career Platform</p>
+        </div>
+      </a>
+
+      <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
+        <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
+        <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
+        <a href="student-login.html" class="hover:text-indigo-300">For students</a>
+        <a href="employer-login.html" class="text-indigo-300">For employers</a>
+      </div>
+
+      <div class="hidden items-center gap-3 md:flex">
+        <a href="employer-login.html" class="text-sm font-medium text-slate-200 hover:text-indigo-300">
+          Log in
+        </a>
+        <a href="employer-signup.html"
+          class="rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
+          Sign up
+        </a>
+      </div>
+
+      <button
+        class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
+        <span class="sr-only">Open menu</span>
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- MAIN -->
+  <main
+    class="mx-auto flex min-h-[calc(100vh-72px-60px)] max-w-6xl flex-col items-center justify-center px-4 py-10">
+    <!-- Breadcrumb -->
+    <div class="mb-6 w-full max-w-md text-xs text-slate-400">
+      <a href="index.html" class="hover:text-indigo-300">Home</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <a href="employer-login.html" class="hover:text-indigo-300">Employer login</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <span class="text-slate-300">Sign up</span>
     </div>
 
-    <!-- NAVBAR -->
-    <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
-        <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
-            <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-2">
-                <div
-                    class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
-                    <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
-                </div>
-                <div class="leading-tight">
-                    <p class="text-base font-semibold tracking-tight">UniTalent</p>
-                    <p class="text-[11px] text-slate-400">Student Career Platform</p>
-                </div>
-            </a>
+    <div class="grid w-full max-w-4xl gap-10 md:grid-cols-[1.1fr,1fr] md:items-center">
+      <!-- Left: form -->
+      <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-slate-900/80">
+        <p class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
+          Employer account
+        </p>
+        <h1 class="text-xl font-bold tracking-tight text-slate-50 sm:text-2xl">
+          Create your employer account
+        </h1>
+        <p class="mt-2 text-xs text-slate-400 sm:text-sm">
+          Register your company to post internships and junior roles, and manage applications in one dashboard.
+        </p>
 
-            <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
-                <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
-                <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
-                <a href="student-login.html" class="hover:text-indigo-300">For students</a>
-                <a href="employer-login.html" class="text-indigo-300">For employers</a>
+        <!-- FORM -->
+        <form id="employerSignupForm" class="mt-5 space-y-4 text-xs sm:text-sm">
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label for="companyName" class="mb-1 block text-slate-200">Company name</label>
+              <input id="companyName" type="text" required placeholder="BrightCode"
+                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
             </div>
-
-            <div class="hidden items-center gap-3 md:flex">
-                <a href="employer-login.html" class="text-sm font-medium text-slate-200 hover:text-indigo-300">
-                    Log in
-                </a>
-                <a href="employer-signup.html"
-                    class="rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
-                    Sign up
-                </a>
+            <div>
+              <label for="bin" class="mb-1 block text-slate-200">BIN (БИН)</label>
+              <input id="bin" type="text" required placeholder="123456789012"
+                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
             </div>
+          </div>
 
-            <button
-                class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
-                <span class="sr-only">Open menu</span>
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                        d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
-        </nav>
-    </header>
-
-    <!-- MAIN -->
-    <main
-        class="mx-auto flex min-h-[calc(100vh-72px-60px)] max-w-6xl flex-col items-center justify-center px-4 py-10">
-        <!-- Breadcrumb -->
-        <div class="mb-6 w-full max-w-md text-xs text-slate-400">
-            <a href="index.html" class="hover:text-indigo-300">Home</a>
-            <span class="mx-1 text-slate-500">/</span>
-            <a href="employer-login.html" class="hover:text-indigo-300">Employer login</a>
-            <span class="mx-1 text-slate-500">/</span>
-            <span class="text-slate-300">Sign up</span>
-        </div>
-
-        <div class="grid w-full max-w-4xl gap-10 md:grid-cols-[1.1fr,1fr] md:items-center">
-            <!-- Left: form -->
-            <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-slate-900/80">
-                <p class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
-                    Employer account
-                </p>
-                <h1 class="text-xl font-bold tracking-tight text-slate-50 sm:text-2xl">
-                    Create your employer account
-                </h1>
-                <p class="mt-2 text-xs text-slate-400 sm:text-sm">
-                    Register your company to post internships and junior roles. Your data will be verified
-                    and stored via UniTalent backend API.
-                </p>
-
-                <!-- ФОРМА: отправка на backend -->
-                <form id="employerSignupForm" class="mt-5 space-y-4 text-xs sm:text-sm">
-                    <div class="grid gap-3 sm:grid-cols-2">
-                        <div>
-                            <label for="companyName" class="mb-1 block text-slate-200">Company name</label>
-                            <input id="companyName" type="text" required placeholder="BrightCode"
-                                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                        </div>
-                        <div>
-                            <label for="bin" class="mb-1 block text-slate-200">BIN (БИН)</label>
-                            <input id="bin" type="text" required placeholder="123456789012"
-                                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                        </div>
-                    </div>
-
-                    <div class="grid gap-3 sm:grid-cols-2">
-                        <div>
-                            <label for="city" class="mb-1 block text-slate-200">City</label>
-                            <input id="city" type="text" placeholder="Almaty, Astana..."
-                                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                        </div>
-                        <div>
-                            <label for="companySize" class="mb-1 block text-slate-200">Company size</label>
-                            <select id="companySize"
-                                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 focus:outline-none sm:text-sm">
-                                <option value="">Select</option>
-                                <option>1–10 employees</option>
-                                <option>11–50</option>
-                                <option>51–200</option>
-                                <option>200+</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="employerEmail" class="mb-1 block text-slate-200">Work email</label>
-                        <input id="employerEmail" type="email" required placeholder="you@company.com"
-                            class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                    </div>
-
-                    <div class="grid gap-3 sm:grid-cols-2">
-                        <div>
-                            <label for="empPassword" class="mb-1 block text-slate-200">Password</label>
-                            <input id="empPassword" type="password" required placeholder="••••••••"
-                                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                        </div>
-                        <div>
-                            <label for="empPassword2" class="mb-1 block text-slate-200">Confirm password</label>
-                            <input id="empPassword2" type="password" required placeholder="••••••••"
-                                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-                        </div>
-                    </div>
-
-                    <div class="flex items-start gap-2 text-[11px] text-slate-400 sm:text-xs">
-                        <input id="empAgree" type="checkbox"
-                            class="mt-[2px] h-3 w-3 rounded border-slate-600 bg-slate-900 text-indigo-500 focus:ring-indigo-500"
-                            required />
-                        <label for="empAgree">
-                            I confirm that I am authorized to post roles on behalf of this company and
-                            agree to the terms of UniTalent.
-                        </label>
-                    </div>
-
-                    <!-- Сообщение об ошибке / успехе -->
-                    <p id="empFormMessage" class="mt-1 text-[11px] sm:text-xs"></p>
-
-                    <button type="submit"
-                        class="mt-2 w-full rounded-full bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 sm:text-sm">
-                        Sign up
-                    </button>
-
-                    <p class="mt-3 text-[11px] text-slate-400 sm:text-xs">
-                        Already registered?
-                        <a href="employer-login.html" class="text-indigo-300 hover:text-indigo-200">Log in</a>
-                    </p>
-                </form>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label for="city" class="mb-1 block text-slate-200">City</label>
+              <input id="city" type="text" placeholder="Almaty, Astana..."
+                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
             </div>
-
-            <!-- Right: info -->
-            <div class="hidden flex-col gap-4 md:flex">
-                <div
-                    class="rounded-3xl border border-slate-800 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-950 p-5 shadow-xl shadow-indigo-500/30">
-                    <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-300">
-                        Why hire through UniTalent?
-                    </p>
-                    <h2 class="mt-2 text-sm font-semibold text-slate-50">
-                        Build your student talent pipeline.
-                    </h2>
-                    <p class="mt-2 text-xs text-slate-200">
-                        Post internships and junior roles, and receive applications from verified students and recent
-                        graduates across multiple universities.
-                    </p>
-                    <ul class="mt-3 space-y-1.5 text-xs text-slate-200">
-                        <li>• Focused on early-career talent.</li>
-                        <li>• Structured student profiles for faster screening.</li>
-                        <li>• Central dashboard for all applications.</li>
-                    </ul>
-                </div>
-
-                <div
-                    class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-slate-900/70">
-                    <img src="https://images.pexels.com/photos/1181555/pexels-photo-1181555.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                        alt="Team interviewing student" class="h-40 w-full object-cover" />
-                    <div class="p-4 text-xs">
-                        <p class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
-                            Campus partnerships
-                        </p>
-                        <p class="mt-1 text-slate-200">
-                            Test potential hires early.
-                        </p>
-                        <p class="mt-1 text-slate-400">
-                            Use UniTalent to run internship programs and discover motivated students before graduation.
-                        </p>
-                    </div>
-                </div>
+            <div>
+              <label for="companySize" class="mb-1 block text-slate-200">Company size</label>
+              <select id="companySize"
+                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 focus:outline-none sm:text-sm">
+                <option value="">Select</option>
+                <option>1–10 employees</option>
+                <option>11–50</option>
+                <option>51–200</option>
+                <option>200+</option>
+              </select>
             </div>
-        </div>
-    </main>
+          </div>
 
-    <!-- FOOTER -->
-    <footer class="border-t border-slate-800 bg-slate-950/90">
+          <div>
+            <label for="employerEmail" class="mb-1 block text-slate-200">Work email</label>
+            <input id="employerEmail" type="email" required placeholder="you@company.com"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
+          </div>
+
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label for="empPassword" class="mb-1 block text-slate-200">Password</label>
+              <input id="empPassword" type="password" required placeholder="••••••••"
+                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
+            </div>
+            <div>
+              <label for="empPassword2" class="mb-1 block text-slate-200">Confirm password</label>
+              <input id="empPassword2" type="password" required placeholder="••••••••"
+                class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
+            </div>
+          </div>
+
+          <div class="flex items-start gap-2 text-[11px] text-slate-400 sm:text-xs">
+            <input id="empAgree" type="checkbox"
+              class="mt-[2px] h-3 w-3 rounded border-slate-600 bg-slate-900 text-indigo-500 focus:ring-indigo-500"
+              required />
+            <label for="empAgree">
+              I confirm that I am authorized to post roles on behalf of this company and agree to the UniTalent terms.
+            </label>
+          </div>
+
+          <!-- Message -->
+          <p id="empFormMessage" class="mt-1 text-[11px] sm:text-xs"></p>
+
+          <button type="submit"
+            class="mt-2 w-full rounded-full bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 sm:text-sm">
+            Sign up
+          </button>
+
+          <p class="mt-3 text-[11px] text-slate-400 sm:text-xs">
+            Already registered?
+            <a href="employer-login.html" class="text-indigo-300 hover:text-indigo-200">Log in</a>
+          </p>
+        </form>
+      </div>
+
+      <!-- Right: info -->
+      <div class="hidden flex-col gap-4 md:flex">
         <div
-            class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
-            <p>© 2025 UniTalent. All rights reserved.</p>
-            <div class="flex flex-wrap gap-4">
-                <a href="index.html#about" class="hover:text-indigo-300">About</a>
-                <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
-                <span>Terms · Privacy</span>
-            </div>
+          class="rounded-3xl border border-slate-800 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-950 p-5 shadow-xl shadow-indigo-500/30">
+          <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-300">
+            Why hire through UniTalent?
+          </p>
+          <h2 class="mt-2 text-sm font-semibold text-slate-50">
+            Build your student talent pipeline.
+          </h2>
+          <p class="mt-2 text-xs text-slate-200">
+            Post internships and junior roles, and receive applications from verified students and recent graduates
+            across multiple universities.
+          </p>
+          <ul class="mt-3 space-y-1.5 text-xs text-slate-200">
+            <li>• Focused on early-career talent.</li>
+            <li>• Structured student profiles for faster screening.</li>
+            <li>• Central dashboard for all applications.</li>
+          </ul>
         </div>
-    </footer>
 
-    <!-- JS: отправка формы на backend -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('employerSignupForm');
-            const messageEl = document.getElementById('empFormMessage');
+        <div
+          class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-slate-900/70">
+          <img
+            src="https://images.pexels.com/photos/1181555/pexels-photo-1181555.jpeg?auto=compress&cs=tinysrgb&w=1200"
+            alt="Team interviewing student" class="h-40 w-full object-cover" />
+          <div class="p-4 text-xs">
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
+              Campus partnerships
+            </p>
+            <p class="mt-1 text-slate-200">
+              Test potential hires early.
+            </p>
+            <p class="mt-1 text-slate-400">
+              Use UniTalent to run internship programs and discover motivated students before graduation.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                messageEl.textContent = '';
-                messageEl.className = 'mt-1 text-[11px] sm:text-xs';
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800 bg-slate-950/90">
+    <div
+      class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
+      <p>© 2025 UniTalent. All rights reserved.</p>
+      <div class="flex flex-wrap gap-4">
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
+        <span>Terms · Privacy</span>
+      </div>
+    </div>
+  </footer>
 
-                const companyName = document.getElementById('companyName').value.trim();
-                const bin = document.getElementById('bin').value.trim();
-                const city = document.getElementById('city').value.trim();
-                const companySize = document.getElementById('companySize').value;
-                const email = document.getElementById('employerEmail').value.trim();
-                const password = document.getElementById('empPassword').value;
-                const password2 = document.getElementById('empPassword2').value;
+  <!-- JS: отправка формы на backend -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('employerSignupForm');
+      const messageEl = document.getElementById('empFormMessage');
 
-                if (password !== password2) {
-                    messageEl.textContent = 'Passwords do not match.';
-                    messageEl.classList.add('text-red-400');
-                    return;
-                }
+      if (!form) return;
 
-                if (bin.length !== 12) {
-                    messageEl.textContent = 'BIN should be 12 digits (demo validation).';
-                    messageEl.classList.add('text-red-400');
-                    return;
-                }
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        messageEl.textContent = '';
+        messageEl.className = 'mt-1 text-[11px] sm:text-xs';
 
-                // 👇 Настрой эти поля под твой EmployerRegisterRequest DTO из Swagger
-                const payload = {
-                    companyName: companyName,
-                    bin: bin,
-                    city: city,
-                    companySize: companySize,
-                    email: email,
-                    password: password
-                };
+        const companyName = document.getElementById('companyName').value.trim();
+        const bin = document.getElementById('bin').value.trim();
+        const city = document.getElementById('city').value.trim();
+        const companySize = document.getElementById('companySize').value;
+        const email = document.getElementById('employerEmail').value.trim();
+        const password = document.getElementById('empPassword').value;
+        const password2 = document.getElementById('empPassword2').value;
 
-                try {
-                    messageEl.textContent = 'Creating employer account...';
-                    messageEl.classList.add('text-slate-300');
+        if (password !== password2) {
+          messageEl.textContent = 'Passwords do not match.';
+          messageEl.classList.add('text-red-400');
+          return;
+        }
 
-                    // 👇 ПОМЕНЯЙ URL НА ТОТ, КОТОРЫЙ В SWAGGER
-                    const response = await fetch('http://localhost:8080/api/v1/auth/register-employer', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    });
+        if (bin.length !== 12) {
+          messageEl.textContent = 'BIN should be 12 digits (demo validation).';
+          messageEl.classList.add('text-red-400');
+          return;
+        }
 
-                    if (!response.ok) {
-                        const errText = await response.text().catch(() => '');
-                        messageEl.textContent = 'Error: ' + (errText || 'Registration failed');
-                        messageEl.classList.remove('text-slate-300');
-                        messageEl.classList.add('text-red-400');
-                        return;
-                    }
+        const payload = {
+          companyName,
+          bin,
+          city,
+          companySize,
+          email,
+          password
+        };
 
-                    // Если бэк возвращает токен/объект компании, можно сохранить токен в localStorage
-                    // const data = await response.json();
-                    // localStorage.setItem('token', data.token);
+        try {
+          messageEl.textContent = 'Creating employer account...';
+          messageEl.classList.add('text-slate-300');
 
-                    messageEl.textContent = 'Employer registered successfully! Redirecting...';
-                    messageEl.classList.remove('text-red-400');
-                    messageEl.classList.add('text-emerald-400');
+          // 👇 ПОМЕНЯЙ URL НА ТОТ, КОТОРЫЙ В SWAGGER ЕСЛИ ДРУГОЙ
+          const response = await fetch('http://localhost:8080/api/v1/auth/register-employer', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
 
-                    setTimeout(() => {
-                        window.location.href = 'employer-dashboard.html';
-                    }, 800);
-                } catch (err) {
-                    console.error(err);
-                    messageEl.textContent = 'Network error. Check if backend is running and CORS is configured.';
-                    messageEl.classList.remove('text-slate-300');
-                    messageEl.classList.add('text-red-400');
-                }
-            });
-        });
-    </script>
+          const errText = await response.text().catch(() => '');
+
+          if (!response.ok) {
+            messageEl.textContent = 'Error: ' + (errText || 'Registration failed');
+            messageEl.classList.remove('text-slate-300');
+            messageEl.classList.add('text-red-400');
+            return;
+          }
+
+          // Можно сохранить имя / email для дашборда
+          if (companyName) {
+            localStorage.setItem('unitalent_employer_name', companyName);
+          } else if (email) {
+            localStorage.setItem('unitalent_employer_name', email);
+          }
+
+          messageEl.textContent = 'Employer registered successfully! Redirecting...';
+          messageEl.classList.remove('text-red-400');
+          messageEl.classList.add('text-emerald-400');
+
+          setTimeout(() => {
+            window.location.href = 'employer-dashboard.html';
+          }, 800);
+        } catch (err) {
+          console.error(err);
+          messageEl.textContent = 'Network error. Check if backend is running and CORS is configured.';
+          messageEl.classList.remove('text-slate-300');
+          messageEl.classList.add('text-red-400');
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

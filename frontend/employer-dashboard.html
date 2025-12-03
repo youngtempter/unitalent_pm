@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <title>UniTalent – Employer Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -18,18 +19,61 @@
       }
     }
   </script>
+
   <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Abstract animated background -->
+  <style>
+    body {
+      position: relative;
+      overflow-x: hidden;
+      background: #020617;
+    }
+
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      pointer-events: none;
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
+      overflow: hidden;
+    }
+
+    .animated-bg::before {
+      content: "";
+      position: absolute;
+      left: -50%;
+      bottom: -40%;
+      width: 200%;
+      height: 200%;
+      background-image: radial-gradient(#64748b 1px, transparent 1px);
+      background-size: 26px 26px;
+      opacity: 0.6;
+      transform-origin: center;
+      transform: perspective(900px) rotateX(72deg) translateY(0);
+      animation: moveGrid 18s linear infinite;
+    }
+
+    @keyframes moveGrid {
+      0% {
+        transform: perspective(900px) rotateX(72deg) translateY(0);
+      }
+
+      100% {
+        transform: perspective(900px) rotateX(72deg) translateY(140px);
+      }
+    }
+  </style>
 </head>
 
-<body class="font-sans bg-slate-950 text-slate-100">
-  <!-- Background gradient blobs -->
-  <div class="pointer-events-none fixed inset-0 -z-10">
-    <div class="absolute -top-40 -left-32 h-72 w-72 rounded-full bg-indigo-500/40 blur-3xl"></div>
-    <div class="absolute top-40 -right-20 h-80 w-80 rounded-full bg-emerald-500/30 blur-3xl"></div>
-  </div>
+<body class="font-sans text-slate-100">
+  <!-- Background -->
+  <div class="animated-bg"></div>
 
   <!-- NAVBAR -->
   <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
@@ -60,16 +104,18 @@
         <span class="text-xs text-slate-400">Logged in as</span>
         <span id="nav-employer-pill"
           class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100">
-          BrightCode · Employer
+          Employer · Company
         </span>
       </div>
 
-      <!-- Mobile menu button (visual only) -->
+      <!-- Mobile menu button -->
       <button
         class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
         <span class="sr-only">Open menu</span>
-        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
     </nav>
@@ -90,23 +136,27 @@
     <section class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div class="space-y-1">
         <p class="text-xs text-slate-400">Employer dashboard</p>
-        <h1 id="employer-dashboard-title" class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
-          Welcome, BrightCode 👋
+        <h1 id="employer-dashboard-title"
+          class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
+          Welcome, Employer 👋
         </h1>
         <p class="text-sm text-slate-400">
           Manage your job posts and review student applications in one place.
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-3 text-xs">
-        <div class="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2">
+        <div
+          class="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2">
           <div id="employer-avatar-initials"
             class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
-            BC
+            EM
           </div>
           <div class="leading-tight">
-            <p id="employer-name-line" class="font-semibold text-slate-100">BrightCode</p>
+            <p id="employer-name-line" class="font-semibold text-slate-100">
+              Your company
+            </p>
             <p id="employer-subtitle-line" class="text-[11px] text-slate-400">
-              IT · Almaty · Hiring frontend interns
+              City · hiring students and graduates
             </p>
           </div>
         </div>
@@ -276,7 +326,8 @@
         </div>
 
         <!-- Recent activity -->
-        <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
+        <div
+          class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
           <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-slate-50">Recent activity</h2>
             <span class="text-[11px] text-slate-400">Last 7 days</span>
@@ -294,7 +345,8 @@
       <!-- RIGHT: candidates & hiring tips -->
       <aside class="space-y-4">
         <!-- Candidate spotlight -->
-        <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
+        <div
+          class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
           <div class="flex items-center justify-between">
             <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
               Candidate spotlight
@@ -304,7 +356,8 @@
             </button>
           </div>
           <div class="mt-3 flex items-start gap-3">
-            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
+            <div
+              class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
               AY
             </div>
             <div class="space-y-1">
@@ -329,7 +382,8 @@
         </div>
 
         <!-- Simple funnel overview -->
-        <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
+        <div
+          class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
           <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
             Hiring funnel overview
           </p>
@@ -392,7 +446,7 @@
       // токен работодателя (будет установлен на login)
       const token = localStorage.getItem('unitalent_employer_token');
 
-      // Если хочешь жёстко кикать неавторизованных с дашборда – раскомментируй:
+      // Если хочешь жёстко кикать неавторизованных – раскомментируй:
       // if (!token) {
       //   window.location.href = 'employer-login.html';
       //   return;
@@ -402,11 +456,40 @@
         alert(msg); // потом можно заменить на красивый toast
       }
 
+      // Заполнить имя компании из localStorage (после login / signup)
+      const storedName = localStorage.getItem('unitalent_employer_name');
+      if (storedName) {
+        const pill = document.getElementById('nav-employer-pill');
+        const title = document.getElementById('employer-dashboard-title');
+        const nameLine = document.getElementById('employer-name-line');
+        const avatar = document.getElementById('employer-avatar-initials');
+
+        if (pill) pill.textContent = storedName + ' · Employer';
+        if (title) title.textContent = `Welcome, ${storedName} 👋`;
+        if (nameLine) nameLine.textContent = storedName;
+
+        if (avatar) {
+          const trimmed = storedName.trim();
+          let initials = 'EM';
+          if (trimmed.length > 0) {
+            const parts = trimmed.split(' ');
+            if (parts.length === 1) {
+              initials = parts[0].slice(0, 2).toUpperCase();
+            } else {
+              initials =
+                (parts[0][0] || '') +
+                (parts[1][0] || '');
+              initials = initials.toUpperCase();
+            }
+          }
+          avatar.textContent = initials;
+        }
+      }
+
       // + Post new job
       const postBtn = document.getElementById('btn-post-job');
       if (postBtn) {
         postBtn.addEventListener('click', () => {
-          // здесь будет форма создания вакансии
           window.location.href = 'employer-new-job.html';
         });
       }
@@ -433,11 +516,11 @@
       if (shortlistBtn) {
         shortlistBtn.addEventListener('click', () => {
           // здесь позже можно сделать POST на backend
-          notify('Candidate shortlisted (demo). Connect API позже.');
+          notify('Candidate shortlisted (demo). Connect API later.');
         });
       }
 
-      // Edit company profile demo
+      // Edit company profile
       const editCompanyBtn = document.getElementById('btn-edit-company');
       if (editCompanyBtn) {
         editCompanyBtn.addEventListener('click', () => {
@@ -446,8 +529,7 @@
       }
 
       // Если позже backend будет отдавать профиль работодателя,
-      // здесь можно сделать fetch('/api/employers/me') и обновить имя / аватар
-      // по аналогии со student-dashboard.
+      // можно сделать fetch('/api/employers/me') и обновить имя / аватар
     });
   </script>
 </body>

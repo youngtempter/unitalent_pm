@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <title>UniTalent – Employer Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -18,17 +19,60 @@
       }
     }
   </script>
+
   <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
 
-  <!-- 🔹 Наш внешний CSS с анимированным фоном -->
-  <link rel="stylesheet" href="employer-login.css">
+  <!-- Abstract animated background -->
+  <style>
+    body {
+      position: relative;
+      overflow-x: hidden;
+      background: #020617;
+    }
+
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      pointer-events: none;
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
+      overflow: hidden;
+    }
+
+    .animated-bg::before {
+      content: "";
+      position: absolute;
+      left: -50%;
+      bottom: -40%;
+      width: 200%;
+      height: 200%;
+      background-image: radial-gradient(#64748b 1px, transparent 1px);
+      background-size: 26px 26px;
+      opacity: 0.6;
+      transform-origin: center;
+      transform: perspective(900px) rotateX(72deg) translateY(0);
+      animation: moveGrid 18s linear infinite;
+    }
+
+    @keyframes moveGrid {
+      0% {
+        transform: perspective(900px) rotateX(72deg) translateY(0);
+      }
+
+      100% {
+        transform: perspective(900px) rotateX(72deg) translateY(140px);
+      }
+    }
+  </style>
 </head>
 
-<body class="font-sans bg-slate-950 text-slate-100">
-  <!-- 🔹 Animated background -->
+<body class="font-sans text-slate-100">
+  <!-- Animated background -->
   <div class="animated-bg"></div>
 
   <!-- NAVBAR -->
@@ -70,15 +114,18 @@
       <button
         class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
         <span class="sr-only">Open menu</span>
-        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
     </nav>
   </header>
 
   <!-- MAIN -->
-  <main class="mx-auto flex min-h-[calc(100vh-72px-60px)] max-w-6xl flex-col items-center justify-center px-4 py-10">
+  <main
+    class="mx-auto flex min-h-[calc(100vh-72px-60px)] max-w-6xl flex-col items-center justify-center px-4 py-10">
     <!-- Breadcrumb -->
     <div class="mb-6 w-full max-w-md text-xs text-slate-400">
       <a href="index.html" class="hover:text-indigo-300">Home</a>
@@ -97,14 +144,15 @@
           Log in to your employer account
         </h1>
         <p class="mt-2 text-xs text-slate-400 sm:text-sm">
-          Post internships and junior roles, review student profiles and manage applications.
+          Use your work email and password to manage job posts and review student applications.
         </p>
 
         <!-- Login form -->
         <form id="employer-login-form" method="post" class="mt-5 space-y-4 text-xs sm:text-sm">
           <div>
             <label for="companyEmail" class="mb-1 block text-slate-200">Work email</label>
-            <input id="companyEmail" name="email" type="email" required placeholder="you@company.com"
+            <input id="companyEmail" name="email" type="email" required
+              placeholder="you@company.com"
               class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
           </div>
 
@@ -115,7 +163,8 @@
                 Forgot password?
               </button>
             </div>
-            <input id="password" name="password" type="password" required placeholder="••••••••"
+            <input id="password" name="password" type="password" required
+              placeholder="••••••••"
               class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
           </div>
 
@@ -171,8 +220,10 @@
           </ul>
         </div>
 
-        <div class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-slate-900/70">
-          <img src="https://images.pexels.com/photos/1181352/pexels-photo-1181352.jpeg?auto=compress&cs=tinysrgb&w=1200"
+        <div
+          class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-slate-900/70">
+          <img
+            src="https://images.pexels.com/photos/1181352/pexels-photo-1181352.jpeg?auto=compress&cs=tinysrgb&w=1200"
             alt="Employer interviewing student" class="h-40 w-full object-cover" />
           <div class="p-4 text-xs">
             <p class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
@@ -182,7 +233,7 @@
               Build your student talent pipeline.
             </p>
             <p class="mt-1 text-slate-400">
-              Use UniTalent to test projects, internships and junior roles with students before full-time offers.
+              Use UniTalent to test internship and junior roles with students before full-time offers.
             </p>
           </div>
         </div>
@@ -231,32 +282,39 @@
         }
 
         try {
-          // TODO: поменяй URL и body под свой backend endpoint
           const response = await fetch('http://localhost:8080/api/auth/employer/login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-              email: email,
-              password: password
-            })
+            body: JSON.stringify({ email, password })
           });
+
+          const rawBody = await response.text();
 
           if (!response.ok) {
             if (errorBox) {
-              errorBox.textContent = 'Invalid email or password. Please try again.';
+              let err = 'Invalid email or password. Please try again.';
+              try {
+                const errJson = JSON.parse(rawBody);
+                if (errJson.message) err = errJson.message;
+                if (errJson.error) err = errJson.error;
+              } catch (_) { }
+              errorBox.textContent = err;
               errorBox.classList.remove('hidden');
             }
             return;
           }
 
-          const data = await response.json();
+          let data = null;
+          try {
+            data = JSON.parse(rawBody);
+          } catch (_) { }
 
-          if (data.token) {
+          if (data && data.token) {
             localStorage.setItem('unitalent_employer_token', data.token);
           }
-          if (data.companyName) {
+          if (data && data.companyName) {
             localStorage.setItem('unitalent_employer_name', data.companyName);
           } else {
             localStorage.setItem('unitalent_employer_name', email);

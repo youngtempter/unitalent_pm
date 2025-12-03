@@ -5,10 +5,245 @@
   <meta charset="UTF-8" />
   <title>UniTalent – Student Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Abstract animated background -->
+  <style>
+    body {
+      position: relative;
+      overflow-x: hidden;
+      background: #020617;
+    }
+
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      pointer-events: none;
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
+      overflow: hidden;
+    }
+
+    .animated-bg::before {
+      content: "";
+      position: absolute;
+      left: -50%;
+      bottom: -40%;
+      width: 200%;
+      height: 200%;
+      background-image: radial-gradient(#64748b 1px, transparent 1px);
+      background-size: 26px 26px;
+      opacity: 0.6;
+      transform-origin: center;
+      transform: perspective(900px) rotateX(72deg) translateY(0);
+      animation: moveGrid 18s linear infinite;
+    }
+
+    @keyframes moveGrid {
+      0% {
+        transform: perspective(900px) rotateX(72deg) translateY(0);
+      }
+
+      100% {
+        transform: perspective(900px) rotateX(72deg) translateY(140px);
+      }
+    }
+  </style>
+</head>
+
+<body class="font-sans text-slate-100">
+  <!-- Abstract animated background -->
+  <div class="animated-bg"></div>
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-2">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
+          <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
+        </div>
+        <div class="leading-tight">
+          <p class="text-base font-semibold tracking-tight">UniTalent</p>
+          <p class="text-[11px] text-slate-400">Student Career Platform</p>
+        </div>
+      </a>
+
+      <!-- Desktop menu -->
+      <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
+        <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
+        <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
+        <a href="student-login.html" class="text-indigo-300">For students</a>
+        <a href="employer-login.html" class="hover:text-indigo-300">For employers</a>
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+      </div>
+
+      <!-- Auth buttons -->
+      <div class="hidden items-center gap-3 md:flex">
+        <a href="student-login.html" class="text-sm font-medium text-indigo-300">
+          Log in
+        </a>
+        <a href="student-signup.html"
+          class="rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
+          Sign up
+        </a>
+      </div>
+
+      <!-- Mobile menu button (visual only) -->
+      <button
+        class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
+        <span class="sr-only">Open menu</span>
+        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- MAIN -->
+  <main class="mx-auto flex min-h-[calc(100vh-72px-60px)] max-w-6xl flex-col items-center justify-center px-4 py-10">
+    <!-- Breadcrumb -->
+    <div class="mb-6 w-full max-w-md text-xs text-slate-400">
+      <a href="index.html" class="hover:text-indigo-300">Home</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <span class="text-slate-300">Student login</span>
+    </div>
+
+    <!-- Card -->
+    <div class="grid w-full max-w-4xl gap-10 md:grid-cols-[1.1fr,1fr] md:items-center">
+      <!-- Left: form -->
+      <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-slate-900/80">
+        <p class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
+          Student access
+        </p>
+        <h1 class="text-xl font-bold tracking-tight text-slate-50 sm:text-2xl">
+          Log in to your account
+        </h1>
+        <p class="mt-2 text-xs text-slate-400 sm:text-sm">
+          Continue where you left off: applications, saved jobs, and profile.
+        </p>
+
+        <!-- Login form -->
+        <form id="studentLoginForm" class="mt-5 space-y-4 text-xs sm:text-sm">
+          <div>
+            <label for="email" class="mb-1 block text-slate-200">University email</label>
+            <input id="email" name="email" type="email" required placeholder="you@university.kz"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
+          </div>
+
+          <div>
+            <div class="mb-1 flex items-center justify-between">
+              <label for="password" class="text-slate-200">Password</label>
+              <button type="button" class="text-[11px] text-slate-400 hover:text-indigo-300">
+                Forgot password?
+              </button>
+            </div>
+            <input id="password" name="password" type="password" required placeholder="••••••••"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] text-slate-400 sm:text-xs">
+            <label class="inline-flex items-center gap-2">
+              <input type="checkbox"
+                class="h-3 w-3 rounded border-slate-600 bg-slate-900 text-indigo-500 focus:ring-indigo-500" />
+              <span>Keep me signed in</span>
+            </label>
+            <span>Student access only</span>
+          </div>
+
+          <button type="submit"
+            class="mt-2 w-full rounded-full bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 sm:text-sm">
+            Log in
+          </button>
+        </form>
+
+        <p id="loginMessage" class="mt-2 text-[11px] sm:text-xs text-slate-400"></p>
+
+        <!-- Sign-up link -->
+        <div class="mt-4 border-t border-slate-800 pt-4 text-[11px] text-slate-400 sm:text-xs">
+          <p>
+            Don’t have a student account yet?
+            <a href="student-signup.html" class="text-indigo-300 hover:text-indigo-200">
+              Sign up
+            </a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Right: info / illustration -->
+      <div class="hidden flex-col gap-4 md:flex">
+        <div
+          class="rounded-3xl border border-slate-800 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-950 p-5 shadow-xl shadow-indigo-500/30">
+          <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-300">
+            Why log in?
+          </p>
+          <h2 class="mt-2 text-sm font-semibold text-slate-50">
+            Keep all your job search in one place.
+          </h2>
+          <p class="mt-2 text-xs text-slate-200">
+            Save roles, track applications and update your profile whenever you learn something new.
+          </p>
+          <ul class="mt-3 space-y-1.5 text-xs text-slate-200">
+            <li>• One dashboard for all applications.</li>
+            <li>• Better recommendations over time.</li>
+            <li>• Fast access to saved jobs.</li>
+          </ul>
+        </div>
+
+        <div
+          class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-slate-900/70">
+          <img
+            src="https://images.pexels.com/photos/1181359/pexels-photo-1181359.jpeg?auto=compress&cs=tinysrgb&w=1200"
+            alt="Students studying together" class="h-40 w-full object-cover" />
+          <div class="p-4 text-xs">
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
+              UniTalent tip
+            </p>
+            <p class="mt-1 text-slate-200">
+              Spend a few minutes keeping your profile and CV updated.
+            </p>
+            <p class="mt-1 text-slate-400">
+              This small habit increases your chances of getting interview invites.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
   <!-- FOOTER -->
-  <footer>...</footer>
+  <footer class="border-t border-slate-800 bg-slate-950/90">
+    <div
+      class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
+      <p>© 2025 UniTalent. All rights reserved.</p>
+      <div class="flex flex-wrap gap-4">
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
+        <span>Terms · Privacy</span>
+      </div>
+    </div>
+  </footer>
 
   <!-- JS: login -->
   <script>
@@ -16,9 +251,10 @@
       const form = document.getElementById('studentLoginForm');
       const messageEl = document.getElementById('loginMessage');
 
+      if (!form) return;
+
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        console.log('SUBMIT WORKS');   // оставь временно
         messageEl.textContent = 'Logging in...';
         messageEl.className = 'mt-2 text-[11px] sm:text-xs text-slate-300';
 
@@ -59,6 +295,12 @@
           if (data && data.token) {
             localStorage.setItem('unitalent_token', data.token);
           }
+          if (data && data.studentName) {
+            localStorage.setItem('unitalent_student_name', data.studentName);
+          }
+          if (email) {
+            localStorage.setItem('unitalent_student_email', email);
+          }
 
           messageEl.textContent = 'Login successful! Redirecting...';
           messageEl.className = 'mt-2 text-[11px] sm:text-xs text-emerald-400';
@@ -74,190 +316,6 @@
       });
     });
   </script>
-  </body>
-
-</html>
-
-
-
-
-<body class="font-sans bg-slate-950 text-slate-100">
-  <!-- Background gradient blobs -->
-  <div class="pointer-events-none fixed inset-0 -z-10">
-    <div class="absolute -top-40 -left-32 h-72 w-72 rounded-full bg-indigo-500/40 blur-3xl"></div>
-    <div class="absolute top-40 -right-20 h-80 w-80 rounded-full bg-emerald-500/30 blur-3xl"></div>
-  </div>
-
-  <!-- NAVBAR -->
-  <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
-    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
-      <!-- Logo -->
-      <a href="index.html" class="flex items-center gap-2">
-        <div
-          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
-          <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
-        </div>
-        <div class="leading-tight">
-          <p class="text-base font-semibold tracking-tight">UniTalent</p>
-          <p class="text-[11px] text-slate-400">Student Career Platform</p>
-        </div>
-      </a>
-
-
-      <!-- Desktop menu -->
-      <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
-        <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
-        <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
-        <a href="student-login.html" class="text-indigo-300">For students</a>
-        <a href="employer-login.html" class="hover:text-indigo-300">For employers</a>
-        <a href="index.html#about" class="hover:text-indigo-300">About</a>
-      </div>
-
-      <!-- Auth buttons -->
-      <div class="hidden items-center gap-3 md:flex">
-        <a href="student-login.html" class="text-sm font-medium text-indigo-300">
-          Log in
-        </a>
-        <a href="student-signup.html"
-          class="rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
-          Sign up
-        </a>
-      </div>
-
-      <!-- Mobile menu button (visual only) -->
-      <button
-        class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
-        <span class="sr-only">Open menu</span>
-        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
-    </nav>
-  </header>
-
-  <!-- MAIN -->
-  <main class="mx-auto flex min-h-[calc(100vh-72px-60px)] max-w-6xl flex-col items-center justify-center px-4 py-10">
-    <!-- Breadcrumb -->
-    <div class="mb-6 w-full max-w-md text-xs text-slate-400">
-      <a href="index.html" class="hover:text-indigo-300">Home</a>
-      <span class="mx-1 text-slate-500">/</span>
-      <span class="text-slate-300">Student login</span>
-    </div>
-
-    <!-- Card -->
-    <div class="grid w-full max-w-4xl gap-10 md:grid-cols-[1.1fr,1fr] md:items-center">
-      <!-- Left: form -->
-      <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-slate-900/80">
-        <p class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
-          Student access
-        </p>
-        <h1 class="text-xl font-bold tracking-tight text-slate-50 sm:text-2xl">
-          Log in to your student account
-        </h1>
-        <p class="mt-2 text-xs text-slate-400 sm:text-sm">
-          Access your profile, saved jobs and applications. This is a UI mockup – backend login will be added later.
-        </p>
-
-        <!-- Login form -->
-        <form id="studentLoginForm" class="mt-5 space-y-4 text-xs sm:text-sm">
-          <div>
-            <label for="email" class="mb-1 block text-slate-200">University email</label>
-            <input id="email" name="email" type="email" required placeholder="you@university.kz"
-              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-          </div>
-
-          <div>
-            <div class="mb-1 flex items-center justify-between">
-              <label for="password" class="text-slate-200">Password</label>
-              <button type="button" class="text-[11px] text-slate-400 hover:text-indigo-300">
-                Forgot password?
-              </button>
-            </div>
-            <input id="password" name="password" type="password" required placeholder="••••••••"
-              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
-          </div>
-
-          <div class="flex items-center justify-between text-[11px] text-slate-400 sm:text-xs">
-            <label class="inline-flex items-center gap-2">
-              <input type="checkbox"
-                class="h-3 w-3 rounded border-slate-600 bg-slate-900 text-indigo-500 focus:ring-indigo-500" />
-              <span>Keep me signed in</span>
-            </label>
-            <span>Student access only</span>
-          </div>
-
-          <button type="submit"
-            class="mt-2 w-full rounded-full bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 sm:text-sm">
-            Log in
-          </button>
-        </form>
-
-        <p id="loginMessage" class="mt-2 text-[11px] sm:text-xs text-slate-400"></p>
-
-
-        <!-- 🔹 Updated block: sign-up link -->
-        <div class="mt-4 border-t border-slate-800 pt-4 text-[11px] text-slate-400 sm:text-xs">
-          <p>
-            Don’t have a student account yet?
-            <a href="student-signup.html" class="text-indigo-300 hover:text-indigo-200">
-              Sign up
-            </a>
-          </p>
-        </div>
-      </div>
-
-      <!-- Right: info / illustration -->
-      <div class="hidden flex-col gap-4 md:flex">
-        <div
-          class="rounded-3xl border border-slate-800 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-950 p-5 shadow-xl shadow-indigo-500/30">
-          <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-300">
-            Why create a profile?
-          </p>
-          <h2 class="mt-2 text-sm font-semibold text-slate-50">
-            Show more than just grades.
-          </h2>
-          <p class="mt-2 text-xs text-slate-200">
-            Add your skills, projects and internships in one place. Employers on UniTalent see what you can actually do,
-            not only your GPA.
-          </p>
-          <ul class="mt-3 space-y-1.5 text-xs text-slate-200">
-            <li>• Highlight course projects and hackathons.</li>
-            <li>• Track every application you send.</li>
-            <li>• Get ready for your first internship or junior role.</li>
-          </ul>
-        </div>
-
-        <div class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-slate-900/70">
-          <img src="https://images.pexels.com/photos/1181359/pexels-photo-1181359.jpeg?auto=compress&cs=tinysrgb&w=1200"
-            alt="Students studying together" class="h-40 w-full object-cover" />
-          <div class="p-4 text-xs">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
-              UniTalent tip
-            </p>
-            <p class="mt-1 text-slate-200">
-              Spend 10–15 minutes making your profile clean and complete.
-            </p>
-            <p class="mt-1 text-slate-400">
-              A strong profile can turn one application into multiple interview invites.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="border-t border-slate-800 bg-slate-950/90">
-    <div
-      class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
-      <p>© 2025 UniTalent. All rights reserved.</p>
-      <div class="flex flex-wrap gap-4">
-        <a href="index.html#about" class="hover:text-indigo-300">About</a>
-        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
-        <span>Terms · Privacy</span>
-      </div>
-    </div>
-  </footer>
 </body>
 
 </html>

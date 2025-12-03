@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <title>UniTalent – Student Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Tailwind CDN -->
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -18,40 +18,59 @@
       }
     }
   </script>
-  <!-- Google Font -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('unitalent_token');
 
-    // если нет токена — кидаем на логин
-    if (!token) {
-      window.location.href = 'student-login.html';
-      return;
+  <style>
+    body {
+      position: relative;
+      overflow-x: hidden;
+      background: #020617;
     }
 
-    // пока ничего не грузим с бэка,
-    // просто оставляем "Welcome back" и статические данные
-    console.log('Token found, staying on dashboard');
-  });
-</script>
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      pointer-events: none;
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
+      overflow: hidden;
+    }
 
+    .animated-bg::before {
+      content: "";
+      position: absolute;
+      left: -50%;
+      bottom: -40%;
+      width: 200%;
+      height: 200%;
+      background-image: radial-gradient(#64748b 1px, transparent 1px);
+      background-size: 26px 26px;
+      opacity: 0.6;
+      transform-origin: center;
+      transform: perspective(900px) rotateX(72deg) translateY(0);
+      animation: moveGrid 18s linear infinite;
+    }
 
+    @keyframes moveGrid {
+      0% {
+        transform: perspective(900px) rotateX(72deg) translateY(0);
+      }
 
-<body class="font-sans bg-slate-950 text-slate-100">
-  <!-- Background gradient blobs -->
-  <div class="pointer-events-none fixed inset-0 -z-10">
-    <div class="absolute -top-40 -left-32 h-72 w-72 rounded-full bg-indigo-500/40 blur-3xl"></div>
-    <div class="absolute top-40 -right-20 h-80 w-80 rounded-full bg-emerald-500/30 blur-3xl"></div>
-  </div>
+      100% {
+        transform: perspective(900px) rotateX(72deg) translateY(140px);
+      }
+    }
+  </style>
+</head>
 
-  <!-- NAVBAR -->
+<body class="font-sans text-slate-100">
+  <div class="animated-bg"></div>
+
   <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
     <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
-      <!-- Logo -->
       <a href="index.html" class="flex items-center gap-2">
         <div
           class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
@@ -63,8 +82,6 @@
         </div>
       </a>
 
-
-      <!-- Desktop menu -->
       <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
         <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
         <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
@@ -73,16 +90,13 @@
         <a href="index.html#about" class="hover:text-indigo-300">About</a>
       </div>
 
-      <!-- Auth buttons -->
       <div class="hidden items-center gap-3 md:flex">
         <span class="text-xs text-slate-400">Logged in as</span>
         <span id="nav-user-pill" class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100">
-          Loading...
+          Yeskendir
         </span>
       </div>
 
-
-      <!-- Mobile menu button (visual only) -->
       <button
         class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
         <span class="sr-only">Open menu</span>
@@ -93,9 +107,7 @@
     </nav>
   </header>
 
-  <!-- MAIN -->
   <main class="mx-auto max-w-6xl px-4 pb-16 pt-6 md:pt-8">
-    <!-- Breadcrumb -->
     <div class="mb-4 text-xs text-slate-400">
       <a href="index.html" class="hover:text-indigo-300">Home</a>
       <span class="mx-1 text-slate-500">/</span>
@@ -104,30 +116,29 @@
       <span class="text-slate-300">Dashboard</span>
     </div>
 
-    <!-- Header + profile summary -->
     <section class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div class="space-y-1">
         <p class="text-xs text-slate-400">Student dashboard</p>
         <h1 id="dashboard-title" class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
           Welcome back 👋
         </h1>
-
         <p class="text-sm text-slate-400">
-          Here’s a snapshot of your applications and opportunities you might like.
+          Quick view of your applications and suggested roles.
         </p>
       </div>
+
       <div class="flex flex-wrap items-center gap-3 text-xs">
         <div class="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2">
           <div id="profile-avatar-initials"
             class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
-            ST
+            YK
           </div>
           <div class="leading-tight">
             <p id="profile-line-1" class="font-semibold text-slate-100">
-              Student · Major
+              Yeskendir Kaldybek
             </p>
             <p id="profile-line-2" class="text-[11px] text-slate-400">
-              University · looking for...
+              Information Systems
             </p>
           </div>
         </div>
@@ -139,7 +150,6 @@
       </div>
     </section>
 
-    <!-- Stats -->
     <section class="mt-6 grid gap-4 text-xs md:grid-cols-3">
       <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
         <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
@@ -152,11 +162,11 @@
       </div>
       <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
         <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-          Interviews scheduled
+          Interviews
         </p>
         <p class="mt-2 text-2xl font-bold text-slate-50">1</p>
         <p class="mt-1 text-[11px] text-emerald-300">
-          Next: Thu, 16:00 · Online
+          Thu, 16:00 · Online
         </p>
       </div>
       <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
@@ -165,14 +175,12 @@
         </p>
         <p class="mt-2 text-2xl font-bold text-slate-50">7</p>
         <p class="mt-1 text-[11px] text-slate-400">
-          Try applying to at least 2 more this week.
+          Try applying to 2 more this week.
         </p>
       </div>
     </section>
 
-    <!-- Main content: applications + recommendations -->
     <section class="mt-8 grid gap-6 md:grid-cols-[minmax(0,1.6fr),minmax(0,1fr)]">
-      <!-- Left: My applications -->
       <div class="space-y-4">
         <div class="flex items-center justify-between">
           <h2 class="text-sm font-semibold text-slate-50">
@@ -183,10 +191,10 @@
           </a>
         </div>
 
-        <div class="space-y-3 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70">
-          <!-- Row 1 -->
+        <div
+          class="space-y-3 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
           <article
-            class="flex flex-col gap-3 border-b border-slate-800 pb-3 text-xs last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
+            class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
             <div>
               <p class="text-[11px] uppercase tracking-wide text-emerald-400">Applied</p>
               <h3 class="mt-1 text-sm font-semibold text-slate-50">
@@ -214,9 +222,8 @@
             </div>
           </article>
 
-          <!-- Row 2 -->
           <article
-            class="flex flex-col gap-3 border-b border-slate-800 pb-3 text-xs last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
+            class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
             <div>
               <p class="text-[11px] uppercase tracking-wide text-emerald-400">Interview</p>
               <h3 class="mt-1 text-sm font-semibold text-slate-50">
@@ -226,7 +233,7 @@
                 CampusLabs · Remote
               </p>
               <p class="mt-1 text-[11px] text-slate-300">
-                Interview scheduled · Thu, 16:00 (Zoom)
+                Thu, 16:00 (Zoom)
               </p>
               <div class="mt-1 flex flex-wrap gap-1 text-[10px] text-slate-300">
                 <span class="rounded-full bg-slate-800 px-2 py-0.5">Instagram</span>
@@ -244,9 +251,8 @@
             </div>
           </article>
 
-          <!-- Row 3 -->
           <article
-            class="flex flex-col gap-3 border-b border-slate-800 pb-3 text-xs last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
+            class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
             <div>
               <p class="text-[11px] uppercase tracking-wide text-slate-500">Closed</p>
               <h3 class="mt-1 text-sm font-semibold text-slate-50">
@@ -269,7 +275,6 @@
             </div>
           </article>
 
-          <!-- Row 4 -->
           <article class="flex flex-col gap-3 text-xs md:flex-row md:items-center md:justify-between">
             <div>
               <p class="text-[11px] uppercase tracking-wide text-emerald-400">Draft</p>
@@ -280,7 +285,7 @@
                 EduNext · Almaty · Hybrid
               </p>
               <p class="mt-1 text-[11px] text-slate-300">
-                You started an application but didn’t submit yet.
+                You started an application but haven’t submitted yet.
               </p>
             </div>
             <div class="flex flex-col items-end gap-1">
@@ -295,9 +300,7 @@
         </div>
       </div>
 
-      <!-- Right: recommended + profile completeness -->
       <aside class="space-y-4">
-        <!-- Profile completeness -->
         <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
           <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
             Profile completeness
@@ -305,10 +308,9 @@
           <div class="mt-3 flex items-center justify-between">
             <p class="text-sm font-semibold text-slate-50">70% complete</p>
             <span class="rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-200">
-              +30% for better matches
+              Finish to get better matches
             </span>
           </div>
-          <!-- Progress bar -->
           <div class="mt-3 h-1.5 rounded-full bg-slate-800">
             <div class="h-1.5 w-[70%] rounded-full bg-indigo-500"></div>
           </div>
@@ -336,7 +338,6 @@
           </button>
         </div>
 
-        <!-- Recommended jobs -->
         <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
           <div class="flex items-center justify-between">
             <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
@@ -348,7 +349,6 @@
           </div>
 
           <div class="mt-3 space-y-3">
-            <!-- Rec 1 -->
             <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
               <p class="text-[11px] uppercase tracking-wide text-emerald-400">Based on your skills</p>
               <h3 class="mt-1 text-sm font-semibold text-slate-50">
@@ -364,9 +364,8 @@
               </button>
             </article>
 
-            <!-- Rec 2 -->
             <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
-              <p class="text-[11px] uppercase tracking-wide text-slate-400">Because you saved 3 similar roles</p>
+              <p class="text-[11px] uppercase tracking-wide text-slate-400">Because you saved similar roles</p>
               <h3 class="mt-1 text-sm font-semibold text-slate-50">
                 Social Media & Content Intern
               </h3>
@@ -379,21 +378,186 @@
           </div>
         </div>
 
-        <!-- Small info card -->
         <div
           class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 text-xs text-slate-300 shadow-xl shadow-slate-900/70">
           <p class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
             Tip for this week
           </p>
           <p class="mt-1">
-            Choose 1–2 roles you really like and adapt your CV + profile description to match the requirements.
+            Pick 1–2 roles you really like and adjust your CV + profile to match the requirements.
           </p>
         </div>
       </aside>
     </section>
+
+    <section class="mt-10 grid gap-6 md:grid-cols-[minmax(0,1.4fr),minmax(0,1.1fr)]">
+      <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+              Weekly schedule
+            </p>
+            <p class="text-sm font-semibold text-slate-50">
+              2025–2026 · 1 term
+            </p>
+          </div>
+          <span class="rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-200">
+            Information Systems
+          </span>
+        </div>
+
+        <div class="mt-4 hidden text-[11px] text-slate-200 md:block">
+          <div
+            class="grid grid-cols-5 gap-2 border-b border-slate-800 pb-2 text-[10px] uppercase tracking-wide text-slate-400">
+            <span>Day</span>
+            <span>08:30–10:20</span>
+            <span>10:30–12:20</span>
+            <span>12:30–14:20</span>
+            <span>14:30–18:20</span>
+          </div>
+
+          <div class="grid grid-cols-5 gap-2 border-b border-slate-800 py-2">
+            <span class="font-semibold text-slate-100">Mon</span>
+            <span>
+              CSS 331 · Lecture<br />
+              <span class="text-slate-400">E221</span>
+            </span>
+            <span>
+              CSS 331 · Lab<br />
+              <span class="text-slate-400">E221</span>
+            </span>
+            <span>
+              MDE 132 · Turk. Lang<br />
+              <span class="text-slate-400">H 02</span>
+            </span>
+            <span>
+              MAT 151 · Lecture<br />
+              <span class="text-slate-400">D218</span>
+            </span>
+          </div>
+
+          <div class="grid grid-cols-5 gap-2 border-b border-slate-800 py-2">
+            <span class="font-semibold text-slate-100">Thu</span>
+            <span>
+              CSS 108 · Lecture<br />
+              <span class="text-slate-400">D116</span>
+            </span>
+            <span>
+              CSS 108 · Lab<br />
+              <span class="text-slate-400">D116</span>
+            </span>
+            <span>
+              MAT 137 · Practice<br />
+              <span class="text-slate-400">F305</span>
+            </span>
+            <span class="text-slate-500">—</span>
+          </div>
+
+          <div class="grid grid-cols-5 gap-2 py-2">
+            <span class="font-semibold text-slate-100">Fri</span>
+            <span>
+              MDE 191 · Lecture<br />
+              <span class="text-slate-400">E117</span>
+            </span>
+            <span>
+              MDE 191 · Practice<br />
+              <span class="text-slate-400">F204</span>
+            </span>
+            <span>
+              MAT 151 · Practice<br />
+              <span class="text-slate-400">F102</span>
+            </span>
+            <span class="text-slate-500">—</span>
+          </div>
+        </div>
+
+        <div class="mt-4 space-y-3 text-[11px] text-slate-200 md:hidden">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Mon</p>
+            <p>CSS 331 – E221 · morning</p>
+            <p>MDE 132 – H 02 · midday</p>
+            <p>MAT 151 – D218 · afternoon</p>
+          </div>
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Thu</p>
+            <p>CSS 108 – D116 · morning</p>
+            <p>MAT 137 – F305 · midday</p>
+          </div>
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Fri</p>
+            <p>MDE 191 – E117/F204 · morning</p>
+            <p>MAT 151 – F102 · afternoon</p>
+          </div>
+        </div>
+
+        <p class="mt-3 text-[11px] text-slate-400">
+          You can keep this section in sync with your AISU schedule – for now it’s a static preview.
+        </p>
+      </div>
+
+      <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+              Transcript
+            </p>
+            <p class="text-sm font-semibold text-slate-50">
+              Bachelor · Information Systems
+            </p>
+          </div>
+          <div class="text-right text-[11px] text-slate-300">
+            <p><span class="text-slate-400">GPA:</span> 2.88</p>
+            <p><span class="text-slate-400">Faculty:</span> School of Information Technology and Applied Mathematics</p>
+          </div>
+        </div>
+
+        <div class="mt-4 space-y-4">
+          <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
+            <div class="flex items-center justify-between">
+              <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                2023–2024 · Term 1
+              </p>
+              <span class="text-[11px] text-slate-400">GPA: 2.85</span>
+            </div>
+            <ul class="mt-2 space-y-1 text-[11px] text-slate-200">
+              <li><span class="font-semibold text-orange-300">CSS 105</span> – Fundamentals of Programming (D+)</li>
+              <li><span class="font-semibold">INF 106</span> – Information and Communication Technologies (B)</li>
+              <li><span class="font-semibold">MAT 156</span> – Discrete Mathematics (C+)</li>
+              <li><span class="font-semibold">MDE 131</span> – Turkish Language 1 (B+)</li>
+              <li><span class="font-semibold">MDE 171</span> – History of Kazakhstan (B+)</li>
+              <li><span class="font-semibold">MDE 190</span> – Foreign Language 1 (English, B1) (A-)</li>
+              <li><span class="font-semibold">MDE 291</span> – Physical Education 1 (A-)</li>
+            </ul>
+          </div>
+
+          <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
+            <div class="flex items-center justify-between">
+              <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                2023–2024 · Term 2
+              </p>
+              <span class="text-[11px] text-slate-400">GPA: 2.88</span>
+            </div>
+            <ul class="mt-2 space-y-1 text-[11px] text-slate-200">
+              <li><span class="font-semibold">CSS 108</span> – Programming Technologies & Practice (C+)</li>
+              <li><span class="font-semibold">CSS 331</span> – Operating Systems (C+)</li>
+              <li><span class="font-semibold">MAT 137</span> – Mathematics for IS 1 (B)</li>
+              <li><span class="font-semibold">MAT 151</span> – Linear Algebra (B)</li>
+              <li><span class="font-semibold">MDE 132</span> – Turkish Language 2 (A1) (B)</li>
+              <li><span class="font-semibold">MDE 170</span> – Community engagement (Pass)</li>
+              <li><span class="font-semibold">MDE 191</span> – Foreign Language 2 (English B1+) (A-)</li>
+              <li><span class="font-semibold">MDE 292</span> – Physical Education 2 (B+)</li>
+            </ul>
+          </div>
+        </div>
+
+        <p class="mt-3 text-[11px] text-slate-400">
+          This block is based on your current transcript. In the real app it can be synced with the
+          university system or uploaded as PDF.
+        </p>
+      </div>
+    </section>
   </main>
 
-  <!-- FOOTER -->
   <footer class="border-t border-slate-800 bg-slate-950/90">
     <div
       class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
@@ -405,6 +569,63 @@
       </div>
     </div>
   </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ⚠️ DEMO-MODE logic
+      // We set the user details to Yeskendir Kaldybek by default for this view
+
+      const token = localStorage.getItem('unitalent_token') || 'demo-token';
+
+      const dashboardTitle = document.getElementById('dashboard-title');
+      const navUserPill = document.getElementById('nav-user-pill');
+      const avatarInitials = document.getElementById('profile-avatar-initials');
+      const profileLine1 = document.getElementById('profile-line-1');
+      const profileLine2 = document.getElementById('profile-line-2');
+
+      // Use specific data from the image unless localStorage has an overwrite
+      const storedName = localStorage.getItem('unitalent_student_name');
+      const storedEmail = localStorage.getItem('unitalent_student_email');
+      const storedMajor = localStorage.getItem('unitalent_student_major');
+
+      // Defaults based on the provided Transcript Image
+      const defaultName = 'Yeskendir Kaldybek';
+      const defaultMajor = 'Information Systems';
+      const defaultEmail = '230103282@stu.sdu.edu.kz'; // Inferred from ID, generic format
+
+      const displayName = storedName && storedName.trim() ? storedName : defaultName;
+      const displayMajor = storedMajor || defaultMajor;
+
+      if (dashboardTitle) {
+        dashboardTitle.textContent = `Welcome back, ${displayName} 👋`;
+      }
+
+      if (navUserPill) {
+        navUserPill.textContent = displayName;
+      }
+
+      if (avatarInitials) {
+        const initials = displayName.split(' ')
+          .filter(Boolean)
+          .map(part => part[0])
+          .join('')
+          .slice(0, 2)
+          .toUpperCase();
+        avatarInitials.textContent = initials || 'YK';
+      }
+
+      if (profileLine1) {
+        profileLine1.textContent = displayName;
+      }
+
+      if (profileLine2) {
+        profileLine2.textContent = displayMajor;
+      }
+
+      console.log('Student dashboard loaded with Transcript data.');
+    });
+  </script>
+
 </body>
 
 </html>
