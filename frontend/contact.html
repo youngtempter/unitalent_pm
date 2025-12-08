@@ -162,8 +162,8 @@
 
           <p id="contactMessageEl" class="text-[11px]"></p>
 
-          <button type="submit"
-            class="w-full rounded-full bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 disabled:cursor-not-allowed disabled:bg-slate-700">
+          <button type="submit" id="contactSubmitBtn"
+            class="w-full rounded-full bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:opacity-50">
             Send message
           </button>
         </form>
@@ -183,13 +183,51 @@
     </div>
   </footer>
 
+  <!-- Contact Form Script - Must run before auth.js -->
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const API = "http://localhost:3000";
+    (function() {
+      'use strict';
+      
+      // Immediate test - this should always show in console
+      console.log("✅ Contact page script loaded");
+      
+      // Test if DOM is ready
+      if (document.readyState === 'loading') {
+        console.log("⏳ DOM is still loading, waiting for DOMContentLoaded");
+      } else {
+        console.log("✅ DOM already loaded");
+      }
+      
+      function initContactForm() {
+        console.log("🚀 initContactForm called");
+        
+        try {
+          const API = "http://localhost:3000";
       const form = document.getElementById("contactForm");
       const messageEl = document.getElementById("contactMessageEl");
       const emailHint = document.getElementById("contactEmailHint");
-      const submitBtn = form?.querySelector('button[type="submit"]');
+      const submitBtn = document.getElementById("contactSubmitBtn");
+      
+      console.log("Elements found:", {
+        form: !!form,
+        messageEl: !!messageEl,
+        emailHint: !!emailHint,
+        submitBtn: !!submitBtn
+      });
+      
+      if (!form) {
+        alert("ERROR: Contact form not found! Check console.");
+        console.error("Contact form element not found!");
+        return;
+      }
+      
+      if (!submitBtn) {
+        alert("ERROR: Submit button not found! Check console.");
+        console.error("Submit button not found!");
+        return;
+      }
+      
+      console.log("All elements found, initializing form...");
 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const detectEmailDomainTypo = (email = "") => {
@@ -231,7 +269,15 @@
         const msg = document.getElementById("contactMessage")?.value.trim() || "";
         // Name must be at least 2 chars, email valid format, message at least 10 chars
         const valid = name.length >= 2 && emailRegex.test(email) && msg.length >= 10;
-        if (submitBtn) submitBtn.disabled = !valid;
+        if (submitBtn) {
+          submitBtn.disabled = !valid;
+          // Update button appearance based on state
+          if (valid) {
+            submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
+          } else {
+            submitBtn.classList.add("opacity-50");
+          }
+        }
         return { name, email, msg, valid };
       };
 
@@ -247,37 +293,51 @@
 
       validate();
 
-      if (!form) return;
-
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+      // Handle form submission
+      const handleSubmit = async (e) => {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        
+        console.log("Form submit triggered");
+        
         const { name, email, msg, valid } = validate();
         showEmailHint(email);
         
         // Frontend validation
         if (!name || name.length < 2) {
           setMsg("err", "Name must be at least 2 characters.");
+          if (submitBtn) submitBtn.disabled = false;
           return;
         }
         
         if (!email || !emailRegex.test(email)) {
           setMsg("err", "Please enter a valid email address.");
+          if (submitBtn) submitBtn.disabled = false;
           return;
         }
         
         if (!msg || msg.length < 10) {
           setMsg("err", "Message must be at least 10 characters.");
+          if (submitBtn) submitBtn.disabled = false;
           return;
         }
 
         if (!valid) {
           setMsg("err", "Please fill all fields correctly.");
+          if (submitBtn) submitBtn.disabled = false;
           return;
         }
+        
+        console.log("Validation passed, sending request...", { name, email, messageLength: msg.length });
 
         try {
           setMsg("info", "Sending...");
-          if (submitBtn) submitBtn.disabled = true;
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Sending...";
+          }
           
           const res = await fetch(`${API}/api/contact`, {
             method: "POST",
@@ -285,11 +345,22 @@
             body: JSON.stringify({ name, email, message: msg })
           });
           
-          const data = await res.json().catch(() => ({}));
+          let data = {};
+          try {
+            const text = await res.text();
+            data = text ? JSON.parse(text) : {};
+          } catch (parseErr) {
+            console.error("Failed to parse response:", parseErr);
+            data = { message: "Invalid response from server" };
+          }
           
           if (!res.ok) {
-            setMsg("err", data?.message || "Failed to send message.");
-            if (submitBtn) submitBtn.disabled = false;
+            const errorMsg = data?.message || `Server error (${res.status}). Please try again.`;
+            setMsg("err", errorMsg);
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = "Send message";
+            }
             return;
           }
           
@@ -297,14 +368,76 @@
           setMsg("ok", "Thanks! We received your message. We'll get back to you soon.");
           form.reset();
           validate();
+          if (submitBtn) {
+            submitBtn.textContent = "Send message";
+          }
         } catch (err) {
-          console.error(err);
+          console.error("Contact form submission error:", err);
           setMsg("err", "Network error. Please check your connection and try again.");
+          if (submitBtn) {
+            submitBtn.textContent = "Send message";
+          }
         } finally {
           if (submitBtn) submitBtn.disabled = false;
         }
+      };
+
+      // Attach form submit handler
+      form.addEventListener("submit", handleSubmit);
+      
+      // Also attach click handler to button as fallback
+      if (submitBtn) {
+        submitBtn.addEventListener("click", (e) => {
+          console.log("Button clicked!", { disabled: submitBtn.disabled });
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Force enable if somehow disabled
+          if (submitBtn.disabled) {
+            console.warn("Button was disabled, but click detected. Enabling and proceeding...");
+            submitBtn.disabled = false;
+          }
+          
+          handleSubmit(e);
+        });
+        
+        // Test: Add a simple alert on first click to verify button works
+        let clickTestDone = false;
+        const originalClick = submitBtn.onclick;
+        submitBtn.addEventListener("click", () => {
+          if (!clickTestDone) {
+            console.log("✅ Button click is working!");
+            clickTestDone = true;
+          }
+        }, { once: true });
+      }
+      
+      console.log("✅ Contact form fully initialized and ready!");
+        } catch (error) {
+          console.error("❌ Error initializing contact form:", error);
+          alert("Error initializing contact form. Check console for details.");
+        }
+      }
+      
+      // Try multiple ways to ensure script runs
+      if (document.readyState === 'loading') {
+        document.addEventListener("DOMContentLoaded", initContactForm);
+      } else {
+        // DOM already loaded
+        setTimeout(initContactForm, 0);
+      }
+      
+      // Also try on window load as fallback
+      window.addEventListener("load", () => {
+        console.log("📦 Window loaded, checking if form initialized...");
+        const form = document.getElementById("contactForm");
+        if (form && !form.hasAttribute("data-initialized")) {
+          console.log("🔄 Form not initialized yet, initializing now...");
+          form.setAttribute("data-initialized", "true");
+          initContactForm();
+        }
       });
-    });
+    })();
   </script>
 
   <script type="module" src="js/auth.js"></script>
