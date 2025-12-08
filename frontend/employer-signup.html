@@ -177,6 +177,7 @@
             <label for="employerEmail" class="mb-1 block text-slate-200">Work email</label>
             <input id="employerEmail" type="email" required placeholder="you@company.com"
               class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
+            <p id="employerEmailHint" class="mt-1 text-[11px] text-slate-400 sm:text-xs"></p>
           </div>
 
           <div class="grid gap-3 sm:grid-cols-2">
@@ -184,6 +185,9 @@
               <label for="empPassword" class="mb-1 block text-slate-200">Password</label>
               <input id="empPassword" type="password" required placeholder="••••••••"
                 class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
+              <p class="mt-1 text-[11px] text-slate-500 sm:text-xs">
+                At least 8 chars, incl. uppercase, lowercase, and a number.
+              </p>
             </div>
             <div>
               <label for="empPassword2" class="mb-1 block text-slate-200">Confirm password</label>
@@ -263,7 +267,7 @@
       <p>© 2025 UniTalent. All rights reserved.</p>
       <div class="flex flex-wrap gap-4">
         <a href="index.html#about" class="hover:text-indigo-300">About</a>
-        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
+        <a href="contact.html" class="hover:text-indigo-300">Contact</a>
         <span>Terms · Privacy</span>
       </div>
     </div>
@@ -276,6 +280,7 @@
 
       const form = document.getElementById('employerSignupForm');
       const messageEl = document.getElementById('empFormMessage');
+      const emailHint = document.getElementById('employerEmailHint');
 
       // optional UI elements (safe if not exist)
       const submitBtn =
@@ -334,6 +339,67 @@
         else messageEl.classList.add('text-slate-300');
       }
 
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const isStrongPassword = (pwd = "") =>
+        pwd.length >= 8 &&
+        /[A-Z]/.test(pwd) &&
+        /[a-z]/.test(pwd) &&
+        /[0-9]/.test(pwd);
+
+      const detectEmailDomainTypo = (email = "") => {
+        const typoMap = {
+          "gmai.com": "gmail.com",
+          "gmial.com": "gmail.com",
+          "gmail.con": "gmail.com",
+          "gmaill.com": "gmail.com",
+        };
+        const [, domain = ""] = String(email).split("@");
+        const suggestion = typoMap[domain.toLowerCase()];
+        return suggestion || null;
+      };
+
+      const showEmailHint = (email) => {
+        if (!emailHint) return;
+        const suggestion = detectEmailDomainTypo(email);
+        if (suggestion) {
+          emailHint.textContent = `Did you mean gmail.com?`;
+          emailHint.className = "mt-1 text-[11px] text-amber-300 sm:text-xs";
+        } else {
+          emailHint.textContent = "";
+          emailHint.className = "mt-1 text-[11px] text-slate-400 sm:text-xs";
+        }
+      };
+
+      const validateFormFields = () => {
+        const emailVal = document.getElementById('employerEmail')?.value.trim() || '';
+        const pwd = document.getElementById('empPassword')?.value || '';
+        const pwd2 = document.getElementById('empPassword2')?.value || '';
+        const companyVal = document.getElementById('companyName')?.value.trim() || '';
+        const binVal = document.getElementById('bin')?.value.trim() || '';
+
+        const validEmail = emailRegex.test(emailVal);
+        const validPwd = isStrongPassword(pwd);
+        const pwdMatch = pwd && pwd === pwd2;
+        const validBin = /^\d{12}$/.test(binVal || '');
+        const validCompany = companyVal.length > 0;
+
+        const validAll = validEmail && validPwd && pwdMatch && validBin && validCompany;
+        if (submitBtn) submitBtn.disabled = !validAll;
+        return { validAll, validEmail, validPwd, pwdMatch, validBin, validCompany };
+      };
+
+      ["employerEmail", "empPassword", "empPassword2", "companyName", "bin"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener("input", () => {
+            showEmailHint(document.getElementById("employerEmail")?.value || "");
+            validateFormFields();
+          });
+        }
+      });
+
+      validateFormFields();
+
       function setLoading(loading) {
         if (!submitBtn) return;
         submitBtn.disabled = loading;
@@ -387,9 +453,22 @@
         const password = document.getElementById('empPassword')?.value || '';
         const password2 = document.getElementById('empPassword2')?.value || '';
 
+        const { validAll, validEmail, validPwd, pwdMatch, validBin, validCompany } = validateFormFields();
+        showEmailHint(email);
+
         // Basic required checks
-        if (!companyName || !email || !password || !password2) {
+        if (!validCompany || !email || !password || !password2) {
           setMsg('err', 'Please fill all required fields.');
+          return;
+        }
+
+        if (!validEmail) {
+          setMsg('err', 'Invalid email format.');
+          return;
+        }
+
+        if (!validPwd) {
+          setMsg('err', 'Password must be at least 8 characters and include uppercase, lowercase, and a number.');
           return;
         }
 
@@ -399,7 +478,7 @@
         }
 
         // BIN validation: 12 digits
-        if (!/^\d{12}$/.test(bin || '')) {
+        if (!validBin) {
           setMsg('err', 'BIN should be exactly 12 digits.');
           return;
         }

@@ -389,6 +389,16 @@
         }
       }
 
+      function formatInterviewDate(iso) {
+        try {
+          const d = new Date(iso);
+          if (Number.isNaN(d.getTime())) return null;
+          return d.toLocaleString();
+        } catch {
+          return null;
+        }
+      }
+
       // =========================
       // UI elements
       // =========================
@@ -489,6 +499,36 @@
         window.location.href = 'index.html';
       });
 
+      async function cancelInterview(appId, buttonEl) {
+        if (!confirm('Cancel this interview?')) return;
+        if (buttonEl) {
+          buttonEl.disabled = true;
+          buttonEl.textContent = 'Cancelling...';
+        }
+        try {
+          const res = await fetch(`${API}/api/applications/${appId}/interview/cancel`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': 'Bearer ' + token,
+              'Content-Type': 'application/json'
+            }
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            alert(data?.message || 'Failed to cancel interview');
+          } else {
+            await loadMyApplications();
+          }
+        } catch (err) {
+          alert('Network error. Try again.');
+        } finally {
+          if (buttonEl) {
+            buttonEl.disabled = false;
+            buttonEl.textContent = 'Cancel interview';
+          }
+        }
+      }
+
       // =========================
       // ✅ Applications UI
       // =========================
@@ -517,6 +557,8 @@
           const created = formatDate(app.createdAt);
           const createdText = created ? `Sent on ${created}` : 'Sent recently';
 
+          const interviewDate = app.interviewDate ? formatInterviewDate(app.interviewDate) : null;
+
           return `
           <article class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
             <div>
@@ -525,18 +567,37 @@
               <p class="text-[11px] text-slate-400">${location}</p>
               <p class="mt-1 text-[11px] text-slate-300">${createdText}</p>
               <p class="mt-1 text-[11px] text-slate-500">${salary}</p>
+              <p class="mt-1 text-[11px] text-slate-300">
+                ${interviewDate
+              ? `Interview scheduled: <span class="text-indigo-200">${escapeHtml(interviewDate)}</span>`
+              : 'No interview scheduled'}
+              </p>
             </div>
             <div class="flex flex-col items-end gap-1">
               <span class="rounded-full bg-slate-800 px-2 py-1 text-[10px] font-medium text-slate-200">
                 Status: ${status}
               </span>
+              ${interviewDate ? `
+              <button data-cancel="${app.id}"
+                class="rounded-full bg-rose-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-rose-500 disabled:opacity-70">
+                Cancel interview
+              </button>
+              ` : `
               <a href="jobs.html" class="text-[11px] text-indigo-300 hover:text-indigo-200">
                 View job
               </a>
+              `}
             </div>
           </article>
         `;
         }).join('');
+
+        document.querySelectorAll('button[data-cancel]')?.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const appId = btn.getAttribute('data-cancel');
+            cancelInterview(appId, btn);
+          });
+        });
       }
 
       // =========================

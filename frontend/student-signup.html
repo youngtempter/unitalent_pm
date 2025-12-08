@@ -179,12 +179,16 @@
             <label for="studentEmail" class="mb-1 block text-slate-200">Email</label>
             <input id="studentEmail" type="email" required placeholder="name@university.kz"
               class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
+            <p id="studentEmailHint" class="mt-1 text-[11px] text-slate-400 sm:text-xs"></p>
           </div>
 
           <div>
             <label for="password" class="mb-1 block text-slate-200">Password</label>
             <input id="password" type="password" required placeholder="••••••••"
               class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm" />
+            <p class="mt-1 text-[11px] text-slate-500 sm:text-xs">
+              At least 8 chars, incl. uppercase, lowercase, and a number.
+            </p>
           </div>
 
           <div class="flex items-start gap-2 text-[11px] text-slate-400 sm:text-xs">
@@ -257,7 +261,7 @@
       <p>© 2025 UniTalent. All rights reserved.</p>
       <div class="flex flex-wrap gap-4">
         <a href="index.html#about" class="hover:text-indigo-300">About</a>
-        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
+        <a href="contact.html" class="hover:text-indigo-300">Contact</a>
         <span>Terms · Privacy</span>
       </div>
     </div>
@@ -350,12 +354,73 @@
       // -------------------------
       const form = document.getElementById("studentSignupForm");
       const messageEl = document.getElementById("formMessage");
+      const emailHint = document.getElementById("studentEmailHint");
+      const submitBtn =
+        form?.querySelector('button[type="submit"]') ||
+        document.getElementById("signup-submit-btn");
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const isStrongPassword = (pwd = "") =>
+        pwd.length >= 8 &&
+        /[A-Z]/.test(pwd) &&
+        /[a-z]/.test(pwd) &&
+        /[0-9]/.test(pwd);
+
+      const detectEmailDomainTypo = (email = "") => {
+        const typoMap = {
+          "gmai.com": "gmail.com",
+          "gmial.com": "gmail.com",
+          "gmail.con": "gmail.com",
+          "gmaill.com": "gmail.com",
+        };
+        const [, domain = ""] = String(email).split("@");
+        const suggestion = typoMap[domain.toLowerCase()];
+        return suggestion || null;
+      };
 
       function setMessage(text, cls) {
         if (!messageEl) return;
         messageEl.textContent = text || "";
         messageEl.className = cls || "mt-1 text-[11px] sm:text-xs";
       }
+
+      const showEmailHint = (email) => {
+        if (!emailHint) return;
+        const suggestion = detectEmailDomainTypo(email);
+        if (suggestion) {
+          emailHint.textContent = `Did you mean ${suggestion}?`;
+          emailHint.className = "mt-1 text-[11px] text-amber-300 sm:text-xs";
+        } else {
+          emailHint.textContent = "";
+          emailHint.className = "mt-1 text-[11px] text-slate-400 sm:text-xs";
+        }
+      };
+
+      const validateFormFields = () => {
+        const usernameVal = document.getElementById("username")?.value.trim() || "";
+        const emailVal = document.getElementById("studentEmail")?.value.trim() || "";
+        const passwordVal = document.getElementById("password")?.value || "";
+
+        const validEmail = emailRegex.test(emailVal);
+        const validPwd = isStrongPassword(passwordVal);
+        const validUsername = usernameVal.length >= 3;
+
+        const valid = validEmail && validPwd && validUsername;
+        if (submitBtn) submitBtn.disabled = !valid;
+        return { valid, validEmail, validPwd, validUsername };
+      };
+
+      ["studentEmail", "password", "username"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener("input", () => {
+            showEmailHint(document.getElementById("studentEmail")?.value || "");
+            validateFormFields();
+          });
+        }
+      });
+
+      validateFormFields();
 
       if (!form) return;
 
@@ -374,9 +439,28 @@
         const email = document.getElementById("studentEmail")?.value.trim() || "";
         const password = document.getElementById("password")?.value || "";
 
-        if (username.length < 3) {
+        showEmailHint(email);
+        const { valid, validEmail, validPwd, validUsername } = validateFormFields();
+
+        if (!validUsername) {
           setMessage(
             "Username should be at least 3 characters.",
+            "mt-1 text-[11px] sm:text-xs text-red-400"
+          );
+          return;
+        }
+
+        if (!validEmail) {
+          setMessage(
+            "Invalid email format.",
+            "mt-1 text-[11px] sm:text-xs text-red-400"
+          );
+          return;
+        }
+
+        if (!validPwd) {
+          setMessage(
+            "Password must be at least 8 characters and include uppercase, lowercase, and a number.",
             "mt-1 text-[11px] sm:text-xs text-red-400"
           );
           return;

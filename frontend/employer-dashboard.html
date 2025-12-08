@@ -249,36 +249,42 @@
 
       <!-- RIGHT -->
       <aside class="space-y-4">
-        <!-- Candidate spotlight (demo) -->
-        <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
+        <!-- Candidate spotlight -->
+        <div id="candidate-spotlight"
+          class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
           <div class="flex items-center justify-between">
             <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
               Candidate spotlight
             </p>
-            <button class="text-[11px] text-indigo-300 hover:text-indigo-200">
+            <button id="btn-view-cv"
+              class="text-[11px] text-indigo-300 hover:text-indigo-200 disabled:cursor-not-allowed disabled:text-slate-500">
               View CV
             </button>
           </div>
-          <div class="mt-3 flex items-start gap-3">
-            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
-              AY
+
+          <div id="spotlight-body" class="mt-3 flex items-start gap-3">
+            <div id="spotlight-avatar"
+              class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
+              --
             </div>
             <div class="space-y-1">
-              <p class="text-sm font-semibold text-slate-50">
-                Demo Student · Frontend track
+              <p id="spotlight-name" class="text-sm font-semibold text-slate-50">
+                Loading candidate...
               </p>
-              <p class="text-[11px] text-slate-400">
-                This block is UI demo. Connect real data later.
+              <p id="spotlight-job" class="text-[11px] text-slate-400">
+                We will show the latest applicant across your jobs.
               </p>
-              <div class="mt-1 flex flex-wrap gap-1 text-[10px] text-slate-200">
-                <span class="rounded-full bg-slate-800 px-2 py-0.5">HTML/CSS</span>
-                <span class="rounded-full bg-slate-800 px-2 py-0.5">JavaScript</span>
-                <span class="rounded-full bg-slate-800 px-2 py-0.5">React basics</span>
+              <div id="spotlight-skills" class="mt-1 flex flex-wrap gap-1 text-[10px] text-slate-200">
               </div>
             </div>
           </div>
+
+          <div id="spotlight-empty" class="mt-2 hidden text-[11px] text-slate-400">
+            No applicants yet.
+          </div>
+
           <button id="btn-shortlist-candidate"
-            class="mt-3 w-full rounded-full bg-indigo-500 px-4 py-2 text-[11px] font-semibold text-white hover:bg-indigo-400">
+            class="mt-3 w-full rounded-full bg-indigo-500 px-4 py-2 text-[11px] font-semibold text-white hover:bg-indigo-400 disabled:cursor-not-allowed disabled:bg-slate-700">
             Shortlist candidate
           </button>
         </div>
@@ -337,7 +343,7 @@
       <p>© 2025 UniTalent. All rights reserved.</p>
       <div class="flex flex-wrap gap-4">
         <a href="index.html#about" class="hover:text-indigo-300">About</a>
-        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
+        <a href="contact.html" class="hover:text-indigo-300">Contact</a>
         <span>Terms · Privacy</span>
       </div>
     </div>
@@ -517,11 +523,75 @@
       }
 
       const shortlistBtn = $('btn-shortlist-candidate');
-      if (shortlistBtn) {
-        shortlistBtn.addEventListener('click', () => {
-          notify('Candidate shortlisted (demo). Connect API later.');
-        });
-      }
+      const viewCvBtn = $('btn-view-cv');
+      const spotlightName = $('spotlight-name');
+      const spotlightJob = $('spotlight-job');
+      const spotlightSkills = $('spotlight-skills');
+      const spotlightAvatar = $('spotlight-avatar');
+      const spotlightEmpty = $('spotlight-empty');
+      const spotlightBody = $('spotlight-body');
+
+      let spotlightApp = null;
+
+      const skillsToBadges = (skills) => {
+        if (!skills) return [];
+        return skills
+          .split(",")
+          .map(s => s.trim())
+          .filter(Boolean)
+          .slice(0, 6);
+      };
+
+      const setSpotlightEmpty = (msg = "No applicants yet.") => {
+        if (spotlightEmpty) {
+          spotlightEmpty.textContent = msg;
+          spotlightEmpty.classList.remove("hidden");
+        }
+        spotlightBody?.classList.add("hidden");
+        shortlistBtn?.setAttribute("disabled", "true");
+        viewCvBtn?.setAttribute("disabled", "true");
+      };
+
+      const renderSpotlight = (app) => {
+        spotlightApp = app;
+        if (!app) {
+          setSpotlightEmpty();
+          return;
+        }
+
+        spotlightBody?.classList.remove("hidden");
+        spotlightEmpty?.classList.add("hidden");
+
+        const fullName = studentName(app);
+        const username = app?.student?.username;
+        const title = app?.job?.title || `Job #${app?.jobId}`;
+        const skills = skillsToBadges(app?.student?.skills || "");
+
+        if (spotlightName) {
+          const nameLine = username ? `${fullName} (${username})` : fullName;
+          spotlightName.textContent = nameLine || "Student";
+        }
+
+        if (spotlightJob) {
+          spotlightJob.textContent = `Applied to ${title}`;
+        }
+
+        if (spotlightAvatar) {
+          spotlightAvatar.textContent = initialsFromName(fullName || username || "ST");
+        }
+
+        if (spotlightSkills) {
+          spotlightSkills.innerHTML =
+            skills.length > 0
+              ? skills
+                .map(s => `<span class="rounded-full bg-slate-800 px-2 py-0.5">${escapeHtml(s)}</span>`)
+                .join("")
+              : `<span class="rounded-full bg-slate-800 px-2 py-0.5">New applicant</span>`;
+        }
+
+        shortlistBtn?.removeAttribute("disabled");
+        viewCvBtn?.removeAttribute("disabled");
+      };
 
       // -------- DATA LOAD --------
       const statActive = $('stat-active-jobs');
@@ -551,6 +621,56 @@
       } catch (e) {
         console.warn('Failed to load employer applications:', e.message);
         myApps = [];
+      }
+
+      // -------- Candidate Spotlight --------
+      const latestApplied = Array.isArray(myApps)
+        ? myApps
+          .filter(a => (a?.status || '').toUpperCase() === 'APPLIED')
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0]
+        : null;
+
+      renderSpotlight(latestApplied);
+
+      if (viewCvBtn) {
+        viewCvBtn.addEventListener('click', () => {
+          if (!spotlightApp?.student?.id) return;
+          window.location.href = `employer-student-profile.html?studentId=${encodeURIComponent(spotlightApp.student.id)}`;
+        });
+      }
+
+      if (shortlistBtn) {
+        shortlistBtn.addEventListener('click', async () => {
+          if (!spotlightApp?.id) return;
+          shortlistBtn.disabled = true;
+          shortlistBtn.textContent = "Shortlisting...";
+          try {
+            const res = await fetch(`${API}/api/applications/${spotlightApp.id}`, {
+              method: "PATCH",
+              headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ status: "INTERVIEW" })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+              alert(data?.message || "Failed to shortlist");
+              shortlistBtn.disabled = false;
+              shortlistBtn.textContent = "Shortlist candidate";
+              return;
+            }
+            shortlistBtn.textContent = "Shortlisted";
+            shortlistBtn.classList.add("bg-emerald-600");
+            shortlistBtn.classList.remove("bg-indigo-500");
+            viewCvBtn?.removeAttribute("disabled");
+          } catch (err) {
+            console.error(err);
+            alert("Network error");
+            shortlistBtn.disabled = false;
+            shortlistBtn.textContent = "Shortlist candidate";
+          }
+        });
       }
 
       // -------- Stats fill --------
@@ -714,3 +834,4 @@
 </body>
 
 </html>
+

@@ -72,7 +72,23 @@ router.get("/", auth, requireRole("EMPLOYER"), async (req, res) => {
       where: { jobId },
       include: {
         job: true,
-        student: { select: { id: true, email: true, firstName: true, lastName: true } }
+        student: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            username: true,
+            university: true,
+            major: true,
+            studyYear: true,
+            city: true,
+            skills: true,
+            github: true,
+            linkedin: true,
+            portfolio: true
+          }
+        }
       },
       orderBy: { createdAt: "desc" }
     });
@@ -110,7 +126,23 @@ router.get("/employer/my", auth, requireRole("EMPLOYER"), async (req, res) => {
       where: { job: { employerId: req.user.id } },
       include: {
         job: true,
-        student: { select: { id: true, email: true, firstName: true, lastName: true } }
+        student: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            username: true,
+            university: true,
+            major: true,
+            studyYear: true,
+            city: true,
+            skills: true,
+            github: true,
+            linkedin: true,
+            portfolio: true
+          }
+        }
       },
       orderBy: { createdAt: "desc" }
     });
@@ -209,6 +241,41 @@ router.patch("/:id/interview", auth, requireRole("EMPLOYER"), async (req, res) =
     res.json(updated);
   } catch (e) {
     res.status(500).json({ message: "Failed to schedule interview", error: e.message });
+  }
+});
+
+/**
+ * ✅ STUDENT cancels interview
+ * PATCH /api/applications/:id/interview/cancel
+ */
+router.patch("/:id/interview/cancel", auth, requireRole("STUDENT"), async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({ message: "Invalid application id" });
+    }
+
+    const app = await prisma.application.findUnique({
+      where: { id },
+      include: { job: true }
+    });
+
+    if (!app || app.studentId !== req.user.id) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    const updated = await prisma.application.update({
+      where: { id },
+      data: {
+        interviewDate: null,
+        status: "APPLIED"
+      }
+    });
+
+    res.json(updated);
+  } catch (e) {
+    res.status(500).json({ message: "Failed to cancel interview", error: e.message });
   }
 });
 

@@ -71,14 +71,20 @@
     </div>
 
     <section class="space-y-4">
-      <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
-            Applicants
-          </h1>
-          <p id="jobTitle" class="mt-1 text-sm text-slate-400">
-            Loading job info...
-          </p>
+      <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div class="flex items-center gap-3">
+          <button id="back-dashboard"
+            class="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1.5 text-[11px] font-semibold text-slate-200 hover:border-indigo-400 hover:text-indigo-200">
+            ← Back to Dashboard
+          </button>
+          <div>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
+              Applicants
+            </h1>
+            <p id="jobTitle" class="mt-1 text-sm text-slate-400">
+              Loading job info...
+            </p>
+          </div>
         </div>
 
         <div id="status" class="flex items-center gap-2 text-xs text-slate-400">
@@ -138,6 +144,7 @@
       const countEl = document.getElementById('count');
       const jobTitleEl = document.getElementById('jobTitle');
       const logoutBtn = document.getElementById('logoutBtn');
+      const backDashboardBtn = document.getElementById('back-dashboard');
 
       // -------------------------
       // Storage helper
@@ -238,6 +245,18 @@
           sessionStorage.removeItem('unitalent_employer_size');
 
           window.location.href = 'employer-login.html';
+        });
+      }
+
+      if (backDashboardBtn) {
+        backDashboardBtn.addEventListener('click', () => {
+          if (document.referrer && document.referrer.includes('employer-dashboard')) {
+            window.location.href = 'employer-dashboard.html';
+          } else if (window.history.length > 1) {
+            window.history.back();
+          } else {
+            window.location.href = 'employer-dashboard.html';
+          }
         });
       }
 

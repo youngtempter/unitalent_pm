@@ -27,6 +27,23 @@ const buildAuthResponse = (user) => ({
   user: safeUser(user)
 });
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const isStrongPassword = (pwd = "") => {
+  const str = String(pwd);
+  return (
+    str.length >= 8 &&
+    /[A-Z]/.test(str) &&
+    /[a-z]/.test(str) &&
+    /[0-9]/.test(str)
+  );
+};
+
+const passwordErrorMessage =
+  "Password must be at least 8 characters and include uppercase, lowercase, and a number.";
+
+const emailErrorMessage = "Invalid email format.";
+
 // -----------------------------
 // STUDENT REGISTER
 // POST /api/auth/register
@@ -37,6 +54,14 @@ router.post("/register", async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password required" });
+    }
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: emailErrorMessage });
+    }
+
+    if (!isStrongPassword(password)) {
+      return res.status(400).json({ message: passwordErrorMessage });
     }
 
     // ✅ check email uniqueness
@@ -110,6 +135,14 @@ router.post("/employer/register", async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password required" });
+    }
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: emailErrorMessage });
+    }
+
+    if (!isStrongPassword(password)) {
+      return res.status(400).json({ message: passwordErrorMessage });
     }
 
     const existingEmail = await prisma.user.findUnique({ where: { email } });

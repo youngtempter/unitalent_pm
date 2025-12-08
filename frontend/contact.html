@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>UniTalent – Contact Us</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    body {
+      position: relative;
+      overflow-x: hidden;
+      background: #020617;
+    }
+
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      pointer-events: none;
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
+      overflow: hidden;
+    }
+
+    .animated-bg::before {
+      content: "";
+      position: absolute;
+      left: -50%;
+      bottom: -40%;
+      width: 200%;
+      height: 200%;
+      background-image: radial-gradient(#64748b 1px, transparent 1px);
+      background-size: 26px 26px;
+      opacity: 0.6;
+      transform-origin: center;
+      transform: perspective(900px) rotateX(72deg) translateY(0);
+      animation: moveGrid 18s linear infinite;
+    }
+
+    @keyframes moveGrid {
+      0% {
+        transform: perspective(900px) rotateX(72deg) translateY(0);
+      }
+
+      100% {
+        transform: perspective(900px) rotateX(72deg) translateY(140px);
+      }
+    }
+  </style>
+</head>
+
+<body class="font-sans text-slate-100" data-guard="GUEST">
+  <div class="animated-bg"></div>
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
+      <a href="index.html" class="flex items-center gap-2">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
+          <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
+        </div>
+        <div class="leading-tight">
+          <p class="text-base font-semibold tracking-tight">UniTalent</p>
+          <p class="text-[11px] text-slate-400">Student Career Platform</p>
+        </div>
+      </a>
+
+      <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
+        <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
+        <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
+        <a href="student-login.html" class="hover:text-indigo-300">For students</a>
+        <a href="employer-login.html" class="hover:text-indigo-300">For employers</a>
+        <a href="contact.html" class="text-indigo-300">Contact</a>
+      </div>
+
+      <div class="hidden items-center gap-3 md:flex">
+        <a href="student-login.html" class="text-sm font-medium text-slate-200 hover:text-indigo-300">
+          Log in
+        </a>
+        <a href="student-signup.html"
+          class="rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
+          Sign up
+        </a>
+      </div>
+
+      <button
+        class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
+        <span class="sr-only">Open menu</span>
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <main class="mx-auto flex min-h-[calc(100vh-72px-60px)] max-w-6xl flex-col justify-center px-4 py-10">
+    <div class="mb-6 text-xs text-slate-400">
+      <a href="index.html" class="hover:text-indigo-300">Home</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <span class="text-slate-300">Contact us</span>
+    </div>
+
+    <div class="grid gap-8 md:grid-cols-[1fr,0.9fr] md:items-start">
+      <div class="space-y-3">
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
+          Contact us
+        </p>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
+          We’d love to hear from you
+        </h1>
+        <p class="text-sm text-slate-300">
+          Tell us about your hiring needs, partnerships, or feedback about UniTalent. We usually respond within one
+          business day.
+        </p>
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-sm text-slate-200">
+          <p class="font-semibold text-indigo-200">Prefer email?</p>
+          <p class="mt-1 text-slate-300">Drop us a note at <span class="text-indigo-200">hello@unitalent.local</span>
+            and we’ll get back to you.</p>
+        </div>
+      </div>
+
+      <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-slate-900/70">
+        <form id="contactForm" class="space-y-4 text-sm">
+          <div>
+            <label for="contactName" class="mb-1 block text-slate-200">Name</label>
+            <input id="contactName" type="text" required placeholder="Your name"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none" />
+          </div>
+
+          <div>
+            <label for="contactEmail" class="mb-1 block text-slate-200">Email</label>
+            <input id="contactEmail" type="email" required placeholder="you@example.com"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none" />
+            <p id="contactEmailHint" class="mt-1 text-[11px] text-slate-400"></p>
+          </div>
+
+          <div>
+            <label for="contactMessage" class="mb-1 block text-slate-200">Message</label>
+            <textarea id="contactMessage" rows="4" required placeholder="How can we help?"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"></textarea>
+            <p class="mt-1 text-[11px] text-slate-500">Please include at least 10 characters.</p>
+          </div>
+
+          <p id="contactMessageEl" class="text-[11px]"></p>
+
+          <button type="submit"
+            class="w-full rounded-full bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 disabled:cursor-not-allowed disabled:bg-slate-700">
+            Send message
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-800 bg-slate-950/90">
+    <div
+      class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
+      <p>© 2025 UniTalent. All rights reserved.</p>
+      <div class="flex flex-wrap gap-4">
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+        <a href="contact.html" class="hover:text-indigo-300">Contact</a>
+        <span>Terms · Privacy</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const API = "http://localhost:3000";
+      const form = document.getElementById("contactForm");
+      const messageEl = document.getElementById("contactMessageEl");
+      const emailHint = document.getElementById("contactEmailHint");
+      const submitBtn = form?.querySelector('button[type="submit"]');
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const detectEmailDomainTypo = (email = "") => {
+        const typoMap = {
+          "gmai.com": "gmail.com",
+          "gmial.com": "gmail.com",
+          "gmail.con": "gmail.com",
+          "gmaill.com": "gmail.com",
+        };
+        const [, domain = ""] = String(email).split("@");
+        return typoMap[domain.toLowerCase()] || null;
+      };
+
+      const showEmailHint = (email) => {
+        if (!emailHint) return;
+        const suggestion = detectEmailDomainTypo(email);
+        if (suggestion) {
+          emailHint.textContent = "Did you mean gmail.com?";
+          emailHint.className = "mt-1 text-[11px] text-amber-300";
+        } else {
+          emailHint.textContent = "";
+          emailHint.className = "mt-1 text-[11px] text-slate-400";
+        }
+      };
+
+      const setMsg = (type, text) => {
+        if (!messageEl) return;
+        messageEl.textContent = text || "";
+        messageEl.className = "text-[11px]";
+        if (!text) return;
+        if (type === "ok") messageEl.classList.add("text-emerald-400");
+        else if (type === "err") messageEl.classList.add("text-red-400");
+        else messageEl.classList.add("text-slate-300");
+      };
+
+      const validate = () => {
+        const name = document.getElementById("contactName")?.value.trim() || "";
+        const email = document.getElementById("contactEmail")?.value.trim() || "";
+        const msg = document.getElementById("contactMessage")?.value.trim() || "";
+        const valid = name && emailRegex.test(email) && msg.length >= 10;
+        if (submitBtn) submitBtn.disabled = !valid;
+        return { name, email, msg, valid };
+      };
+
+      ["contactName", "contactEmail", "contactMessage"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener("input", () => {
+            showEmailHint(document.getElementById("contactEmail")?.value || "");
+            validate();
+          });
+        }
+      });
+
+      validate();
+
+      if (!form) return;
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const { name, email, msg, valid } = validate();
+        showEmailHint(email);
+        if (!valid) {
+          setMsg("err", "Please fill all fields correctly.");
+          return;
+        }
+
+        try {
+          setMsg("info", "Sending...");
+          if (submitBtn) submitBtn.disabled = true;
+          const res = await fetch(`${API}/api/contact`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, message: msg })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            setMsg("err", data?.message || "Failed to send message.");
+            return;
+          }
+          setMsg("ok", "Thanks! We received your message.");
+          form.reset();
+          validate();
+        } catch (err) {
+          console.error(err);
+          setMsg("err", "Network error. Please try again.");
+        } finally {
+          if (submitBtn) submitBtn.disabled = false;
+        }
+      });
+    });
+  </script>
+
+  <script type="module" src="js/auth.js"></script>
+</body>
+
+</html>
+
+
+

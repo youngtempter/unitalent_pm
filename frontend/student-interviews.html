@@ -241,6 +241,46 @@
         window.location.href = 'index.html';
       });
 
+      function formatInterviewDate(iso) {
+        try {
+          const d = new Date(iso);
+          if (Number.isNaN(d.getTime())) return 'Interview scheduled';
+          return d.toLocaleString();
+        } catch {
+          return 'Interview scheduled';
+        }
+      }
+
+      async function cancelInterview(appId, buttonEl) {
+        if (!confirm('Cancel this interview?')) return;
+        if (buttonEl) {
+          buttonEl.disabled = true;
+          buttonEl.textContent = 'Cancelling...';
+        }
+        try {
+          const res = await fetch(`${API}/api/applications/${appId}/interview/cancel`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': 'Bearer ' + token,
+              'Content-Type': 'application/json'
+            }
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            alert(data?.message || 'Failed to cancel interview');
+          } else {
+            await loadInterviewApps();
+          }
+        } catch (err) {
+          alert('Network error. Try again.');
+        } finally {
+          if (buttonEl) {
+            buttonEl.disabled = false;
+            buttonEl.textContent = 'Cancel interview';
+          }
+        }
+      }
+
       // =========================
       // Render
       // =========================
@@ -264,6 +304,7 @@
           const salary = escapeHtml(job.salary || 'Salary not specified');
           const status = escapeHtml(app.status || 'INTERVIEW');
           const created = formatDate(app.createdAt);
+          const interviewDate = app.interviewDate ? formatInterviewDate(app.interviewDate) : null;
 
           return `
             <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
@@ -283,13 +324,31 @@
                 </span>
               </div>
 
+              <p class="mt-2 text-xs text-slate-300">
+                ${interviewDate ? `Interview scheduled: <span class="text-indigo-200">${escapeHtml(interviewDate)}</span>` : 'No interview scheduled'}
+              </p>
+
+              ${interviewDate ? `
+              <button data-cancel="${app.id}"
+                class="mt-3 rounded-full bg-rose-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-rose-500 disabled:opacity-70">
+                Cancel interview
+              </button>
+              ` : `
               <a href="jobs.html"
                 class="mt-3 inline-flex rounded-full bg-indigo-500 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-indigo-400">
                 View jobs page
               </a>
+              `}
             </article>
           `;
         }).join('');
+
+        document.querySelectorAll('button[data-cancel]')?.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const appId = btn.getAttribute('data-cancel');
+            cancelInterview(appId, btn);
+          });
+        });
       }
 
       // =========================
