@@ -178,24 +178,20 @@
             <button class="rounded-full bg-slate-900/80 px-3 py-1 text-[11px] text-slate-200 ring-1 ring-slate-700">
               Newest
             </button>
-            <button class="rounded-full bg-transparent px-3 py-1 text-[11px] text-slate-400 hover:text-slate-200">
-              Salary high → low
-            </button>
           </div>
         </div>
 
         <div id="jobsList" class="space-y-4"></div>
 
         <div class="mt-4 flex items-center justify-between text-xs text-slate-400">
-          <p>Page 1 of 1</p>
+          <p id="pageIndicator">Page 1 of 1</p>
           <div class="flex items-center gap-2">
-            <button
-              class="rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1 hover:border-indigo-400 hover:text-indigo-200">
+            <button id="prevBtn"
+              class="rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1 hover:border-indigo-400 hover:text-indigo-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-slate-700 disabled:hover:text-slate-400">
               ‹ Previous
             </button>
-            <button class="rounded-full bg-indigo-500 px-3 py-1 text-white">1</button>
-            <button
-              class="rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1 hover:border-indigo-400 hover:text-indigo-200">
+            <button id="nextBtn"
+              class="rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1 hover:border-indigo-400 hover:text-indigo-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-slate-700 disabled:hover:text-slate-400">
               Next ›
             </button>
           </div>
@@ -389,6 +385,8 @@
     let allJobs = [];
     let lastRendered = [];
     let savedJobIds = new Set();
+    let currentPage = 1;
+    const jobsPerPage = 6;
 
     function setStatus(ok, text) {
       if (!jobsStatus) return;
@@ -449,21 +447,47 @@
     }
 
     function render(jobs) {
-      lastRendered = jobs;
+      // Pagination: calculate total pages and slice jobs for current page
+      const totalPages = Math.max(1, Math.ceil(jobs.length / jobsPerPage));
+      const startIndex = (currentPage - 1) * jobsPerPage;
+      const endIndex = startIndex + jobsPerPage;
+      const paginatedJobs = jobs.slice(startIndex, endIndex);
+      
+      lastRendered = paginatedJobs;
 
+      // Update jobs count (show total, not paginated count)
       if (jobsCount) jobsCount.textContent = jobs.length;
+      
+      // Update page indicator
+      const pageIndicator = document.getElementById('pageIndicator');
+      if (pageIndicator) {
+        pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
+      }
+      
+      // Update pagination buttons
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      if (prevBtn) {
+        prevBtn.disabled = currentPage === 1;
+      }
+      if (nextBtn) {
+        nextBtn.disabled = currentPage >= totalPages;
+      }
+
       if (!jobsList) return;
 
-      if (!jobs.length) {
+      if (!paginatedJobs.length) {
         jobsList.innerHTML = `
           <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 text-sm text-slate-300">
-            No jobs found yet. Employers will appear here after posting.
+            ${jobs.length === 0 
+              ? 'No jobs found yet. Employers will appear here after posting.'
+              : 'No jobs on this page.'}
           </div>
         `;
         return;
       }
 
-      jobsList.innerHTML = jobs.map(job => {
+      jobsList.innerHTML = paginatedJobs.map(job => {
         const title = escapeHtml(job.title || 'Untitled role');
         const desc = escapeHtml(truncate(job.description || ''));
         const location = escapeHtml(job.location || 'Location not specified');
@@ -539,7 +563,8 @@
         if (!res.ok) throw new Error(data?.message || 'Failed to load jobs');
 
         allJobs = Array.isArray(data) ? data : [];
-        lastRendered = allJobs;
+        // Reset to page 1 when loading new jobs
+        currentPage = 1;
         render(allJobs);
 
         // ✅ After jobs load, load saved ids & re-render current view
@@ -742,6 +767,33 @@
         }
       }
     });
+
+    // Pagination handlers
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          render(allJobs);
+          // Scroll to top of jobs list
+          jobsList?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
+    
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        const totalPages = Math.max(1, Math.ceil(allJobs.length / jobsPerPage));
+        if (currentPage < totalPages) {
+          currentPage++;
+          render(allJobs);
+          // Scroll to top of jobs list
+          jobsList?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
 
     loadJobs();
   });

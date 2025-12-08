@@ -114,3 +114,11 @@ model SavedJob {
 
   @@unique([studentId, jobId], name: "studentId_jobId")
 }
+
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  message   String   @db.Text
+  createdAt DateTime @default(now())
+}

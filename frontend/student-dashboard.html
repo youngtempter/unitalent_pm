@@ -182,11 +182,11 @@
 
       <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
         <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-          Interviews
+          Upcoming Interviews
         </p>
         <p id="kpi-interviews" class="mt-2 text-2xl font-bold text-slate-50">0</p>
         <p class="mt-1 text-[11px] text-slate-400">
-          Based on application status
+          Scheduled interviews
         </p>
         <a href="student-interviews.html" class="mt-2 inline-block text-[11px] text-indigo-300 hover:text-indigo-200">
           View interviews →
@@ -399,6 +399,33 @@
         }
       }
 
+      function formatStatusLabel(status) {
+        const statusUpper = (status || 'APPLIED').toUpperCase();
+        const statusMap = {
+          'APPLIED': 'Applied',
+          'IN_REVIEW': 'In Review',
+          'INTERVIEW': 'Interview',
+          'OFFERED': 'Offer Received',
+          'ACCEPTED': 'Accepted',
+          'REJECTED': 'Rejected'
+        };
+        return statusMap[statusUpper] || status;
+      }
+
+      function getStatusBadgeClass(status) {
+        const statusUpper = (status || 'APPLIED').toUpperCase();
+        if (statusUpper === 'OFFERED') {
+          return 'bg-emerald-500/20 text-emerald-200';
+        } else if (statusUpper === 'ACCEPTED') {
+          return 'bg-emerald-500/20 text-emerald-200';
+        } else if (statusUpper === 'REJECTED') {
+          return 'bg-rose-500/15 text-rose-300';
+        } else if (statusUpper === 'IN_REVIEW' || statusUpper === 'INTERVIEW') {
+          return 'bg-blue-500/15 text-blue-300';
+        }
+        return 'bg-slate-800 text-slate-200';
+      }
+
       // =========================
       // UI elements
       // =========================
@@ -552,30 +579,38 @@
           const salary = escapeHtml(job.salary || 'Salary not specified');
 
           const statusRaw = (app.status || 'APPLIED').toString();
-          const status = escapeHtml(statusRaw);
+          const statusLabel = formatStatusLabel(statusRaw);
+          const statusBadgeClass = getStatusBadgeClass(statusRaw);
 
           const created = formatDate(app.createdAt);
           const createdText = created ? `Sent on ${created}` : 'Sent recently';
 
           const interviewDate = app.interviewDate ? formatInterviewDate(app.interviewDate) : null;
+          const statusUpper = statusRaw.toUpperCase();
+          const isOffered = statusUpper === 'OFFERED';
 
           return `
           <article class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
             <div>
-              <p class="text-[11px] uppercase tracking-wide text-emerald-400">Applied</p>
+              <p class="text-[11px] uppercase tracking-wide ${isOffered ? 'text-emerald-400' : 'text-emerald-400'}">${isOffered ? 'Offer Received' : 'Applied'}</p>
               <h3 class="mt-1 text-sm font-semibold text-slate-50">${title}</h3>
               <p class="text-[11px] text-slate-400">${location}</p>
               <p class="mt-1 text-[11px] text-slate-300">${createdText}</p>
               <p class="mt-1 text-[11px] text-slate-500">${salary}</p>
+              ${isOffered ? `
+              <p class="mt-2 text-xs font-semibold text-emerald-300">
+                🎉 You received an offer for this position!
+              </p>
+              ` : ''}
               <p class="mt-1 text-[11px] text-slate-300">
                 ${interviewDate
               ? `Interview scheduled: <span class="text-indigo-200">${escapeHtml(interviewDate)}</span>`
-              : 'No interview scheduled'}
+              : statusUpper === 'INTERVIEW' ? 'Interview scheduled' : 'No interview scheduled'}
               </p>
             </div>
             <div class="flex flex-col items-end gap-1">
-              <span class="rounded-full bg-slate-800 px-2 py-1 text-[10px] font-medium text-slate-200">
-                Status: ${status}
+              <span class="rounded-full ${statusBadgeClass} px-2 py-1 text-[10px] font-medium">
+                ${escapeHtml(statusLabel)}
               </span>
               ${interviewDate ? `
               <button data-cancel="${app.id}"
@@ -632,11 +667,7 @@
               apps.length ? 'Updated from backend' : 'No applications yet';
           }
 
-          const interviews = apps.filter(a =>
-            String(a.status || '').toUpperCase().includes('INTERVIEW')
-          ).length;
-
-          if (kpiInterviews) kpiInterviews.textContent = String(interviews);
+          // Upcoming interviews count is loaded separately
 
           renderApps(apps);
           if (appsStatus) appsStatus.textContent = '';
@@ -676,6 +707,33 @@
         } catch (err) {
           console.error(err);
           if (kpiSaved) kpiSaved.textContent = '0';
+        }
+      }
+
+      // =========================
+      // ✅ Load upcoming interviews count
+      // =========================
+      async function loadUpcomingInterviewsCount() {
+        try {
+          if (kpiInterviews) kpiInterviews.textContent = '0';
+
+          const res = await fetch(`${API}/api/applications/my/interviews/upcoming/count`, {
+            headers: { Authorization: 'Bearer ' + token }
+          });
+
+          if (res.status === 401) {
+            clearAllAuth();
+            window.location.href = 'student-login.html';
+            return;
+          }
+
+          const data = await res.json().catch(() => ({ count: 0 }));
+          const count = typeof data.count === 'number' ? data.count : 0;
+
+          if (kpiInterviews) kpiInterviews.textContent = String(count);
+        } catch (err) {
+          console.error(err);
+          if (kpiInterviews) kpiInterviews.textContent = '0';
         }
       }
 
@@ -743,6 +801,7 @@
       // =========================
       loadMyApplications();
       loadSavedKPI();
+      loadUpcomingInterviewsCount();
     });
   </script>
 

@@ -279,4 +279,178 @@ router.patch("/:id/interview/cancel", auth, requireRole("STUDENT"), async (req, 
   }
 });
 
+/**
+ * ✅ EMPLOYER: Get all scheduled interviews
+ * GET /api/applications/employer/interviews
+ */
+router.get("/employer/interviews", auth, requireRole("EMPLOYER"), async (req, res) => {
+  try {
+    const interviews = await prisma.application.findMany({
+      where: {
+        interviewDate: { not: null },
+        job: { employerId: req.user.id }
+      },
+      include: {
+        student: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            username: true,
+            email: true,
+            university: true,
+            major: true,
+            city: true,
+            skills: true
+          }
+        },
+        job: {
+          select: {
+            id: true,
+            title: true,
+            location: true,
+            type: true,
+            workMode: true
+          }
+        }
+      },
+      orderBy: { interviewDate: "asc" }
+    });
+
+    res.json(interviews);
+  } catch (e) {
+    res.status(500).json({ message: "Failed to load interviews", error: e.message });
+  }
+});
+
+/**
+ * ✅ STUDENT: Get upcoming interviews count
+ * GET /api/applications/my/interviews/upcoming/count
+ */
+router.get("/my/interviews/upcoming/count", auth, requireRole("STUDENT"), async (req, res) => {
+  try {
+    const now = new Date();
+    const count = await prisma.application.count({
+      where: {
+        studentId: req.user.id,
+        interviewDate: { gte: now }
+      }
+    });
+
+    res.json({ count });
+  } catch (e) {
+    res.status(500).json({ message: "Failed to count upcoming interviews", error: e.message });
+  }
+});
+
+/**
+ * ✅ EMPLOYER: Get upcoming interviews count
+ * GET /api/applications/employer/interviews/upcoming/count
+ */
+router.get("/employer/interviews/upcoming/count", auth, requireRole("EMPLOYER"), async (req, res) => {
+  try {
+    const now = new Date();
+    const count = await prisma.application.count({
+      where: {
+        interviewDate: { gte: now },
+        job: { employerId: req.user.id }
+      }
+    });
+
+    res.json({ count });
+  } catch (e) {
+    res.status(500).json({ message: "Failed to count upcoming interviews", error: e.message });
+  }
+});
+
+/**
+ * ✅ EMPLOYER: Get hiring funnel stats
+ * GET /api/applications/employer/funnel
+ */
+router.get("/employer/funnel", auth, requireRole("EMPLOYER"), async (req, res) => {
+  try {
+    const whereBase = { job: { employerId: req.user.id } };
+
+    // Total applications received (all statuses)
+    const applicationsReceived = await prisma.application.count({
+      where: whereBase
+    });
+
+    // In review: status = APPLIED OR IN_REVIEW
+    const inReview = await prisma.application.count({
+      where: {
+        ...whereBase,
+        status: { in: ["APPLIED", "IN_REVIEW"] }
+      }
+    });
+
+    // Interviews: status = INTERVIEW OR interviewDate IS NOT NULL
+    const interviews = await prisma.application.count({
+      where: {
+        ...whereBase,
+        OR: [
+          { status: "INTERVIEW" },
+          { interviewDate: { not: null } }
+        ]
+      }
+    });
+
+    // Offers made: status = OFFERED
+    const offersMade = await prisma.application.count({
+      where: {
+        ...whereBase,
+        status: "OFFERED"
+      }
+    });
+
+    res.json({
+      applicationsReceived,
+      inReview,
+      interviews,
+      offersMade
+    });
+  } catch (e) {
+    res.status(500).json({ message: "Failed to load funnel stats", error: e.message });
+  }
+});
+
+/**
+ * ✅ EMPLOYER: Send offer to applicant
+ * PATCH /api/applications/:id/offer
+ */
+router.patch("/:id/offer", auth, requireRole("EMPLOYER"), async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({ message: "Invalid application id" });
+    }
+
+    const app = await prisma.application.findUnique({
+      where: { id },
+      include: { job: true }
+    });
+
+    if (!app) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    if (app.job.employerId !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden: not your application" });
+    }
+
+    const updated = await prisma.application.update({
+      where: { id },
+      data: {
+        status: "OFFERED"
+        // Note: if note field exists in future, add it here
+      }
+    });
+
+    res.json(updated);
+  } catch (e) {
+    res.status(500).json({ message: "Failed to send offer", error: e.message });
+  }
+});
+
 export default router;

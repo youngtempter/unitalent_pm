@@ -229,7 +229,8 @@
         const name = document.getElementById("contactName")?.value.trim() || "";
         const email = document.getElementById("contactEmail")?.value.trim() || "";
         const msg = document.getElementById("contactMessage")?.value.trim() || "";
-        const valid = name && emailRegex.test(email) && msg.length >= 10;
+        // Name must be at least 2 chars, email valid format, message at least 10 chars
+        const valid = name.length >= 2 && emailRegex.test(email) && msg.length >= 10;
         if (submitBtn) submitBtn.disabled = !valid;
         return { name, email, msg, valid };
       };
@@ -252,6 +253,23 @@
         e.preventDefault();
         const { name, email, msg, valid } = validate();
         showEmailHint(email);
+        
+        // Frontend validation
+        if (!name || name.length < 2) {
+          setMsg("err", "Name must be at least 2 characters.");
+          return;
+        }
+        
+        if (!email || !emailRegex.test(email)) {
+          setMsg("err", "Please enter a valid email address.");
+          return;
+        }
+        
+        if (!msg || msg.length < 10) {
+          setMsg("err", "Message must be at least 10 characters.");
+          return;
+        }
+
         if (!valid) {
           setMsg("err", "Please fill all fields correctly.");
           return;
@@ -260,22 +278,28 @@
         try {
           setMsg("info", "Sending...");
           if (submitBtn) submitBtn.disabled = true;
+          
           const res = await fetch(`${API}/api/contact`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name, email, message: msg })
           });
+          
           const data = await res.json().catch(() => ({}));
+          
           if (!res.ok) {
             setMsg("err", data?.message || "Failed to send message.");
+            if (submitBtn) submitBtn.disabled = false;
             return;
           }
-          setMsg("ok", "Thanks! We received your message.");
+          
+          // Success: show message and clear form
+          setMsg("ok", "Thanks! We received your message. We'll get back to you soon.");
           form.reset();
           validate();
         } catch (err) {
           console.error(err);
-          setMsg("err", "Network error. Please try again.");
+          setMsg("err", "Network error. Please check your connection and try again.");
         } finally {
           if (submitBtn) submitBtn.disabled = false;
         }

@@ -2,6 +2,7 @@ import { Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { prisma } from "../prisma.js";
+import { auth } from "../middleware/auth.js";
 
 const router = Router();
 
@@ -190,6 +191,81 @@ router.post("/employer/login", async (req, res) => {
     return res.json(buildAuthResponse(user));
   } catch (e) {
     return res.status(500).json({ message: "Employer login error", error: e.message });
+  }
+});
+
+// -----------------------------
+// CHANGE CREDENTIALS
+// PATCH /api/auth/me/credentials
+// Auth required (any role)
+// -----------------------------
+router.patch("/me/credentials", auth, async (req, res) => {
+  try {
+    const { currentPassword, newEmail, newPassword } = req.body;
+
+    if (!currentPassword) {
+      return res.status(400).json({ message: "Current password is required" });
+    }
+
+    if (!newEmail && !newPassword) {
+      return res.status(400).json({ message: "At least one of newEmail or newPassword must be provided" });
+    }
+
+    // Get current user with password
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id }
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Verify current password
+    const passwordMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Wrong current password" });
+    }
+
+    // Prepare update data
+    const updateData = {};
+
+    // Validate and set new email if provided
+    if (newEmail) {
+      if (!emailRegex.test(newEmail)) {
+        return res.status(400).json({ message: emailErrorMessage });
+      }
+
+      // Check email uniqueness
+      const existingEmail = await prisma.user.findUnique({
+        where: { email: newEmail }
+      });
+
+      if (existingEmail && existingEmail.id !== user.id) {
+        return res.status(409).json({ message: "Email already used" });
+      }
+
+      updateData.email = newEmail.trim();
+    }
+
+    // Validate and set new password if provided
+    if (newPassword) {
+      if (!isStrongPassword(newPassword)) {
+        return res.status(400).json({ message: passwordErrorMessage });
+      }
+
+      updateData.password = await bcrypt.hash(newPassword, 10);
+    }
+
+    // Update user
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: updateData
+    });
+
+    // Return fresh token + updated user
+    return res.json(buildAuthResponse(updatedUser));
+  } catch (e) {
+    return res.status(500).json({ message: "Failed to update credentials", error: e.message });
   }
 });
 

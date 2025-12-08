@@ -326,6 +326,22 @@
             const name = escapeHtml(studentName(app));
             const email = escapeHtml(app.student?.email || '');
             const status = escapeHtml(app.status || 'APPLIED');
+            const statusUpper = (app.status || 'APPLIED').toUpperCase();
+            
+            // Show Send Offer button only if status is NOT OFFERED, ACCEPTED, REJECTED
+            const canSendOffer = !['OFFERED', 'ACCEPTED', 'REJECTED'].includes(statusUpper);
+            
+            // Status badge color based on status
+            let statusBadgeClass = 'bg-emerald-500/15 text-emerald-300';
+            if (statusUpper === 'OFFERED') {
+              statusBadgeClass = 'bg-indigo-500/15 text-indigo-300';
+            } else if (statusUpper === 'ACCEPTED') {
+              statusBadgeClass = 'bg-emerald-500/20 text-emerald-200';
+            } else if (statusUpper === 'REJECTED') {
+              statusBadgeClass = 'bg-rose-500/15 text-rose-300';
+            } else if (statusUpper === 'IN_REVIEW' || statusUpper === 'INTERVIEW') {
+              statusBadgeClass = 'bg-blue-500/15 text-blue-300';
+            }
 
             return ` 
               <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/60">
@@ -334,24 +350,31 @@
                     <p class="text-sm font-semibold text-slate-50">${name}</p>
                     <p class="text-xs text-slate-400">${email}</p>
                   </div>
-                  <span class="rounded-full bg-emerald-500/15 px-2 py-1 text-[11px] font-medium text-emerald-300">
+                  <span class="rounded-full ${statusBadgeClass} px-2 py-1 text-[11px] font-medium">
                     ${status}
                   </span>
                 </div>
                 <p class="mt-2 text-[11px] text-slate-500">
                   Application ID: ${app.id}
                 </p>
-                <div class="mt-2 flex gap-2">
+                <div class="mt-3 flex flex-wrap gap-2">
                   <a 
                     href="employer-student-profile.html?studentId=${app.student?.id}"
                     class="rounded-full border border-indigo-500/60 bg-indigo-500/10 px-4 py-2 text-xs font-semibold text-indigo-200 hover:bg-indigo-500/20">
                     View Profile
                   </a>
+                  ${canSendOffer ? `
                   <button 
                     class="bg-indigo-500 text-white rounded-full px-4 py-2 text-xs font-semibold hover:bg-indigo-400"
                     data-application-id="${app.id}" id="invite-btn-${app.id}">
                     Invite to Interview
                   </button>
+                  <button 
+                    class="bg-emerald-500 text-white rounded-full px-4 py-2 text-xs font-semibold hover:bg-emerald-400"
+                    data-application-id="${app.id}" id="offer-btn-${app.id}">
+                    Send Offer
+                  </button>
+                  ` : ''}
                 </div>
               </div> 
             `;
@@ -376,8 +399,9 @@
       }
 
       // Add invite functionality
-      document.querySelectorAll('[id^="invite-btn-"]').forEach(button => {
-        button.addEventListener('click', () => {
+      listEl?.addEventListener('click', async (e) => {
+        const button = e.target.closest('[id^="invite-btn-"]');
+        if (button) {
           // Open the date picker modal
           const modal = document.getElementById('datePickerModal');
           const confirmBtn = document.getElementById('confirmBtn');
@@ -387,7 +411,7 @@
           modal.classList.remove('hidden');
 
           // Handle confirm button click
-          confirmBtn.addEventListener('click', async () => {
+          const handleConfirm = async () => {
             const interviewDate = interviewDateInput.value;
 
             if (!interviewDate) {
@@ -419,13 +443,66 @@
               alert("Error: " + err.message);
             }
             modal.classList.add('hidden');
-          });
+            confirmBtn.removeEventListener('click', handleConfirm);
+          };
+
+          confirmBtn.addEventListener('click', handleConfirm, { once: true });
 
           // Handle cancel button click
           cancelBtn.addEventListener('click', () => {
             modal.classList.add('hidden');
-          });
-        });
+            confirmBtn.removeEventListener('click', handleConfirm);
+          }, { once: true });
+        }
+
+        // Add Send Offer functionality
+        const offerButton = e.target.closest('[id^="offer-btn-"]');
+        if (offerButton) {
+          const applicationId = offerButton.getAttribute('data-application-id');
+          
+          if (!confirm('Send an offer to this applicant?')) {
+            return;
+          }
+
+          const originalText = offerButton.textContent;
+          offerButton.disabled = true;
+          offerButton.textContent = 'Sending...';
+          offerButton.classList.add('opacity-70');
+
+          try {
+            const res = await fetch(`${API}/api/applications/${applicationId}/offer`, {
+              method: 'PATCH',
+              headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+              }
+            });
+
+            const data = await res.json().catch(() => ({}));
+
+            if (res.status === 401) {
+              window.location.href = 'employer-login.html';
+              return;
+            }
+
+            if (!res.ok) {
+              throw new Error(data?.message || 'Failed to send offer');
+            }
+
+            // Show success message
+            setStatus(true, 'Offer sent successfully!');
+            
+            // Refresh applicants list
+            window.location.reload();
+          } catch (err) {
+            console.error(err);
+            setStatus(false, err.message);
+            offerButton.textContent = originalText;
+            offerButton.disabled = false;
+            offerButton.classList.remove('opacity-70');
+            alert('Failed to send offer: ' + err.message);
+          }
+        }
       });
     });
   </script>
