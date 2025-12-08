@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>UniTalent – Employer Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Background -->
+  <style>
+    body {
+      position: relative;
+      overflow-x: hidden;
+      background: #020617;
+    }
+
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      pointer-events: none;
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
+      overflow: hidden;
+    }
+
+    .animated-bg::before {
+      content: "";
+      position: absolute;
+      left: -50%;
+      bottom: -40%;
+      width: 200%;
+      height: 200%;
+      background-image: radial-gradient(#64748b 1px, transparent 1px);
+      background-size: 26px 26px;
+      opacity: 0.6;
+      transform-origin: center;
+      transform: perspective(900px) rotateX(72deg) translateY(0);
+      animation: moveGrid 18s linear infinite;
+    }
+
+    @keyframes moveGrid {
+      0% {
+        transform: perspective(900px) rotateX(72deg) translateY(0);
+      }
+
+      100% {
+        transform: perspective(900px) rotateX(72deg) translateY(140px);
+      }
+    }
+  </style>
+</head>
+
+<body class="font-sans text-slate-100" data-guard="EMPLOYER">
+  <div class="animated-bg"></div>
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-2">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
+          <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
+        </div>
+        <div class="leading-tight">
+          <p class="text-base font-semibold tracking-tight">UniTalent</p>
+          <p class="text-[11px] text-slate-400">Student Career Platform</p>
+        </div>
+      </a>
+
+      <!-- Desktop menu -->
+      <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
+        <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
+        <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
+        <a href="student-login.html" class="hover:text-indigo-300">For students</a>
+        <a href="employer-dashboard.html" class="text-indigo-300">For employers</a>
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+      </div>
+
+      <!-- Identity + Logout -->
+      <div class="hidden items-center gap-3 md:flex">
+        <span class="text-xs text-slate-400">Logged in as</span>
+        <span id="nav-employer-pill"
+          class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100">
+          Employer · Company
+        </span>
+
+        <button id="logout-btn"
+          class="rounded-full bg-slate-900/80 px-3 py-1 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:ring-rose-400">
+          Logout
+        </button>
+      </div>
+
+      <!-- Mobile menu button -->
+      <button
+        class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
+        <span class="sr-only">Open menu</span>
+        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- MAIN -->
+  <main class="mx-auto max-w-6xl px-4 pb-16 pt-6 md:pt-8">
+    <!-- Breadcrumb -->
+    <div class="mb-4 text-xs text-slate-400">
+      <a href="index.html" class="hover:text-indigo-300">Home</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <a href="employer-dashboard.html" class="hover:text-indigo-300">Dashboard</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <span class="text-slate-300">Employer profile</span>
+    </div>
+
+    <!-- Title -->
+    <section class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div>
+        <p class="text-xs text-slate-400">Employer profile</p>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
+          Edit your company details
+        </h1>
+        <p class="mt-1 text-sm text-slate-400">
+          This information is shown to students on your job posts and applicants view.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a href="employer-dashboard.html"
+          class="rounded-full bg-slate-900/80 px-4 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:ring-indigo-400">
+          ← Back to dashboard
+        </a>
+        <button id="save-top-btn" type="button"
+          class="rounded-full bg-indigo-500 px-4 py-2 text-[11px] font-semibold text-white hover:bg-indigo-400">
+          Save changes
+        </button>
+      </div>
+    </section>
+
+    <!-- Status line -->
+    <div id="page-status" class="mt-4 text-[11px] text-slate-400">
+      Loading your employer profile...
+    </div>
+
+    <!-- FORM CARD -->
+    <section class="mt-4 rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl shadow-slate-900/70">
+      <form id="employer-profile-form" class="grid gap-6">
+
+        <!-- Identity -->
+        <div>
+          <h2 class="text-sm font-semibold text-slate-50">Contact / Identity</h2>
+          <p class="mt-1 text-[11px] text-slate-400">
+            You can use your personal name or company name here (e.g. “TechCorp HR”).
+          </p>
+
+          <!-- 🔁 Only ONE field now -->
+          <div class="mt-4 grid gap-3 md:grid-cols-1">
+            <div>
+              <label class="text-[11px] text-slate-300">Name (or company name)</label>
+              <input id="firstName" type="text"
+                class="mt-1 w-full rounded-2xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 outline-none focus:border-indigo-400"
+                placeholder="AlanT / TechCorp HR" />
+            </div>
+          </div>
+        </div>
+
+        <div class="h-px bg-slate-800"></div>
+
+        <!-- Company legal -->
+        <div>
+          <h2 class="text-sm font-semibold text-slate-50">Company details</h2>
+          <p class="mt-1 text-[11px] text-slate-400">
+            Basic info shown to students and used for trust & verification.
+          </p>
+
+          <div class="mt-4 grid gap-3 md:grid-cols-2">
+            <div>
+              <label class="text-[11px] text-slate-300">BIN / Business ID</label>
+              <input id="bin" type="text"
+                class="mt-1 w-full rounded-2xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 outline-none focus:border-indigo-400"
+                placeholder="XXXXXXXXXXXX" />
+            </div>
+
+            <div>
+              <label class="text-[11px] text-slate-300">Company size</label>
+              <select id="companySize"
+                class="mt-1 w-full rounded-2xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 outline-none focus:border-indigo-400">
+                <option value="">Select size...</option>
+                <option value="1-10">1–10 employees</option>
+                <option value="11-50">11–50 employees</option>
+                <option value="51-200">51–200 employees</option>
+                <option value="200+">200+ employees</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="text-[11px] text-slate-300">City</label>
+              <input id="city" type="text"
+                class="mt-1 w-full rounded-2xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 outline-none focus:border-indigo-400"
+                placeholder="Almaty, Astana, etc." />
+            </div>
+
+            <div>
+              <label class="text-[11px] text-slate-300">Industry</label>
+              <input id="industry" type="text"
+                class="mt-1 w-full rounded-2xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 outline-none focus:border-indigo-400"
+                placeholder="IT, Finance, Education, etc." />
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom actions -->
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p class="text-[10px] text-slate-500">
+            Saving will update how your name and company info appear to students.
+          </p>
+          <div class="flex gap-2">
+            <button type="button" id="reset-btn"
+              class="rounded-full bg-slate-900/80 px-4 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:ring-slate-500">
+              Reset
+            </button>
+            <button type="submit" id="save-btn"
+              class="rounded-full bg-indigo-500 px-5 py-2 text-[11px] font-semibold text-white hover:bg-indigo-400">
+              Save changes
+            </button>
+          </div>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800 bg-slate-950/90">
+    <div
+      class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
+      <p>© 2025 UniTalent. All rights reserved.</p>
+      <div class="flex flex-wrap gap-4">
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
+        <span>Terms · Privacy</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- PAGE SCRIPT -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const API = 'http://localhost:3000';
+
+      // -------------------------
+      // Unified storage helpers
+      // -------------------------
+      const storeGet = (key) =>
+        localStorage.getItem(key) ?? sessionStorage.getItem(key);
+
+      const storeSet = (key, value) => {
+        localStorage.setItem(key, value);
+      };
+
+      const storeRemove = (key) => {
+        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
+      };
+
+      function readUniTalentAuth() {
+        const token = storeGet('unitalent_token');
+        const userRaw = storeGet('unitalent_user');
+
+        if (!token || !userRaw) return { token: null, user: null };
+
+        try {
+          return { token, user: JSON.parse(userRaw) };
+        } catch {
+          storeRemove('unitalent_token');
+          storeRemove('unitalent_user');
+          return { token: null, user: null };
+        }
+      }
+
+      function clearAllAuth() {
+        [
+          'unitalent_token',
+          'unitalent_user',
+          'unitalent_student_name',
+          'unitalent_student_email',
+          'unitalent_student_username',
+          'unitalent_employer_name',
+          'unitalent_employer_bin',
+          'unitalent_employer_city',
+          'unitalent_employer_size',
+          'unitalent_employer_profile'
+        ].forEach(storeRemove);
+      }
+
+      // Local employer profile (for UI)
+      function getLocalEmployerProfile() {
+        try {
+          return JSON.parse(localStorage.getItem('unitalent_employer_profile') || 'null');
+        } catch {
+          return null;
+        }
+      }
+
+      function setLocalEmployerProfile(p) {
+        const profile = p || {};
+        localStorage.setItem('unitalent_employer_profile', JSON.stringify(profile));
+
+        const name = profile.firstName || '';
+        if (name) storeSet('unitalent_employer_name', name);
+        if (profile.bin) storeSet('unitalent_employer_bin', profile.bin);
+        if (profile.companySize) storeSet('unitalent_employer_size', profile.companySize);
+        if (profile.city) storeSet('unitalent_employer_city', profile.city);
+      }
+
+      // -------------------------
+      // Auth guard (EMPLOYER only)
+      // -------------------------
+      const auth = readUniTalentAuth();
+      if (!auth.token || !auth.user) {
+        clearAllAuth();
+        window.location.href = 'employer-login.html';
+        return;
+      }
+
+      let { token, user } = auth;
+
+      if (user.role !== 'EMPLOYER') {
+        window.location.href =
+          user.role === 'STUDENT'
+            ? 'student-login.html'
+            : 'employer-login.html';
+        return;
+      }
+
+      // -------------------------
+      // UI refs
+      // -------------------------
+      const statusEl = document.getElementById('page-status');
+      const navEmployerPill = document.getElementById('nav-employer-pill');
+      const logoutBtn = document.getElementById('logout-btn');
+
+      const form = document.getElementById('employer-profile-form');
+      const saveBtn = document.getElementById('save-btn');
+      const saveTopBtn = document.getElementById('save-top-btn');
+      const resetBtn = document.getElementById('reset-btn');
+
+      const fields = {
+        firstName: document.getElementById('firstName'),
+        bin: document.getElementById('bin'),
+        companySize: document.getElementById('companySize'),
+        city: document.getElementById('city'),
+        industry: document.getElementById('industry')
+      };
+
+      // -------------------------
+      // Helpers
+      // -------------------------
+      function buildDisplayName(p) {
+        return (
+          p?.firstName ||
+          storeGet('unitalent_employer_name') ||
+          [user.firstName, user.lastName].filter(Boolean).join(' ') ||
+          user.email ||
+          'Employer'
+        );
+      }
+
+      function setNavName(p) {
+        if (navEmployerPill) {
+          navEmployerPill.textContent = `${buildDisplayName(p)} · Employer`;
+        }
+      }
+
+      function setField(el, value) {
+        if (!el) return;
+        el.value = value ?? '';
+      }
+
+      function readForm() {
+        return {
+          firstName: fields.firstName?.value.trim() || '',
+          bin: fields.bin?.value.trim() || '',
+          companySize: fields.companySize?.value || '',
+          city: fields.city?.value.trim() || '',
+          industry: fields.industry?.value.trim() || ''
+        };
+      }
+
+      function fillForm(p = {}) {
+        setField(fields.firstName, p.firstName);
+        setField(fields.bin, p.bin);
+        if (fields.companySize) fields.companySize.value = p.companySize || '';
+        setField(fields.city, p.city);
+        setField(fields.industry, p.industry);
+        setNavName(p);
+      }
+
+      function disableSaveButtons(flag) {
+        if (saveBtn) saveBtn.disabled = flag;
+        if (saveTopBtn) saveTopBtn.disabled = flag;
+      }
+
+      // -------------------------
+      // Load profile (local + backend)
+      // -------------------------
+      async function loadEmployerProfile() {
+        const local = getLocalEmployerProfile() || {};
+
+        // Show something immediately
+        fillForm({ ...local });
+
+        try {
+          if (statusEl) statusEl.textContent = 'Loading from backend...';
+
+          const res = await fetch(`${API}/api/employers/me`, {
+            headers: {
+              'Authorization': 'Bearer ' + token
+            }
+          });
+
+          if (res.status === 401) {
+            clearAllAuth();
+            window.location.href = 'employer-login.html';
+            return;
+          }
+
+          const data = await res.json().catch(() => null);
+          if (!res.ok) throw new Error(data?.message || 'Failed to load employer profile');
+
+          const merged = { ...local, ...data };
+          setLocalEmployerProfile(merged);
+          fillForm(merged);
+
+          if (statusEl) statusEl.textContent = 'Employer profile loaded.';
+        } catch (e) {
+          console.warn(e);
+          if (statusEl) statusEl.textContent =
+            'Using local employer profile (backend not available).';
+        }
+      }
+
+      // -------------------------
+      // Save profile
+      // -------------------------
+      async function saveEmployerProfile() {
+        const payload = readForm();
+
+        try {
+          if (statusEl) statusEl.textContent = 'Saving...';
+          disableSaveButtons(true);
+
+          const res = await fetch(`${API}/api/employers/me`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (res.status === 401) {
+            clearAllAuth();
+            window.location.href = 'employer-login.html';
+            return;
+          }
+
+          const data = await res.json().catch(() => null);
+          if (!res.ok) throw new Error(data?.message || 'Failed to save employer profile');
+
+          // update local + simple keys
+          setLocalEmployerProfile(data);
+
+          // Also update stored user (firstName only, we ignore lastName)
+          const updatedUser = {
+            ...user,
+            firstName: data.firstName ?? user.firstName
+          };
+          user = updatedUser;
+          localStorage.setItem('unitalent_user', JSON.stringify(updatedUser));
+
+          setNavName(data);
+
+          if (statusEl) statusEl.textContent = '✅ Employer profile saved.';
+        } catch (e) {
+          console.error(e);
+
+          const localFallback = { ...(getLocalEmployerProfile() || {}), ...payload };
+          setLocalEmployerProfile(localFallback);
+          setNavName(localFallback);
+
+          if (statusEl) statusEl.textContent =
+            '❌ Save failed (stored locally only): ' + e.message;
+        } finally {
+          disableSaveButtons(false);
+        }
+      }
+
+      // -------------------------
+      // Reset
+      // -------------------------
+      function resetForm() {
+        const local = getLocalEmployerProfile() || {};
+        fillForm(local);
+        if (statusEl) statusEl.textContent = 'Form reset to last saved employer profile.';
+      }
+
+      // -------------------------
+      // Logout
+      // -------------------------
+      logoutBtn?.addEventListener('click', () => {
+        clearAllAuth();
+        window.location.href = 'index.html';
+      });
+
+      // -------------------------
+      // Events
+      // -------------------------
+      form?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveEmployerProfile();
+      });
+
+      saveTopBtn?.addEventListener('click', () => saveEmployerProfile());
+      resetBtn?.addEventListener('click', () => resetForm());
+
+      // Init
+      setNavName(getLocalEmployerProfile());
+      loadEmployerProfile();
+    });
+  </script>
+
+  <!-- Shared auth / navbar logic -->
+  <script type="module" src="js/auth.js"></script>
+</body>
+
+</html>

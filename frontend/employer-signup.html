@@ -23,9 +23,7 @@
   <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Abstract animated background -->
   <style>
@@ -71,7 +69,7 @@
   </style>
 </head>
 
-<body class="font-sans text-slate-100">
+<body class="font-sans text-slate-100" data-guard="GUEST">
   <!-- Background -->
   <div class="animated-bg"></div>
 
@@ -111,16 +109,14 @@
         class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
         <span class="sr-only">Open menu</span>
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-            d="M4 6h16M4 12h16M4 18h16" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
     </nav>
   </header>
 
   <!-- MAIN -->
-  <main
-    class="mx-auto flex min-h-[calc(100vh-72px-60px)] max-w-6xl flex-col items-center justify-center px-4 py-10">
+  <main class="mx-auto flex min-h-[calc(100vh-72px-60px)] max-w-6xl flex-col items-center justify-center px-4 py-10">
     <!-- Breadcrumb -->
     <div class="mb-6 w-full max-w-md text-xs text-slate-400">
       <a href="index.html" class="hover:text-indigo-300">Home</a>
@@ -241,10 +237,8 @@
           </ul>
         </div>
 
-        <div
-          class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-slate-900/70">
-          <img
-            src="https://images.pexels.com/photos/1181555/pexels-photo-1181555.jpeg?auto=compress&cs=tinysrgb&w=1200"
+        <div class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-slate-900/70">
+          <img src="https://images.pexels.com/photos/1181555/pexels-photo-1181555.jpeg?auto=compress&cs=tinysrgb&w=1200"
             alt="Team interviewing student" class="h-40 w-full object-cover" />
           <div class="p-4 text-xs">
             <p class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
@@ -275,93 +269,199 @@
     </div>
   </footer>
 
-  <!-- JS: отправка формы на backend -->
+  <!-- JS: signup logic -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      const API_BASE = "http://localhost:3000";
+
       const form = document.getElementById('employerSignupForm');
       const messageEl = document.getElementById('empFormMessage');
 
+      // optional UI elements (safe if not exist)
+      const submitBtn =
+        form?.querySelector('button[type="submit"]') ||
+        document.getElementById('signupBtn');
+      const rememberMe = document.getElementById('rememberMe');
+      // if you don't have it in HTML, no problem
+
       if (!form) return;
 
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        messageEl.textContent = '';
+      // -------------------------
+      // ✅ Auth helpers
+      // -------------------------
+      function readUniTalentAuth() {
+        const token =
+          localStorage.getItem('unitalent_token') ||
+          sessionStorage.getItem('unitalent_token');
+
+        const userRaw =
+          localStorage.getItem('unitalent_user') ||
+          sessionStorage.getItem('unitalent_user');
+
+        if (!token || !userRaw) return { token: null, user: null };
+
+        try {
+          return { token, user: JSON.parse(userRaw) };
+        } catch {
+          localStorage.removeItem('unitalent_token');
+          localStorage.removeItem('unitalent_user');
+          sessionStorage.removeItem('unitalent_token');
+          sessionStorage.removeItem('unitalent_user');
+          return { token: null, user: null };
+        }
+      }
+
+      // ✅ If already logged in as EMPLOYER => skip signup
+      const existing = readUniTalentAuth();
+      if (existing.token && existing.user?.role === "EMPLOYER") {
+        window.location.href = "employer-dashboard.html";
+        return;
+      }
+
+      // -------------------------
+      // ✅ UI helpers
+      // -------------------------
+      function setMsg(type, text) {
+        if (!messageEl) return;
+
+        messageEl.textContent = text || '';
         messageEl.className = 'mt-1 text-[11px] sm:text-xs';
 
-        const companyName = document.getElementById('companyName').value.trim();
-        const bin = document.getElementById('bin').value.trim();
-        const city = document.getElementById('city').value.trim();
-        const companySize = document.getElementById('companySize').value;
-        const email = document.getElementById('employerEmail').value.trim();
-        const password = document.getElementById('empPassword').value;
-        const password2 = document.getElementById('empPassword2').value;
+        if (!text) return;
+
+        if (type === 'ok') messageEl.classList.add('text-emerald-400');
+        else if (type === 'err') messageEl.classList.add('text-red-400');
+        else messageEl.classList.add('text-slate-300');
+      }
+
+      function setLoading(loading) {
+        if (!submitBtn) return;
+        submitBtn.disabled = loading;
+        submitBtn.textContent = loading ? "Creating..." : "Sign up";
+        submitBtn.classList.toggle("opacity-70", loading);
+        submitBtn.classList.toggle("pointer-events-none", loading);
+      }
+
+      function saveAuth({ token, user }, uiData) {
+        const remember = rememberMe?.checked ?? true;
+        const store = remember ? localStorage : sessionStorage;
+
+        // ✅ clear both first to avoid mixed sessions
+        localStorage.removeItem('unitalent_token');
+        localStorage.removeItem('unitalent_user');
+        sessionStorage.removeItem('unitalent_token');
+        sessionStorage.removeItem('unitalent_user');
+
+        if (token) store.setItem('unitalent_token', token);
+        if (user) store.setItem('unitalent_user', JSON.stringify(user));
+
+        // ✅ store employer UI fields
+        // I store them in the SAME storage as auth for consistency
+        const { companyName, bin, city, companySize, email } = uiData || {};
+
+        const display =
+          companyName ||
+          [user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
+          user?.email ||
+          email ||
+          "Employer";
+
+        if (display) store.setItem("unitalent_employer_name", display);
+        if (bin) store.setItem("unitalent_employer_bin", bin);
+        if (city) store.setItem("unitalent_employer_city", city);
+        if (companySize) store.setItem("unitalent_employer_size", companySize);
+      }
+
+      // -------------------------
+      // ✅ Submit
+      // -------------------------
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        setMsg('', '');
+
+        const companyName = document.getElementById('companyName')?.value.trim();
+        const bin = document.getElementById('bin')?.value.trim();
+        const city = document.getElementById('city')?.value.trim();
+        const companySize = document.getElementById('companySize')?.value || '';
+        const email = document.getElementById('employerEmail')?.value.trim();
+        const password = document.getElementById('empPassword')?.value || '';
+        const password2 = document.getElementById('empPassword2')?.value || '';
+
+        // Basic required checks
+        if (!companyName || !email || !password || !password2) {
+          setMsg('err', 'Please fill all required fields.');
+          return;
+        }
 
         if (password !== password2) {
-          messageEl.textContent = 'Passwords do not match.';
-          messageEl.classList.add('text-red-400');
+          setMsg('err', 'Passwords do not match.');
           return;
         }
 
-        if (bin.length !== 12) {
-          messageEl.textContent = 'BIN should be 12 digits (demo validation).';
-          messageEl.classList.add('text-red-400');
+        // BIN validation: 12 digits
+        if (!/^\d{12}$/.test(bin || '')) {
+          setMsg('err', 'BIN should be exactly 12 digits.');
           return;
         }
 
+        // ✅ Backend-compatible payload (temporary mapping)
         const payload = {
-          companyName,
-          bin,
-          city,
-          companySize,
           email,
-          password
+          password,
+          firstName: companyName
         };
 
         try {
-          messageEl.textContent = 'Creating employer account...';
-          messageEl.classList.add('text-slate-300');
+          setLoading(true);
+          setMsg('info', 'Creating employer account...');
 
-          // 👇 ПОМЕНЯЙ URL НА ТОТ, КОТОРЫЙ В SWAGGER ЕСЛИ ДРУГОЙ
-          const response = await fetch('http://localhost:8080/api/v1/auth/register-employer', {
+          const res = await fetch(`${API_BASE}/api/auth/employer/register`, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
           });
 
-          const errText = await response.text().catch(() => '');
+          const data = await res.json().catch(() => ({}));
 
-          if (!response.ok) {
-            messageEl.textContent = 'Error: ' + (errText || 'Registration failed');
-            messageEl.classList.remove('text-slate-300');
-            messageEl.classList.add('text-red-400');
+          if (!res.ok) {
+            const errMsg = data?.message || data?.error || 'Registration failed';
+            setMsg('err', errMsg);
             return;
           }
 
-          // Можно сохранить имя / email для дашборда
-          if (companyName) {
-            localStorage.setItem('unitalent_employer_name', companyName);
-          } else if (email) {
-            localStorage.setItem('unitalent_employer_name', email);
+          // Role safety check (just in case)
+          if (data?.user?.role && data.user.role !== "EMPLOYER") {
+            setMsg('err', 'This signup form is for EMPLOYER accounts only.');
+            return;
           }
 
-          messageEl.textContent = 'Employer registered successfully! Redirecting...';
-          messageEl.classList.remove('text-red-400');
-          messageEl.classList.add('text-emerald-400');
+          // ✅ Save auth + employer UI data
+          saveAuth(
+            { token: data?.token, user: data?.user },
+            { companyName, bin, city, companySize, email }
+          );
 
-          setTimeout(() => {
-            window.location.href = 'employer-dashboard.html';
-          }, 800);
+          setMsg('ok', 'Employer registered successfully! Redirecting...');
+
+          // Fast redirect
+          const t =
+            localStorage.getItem('unitalent_token') ||
+            sessionStorage.getItem('unitalent_token');
+
+          window.location.href = t ? 'employer-dashboard.html' : 'employer-login.html';
+
         } catch (err) {
           console.error(err);
-          messageEl.textContent = 'Network error. Check if backend is running and CORS is configured.';
-          messageEl.classList.remove('text-slate-300');
-          messageEl.classList.add('text-red-400');
+          setMsg('err', 'Network error. Check if backend is running.');
+        } finally {
+          setLoading(false);
         }
       });
     });
   </script>
+
+  <script type="module" src="js/auth.js"></script>
+
 </body>
 
 </html>

@@ -66,7 +66,7 @@
   </style>
 </head>
 
-<body class="font-sans text-slate-100">
+<body class="font-sans text-slate-100" data-guard="STUDENT">
   <div class="animated-bg"></div>
 
   <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
@@ -85,16 +85,27 @@
       <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
         <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
         <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
-        <a href="student-login.html" class="text-indigo-300">For students</a>
+        <a href="saved-jobs.html" class="hover:text-indigo-300">Saved</a>
+
+
+        <!-- ✅ FIX: dashboard link instead of login -->
+        <a href="student-dashboard.html" class="text-indigo-300">For students</a>
+
         <a href="employer-login.html" class="hover:text-indigo-300">For employers</a>
         <a href="index.html#about" class="hover:text-indigo-300">About</a>
       </div>
 
       <div class="hidden items-center gap-3 md:flex">
         <span class="text-xs text-slate-400">Logged in as</span>
+
         <span id="nav-user-pill" class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100">
-          Yeskendir
+          Student
         </span>
+
+        <button id="logout-btn"
+          class="rounded-full bg-slate-900/80 px-3 py-1 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:ring-rose-400">
+          Logout
+        </button>
       </div>
 
       <button
@@ -131,56 +142,72 @@
         <div class="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2">
           <div id="profile-avatar-initials"
             class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
-            YK
+            ST
           </div>
           <div class="leading-tight">
             <p id="profile-line-1" class="font-semibold text-slate-100">
-              Yeskendir Kaldybek
+              Student
             </p>
             <p id="profile-line-2" class="text-[11px] text-slate-400">
-              Information Systems
+              Major not specified
             </p>
           </div>
         </div>
 
-        <button
+        <a href="student-profile.html"
           class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400">
           Edit profile
-        </button>
+        </a>
+
+        <a href="saved-jobs.html"
+          class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-rose-300">
+          Saved jobs
+        </a>
+
+
       </div>
     </section>
 
+    <!-- KPI cards -->
     <section class="mt-6 grid gap-4 text-xs md:grid-cols-3">
       <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
         <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
           Applications sent
         </p>
-        <p class="mt-2 text-2xl font-bold text-slate-50">4</p>
-        <p class="mt-1 text-[11px] text-slate-400">
-          1 new this week
+        <p id="kpi-apps" class="mt-2 text-2xl font-bold text-slate-50">0</p>
+        <p id="kpi-apps-sub" class="mt-1 text-[11px] text-slate-400">
+          Loading...
         </p>
       </div>
+
       <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
         <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
           Interviews
         </p>
-        <p class="mt-2 text-2xl font-bold text-slate-50">1</p>
-        <p class="mt-1 text-[11px] text-emerald-300">
-          Thu, 16:00 · Online
+        <p id="kpi-interviews" class="mt-2 text-2xl font-bold text-slate-50">0</p>
+        <p class="mt-1 text-[11px] text-slate-400">
+          Based on application status
         </p>
+        <a href="student-interviews.html" class="mt-2 inline-block text-[11px] text-indigo-300 hover:text-indigo-200">
+          View interviews →
+        </a>
       </div>
+
+
+
       <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
         <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
           Saved jobs
         </p>
-        <p class="mt-2 text-2xl font-bold text-slate-50">7</p>
+        <p id="kpi-saved" class="mt-2 text-2xl font-bold text-slate-50">0</p>
         <p class="mt-1 text-[11px] text-slate-400">
-          Try applying to 2 more this week.
+          From your bookmarks
         </p>
       </div>
     </section>
 
     <section class="mt-8 grid gap-6 md:grid-cols-[minmax(0,1.6fr),minmax(0,1fr)]">
+      <!-- My applications column -->
       <div class="space-y-4">
         <div class="flex items-center justify-between">
           <h2 class="text-sm font-semibold text-slate-50">
@@ -191,148 +218,33 @@
           </a>
         </div>
 
-        <div
+        <p id="apps-status" class="text-[11px] text-slate-400">Loading your applications...</p>
+
+        <div id="apps-list"
           class="space-y-3 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
-          <article
-            class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p class="text-[11px] uppercase tracking-wide text-emerald-400">Applied</p>
-              <h3 class="mt-1 text-sm font-semibold text-slate-50">
-                Junior Frontend Developer
-              </h3>
-              <p class="text-[11px] text-slate-400">
-                BrightCode · Almaty · Hybrid
-              </p>
-              <p class="mt-1 text-[11px] text-slate-300">
-                Sent 2 days ago · Waiting for review
-              </p>
-              <div class="mt-1 flex flex-wrap gap-1 text-[10px] text-slate-300">
-                <span class="rounded-full bg-slate-800 px-2 py-0.5">HTML/CSS</span>
-                <span class="rounded-full bg-slate-800 px-2 py-0.5">JavaScript</span>
-                <span class="rounded-full bg-slate-800 px-2 py-0.5">React basics</span>
-              </div>
-            </div>
-            <div class="flex flex-col items-end gap-1">
-              <span class="rounded-full bg-slate-800 px-2 py-1 text-[10px] font-medium text-slate-200">
-                Status: Under review
-              </span>
-              <button class="text-[11px] text-indigo-300 hover:text-indigo-200">
-                View application
-              </button>
-            </div>
-          </article>
-
-          <article
-            class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p class="text-[11px] uppercase tracking-wide text-emerald-400">Interview</p>
-              <h3 class="mt-1 text-sm font-semibold text-slate-50">
-                Social Media Content Assistant
-              </h3>
-              <p class="text-[11px] text-slate-400">
-                CampusLabs · Remote
-              </p>
-              <p class="mt-1 text-[11px] text-slate-300">
-                Thu, 16:00 (Zoom)
-              </p>
-              <div class="mt-1 flex flex-wrap gap-1 text-[10px] text-slate-300">
-                <span class="rounded-full bg-slate-800 px-2 py-0.5">Instagram</span>
-                <span class="rounded-full bg-slate-800 px-2 py-0.5">TikTok</span>
-                <span class="rounded-full bg-slate-800 px-2 py-0.5">Content creation</span>
-              </div>
-            </div>
-            <div class="flex flex-col items-end gap-1">
-              <span class="rounded-full bg-indigo-500/20 px-2 py-1 text-[10px] font-medium text-indigo-200">
-                Next step: Interview
-              </span>
-              <button class="text-[11px] text-indigo-300 hover:text-indigo-200">
-                View details
-              </button>
-            </div>
-          </article>
-
-          <article
-            class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p class="text-[11px] uppercase tracking-wide text-slate-500">Closed</p>
-              <h3 class="mt-1 text-sm font-semibold text-slate-50">
-                Data Analytics Intern
-              </h3>
-              <p class="text-[11px] text-slate-400">
-                FinVision · Astana
-              </p>
-              <p class="mt-1 text-[11px] text-slate-300">
-                Application closed · Position filled
-              </p>
-            </div>
-            <div class="flex flex-col items-end gap-1">
-              <span class="rounded-full bg-slate-900 px-2 py-1 text-[10px] font-medium text-slate-400">
-                Status: Not selected
-              </span>
-              <button class="text-[11px] text-slate-400 hover:text-slate-200">
-                View feedback
-              </button>
-            </div>
-          </article>
-
-          <article class="flex flex-col gap-3 text-xs md:flex-row md:items-center md:justify-between">
-            <div>
-              <p class="text-[11px] uppercase tracking-wide text-emerald-400">Draft</p>
-              <h3 class="mt-1 text-sm font-semibold text-slate-50">
-                Product Management Intern
-              </h3>
-              <p class="text-[11px] text-slate-400">
-                EduNext · Almaty · Hybrid
-              </p>
-              <p class="mt-1 text-[11px] text-slate-300">
-                You started an application but haven’t submitted yet.
-              </p>
-            </div>
-            <div class="flex flex-col items-end gap-1">
-              <span class="rounded-full bg-slate-800 px-2 py-1 text-[10px] font-medium text-slate-200">
-                Status: Draft
-              </span>
-              <button class="text-[11px] text-indigo-300 hover:text-indigo-200">
-                Continue application
-              </button>
-            </div>
-          </article>
+          <!-- dynamic -->
         </div>
       </div>
 
+      <!-- Sidebar -->
       <aside class="space-y-4">
         <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
           <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
             Profile completeness
           </p>
+
           <div class="mt-3 flex items-center justify-between">
-            <p class="text-sm font-semibold text-slate-50">70% complete</p>
+            <p id="profile-progress-text" class="text-sm font-semibold text-slate-50">0% complete</p>
             <span class="rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-200">
               Finish to get better matches
             </span>
           </div>
+
           <div class="mt-3 h-1.5 rounded-full bg-slate-800">
-            <div class="h-1.5 w-[70%] rounded-full bg-indigo-500"></div>
+            <div id="profile-progress-bar" class="h-1.5 w-0 rounded-full bg-indigo-500"></div>
           </div>
-          <ul class="mt-3 space-y-1.5">
-            <li class="flex items-center justify-between">
-              <span>Upload your CV</span>
-              <span class="text-emerald-300">Done</span>
-            </li>
-            <li class="flex items-center justify-between">
-              <span>Add 3+ skills</span>
-              <span class="text-emerald-300">Done</span>
-            </li>
-            <li class="flex items-center justify-between">
-              <span>Add projects</span>
-              <span class="text-orange-300">Missing</span>
-            </li>
-            <li class="flex items-center justify-between">
-              <span>Write a short bio</span>
-              <span class="text-orange-300">Missing</span>
-            </li>
-          </ul>
-          <button
+
+          <button id="improve-profile-btn"
             class="mt-4 w-full rounded-full bg-slate-950/70 px-4 py-2 text-[11px] font-semibold text-slate-50 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400">
             Improve profile
           </button>
@@ -348,33 +260,10 @@
             </a>
           </div>
 
-          <div class="mt-3 space-y-3">
-            <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
-              <p class="text-[11px] uppercase tracking-wide text-emerald-400">Based on your skills</p>
-              <h3 class="mt-1 text-sm font-semibold text-slate-50">
-                Frontend Intern · Campus platform
-              </h3>
-              <p class="text-[11px] text-slate-400">Hybrid · Almaty</p>
-              <p class="mt-1 text-[11px] text-slate-300">
-                Uses React and Tailwind – matches your stack.
-              </p>
-              <button
-                class="mt-2 w-full rounded-full bg-indigo-500 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-indigo-400">
-                View job
-              </button>
-            </article>
-
-            <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
-              <p class="text-[11px] uppercase tracking-wide text-slate-400">Because you saved similar roles</p>
-              <h3 class="mt-1 text-sm font-semibold text-slate-50">
-                Social Media & Content Intern
-              </h3>
-              <p class="text-[11px] text-slate-400">Remote</p>
-              <button
-                class="mt-2 w-full rounded-full bg-slate-900 px-3 py-1.5 text-[11px] font-semibold text-slate-100 ring-1 ring-slate-700 hover:bg-slate-800 hover:ring-indigo-400">
-                View job
-              </button>
-            </article>
+          <div id="recommended-list" class="mt-3 space-y-3">
+            <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3 text-[11px] text-slate-300">
+              Recommendations will improve after you complete your profile.
+            </div>
           </div>
         </div>
 
@@ -390,172 +279,7 @@
       </aside>
     </section>
 
-    <section class="mt-10 grid gap-6 md:grid-cols-[minmax(0,1.4fr),minmax(0,1.1fr)]">
-      <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
-        <div class="flex items-center justify-between gap-2">
-          <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-              Weekly schedule
-            </p>
-            <p class="text-sm font-semibold text-slate-50">
-              2025–2026 · 1 term
-            </p>
-          </div>
-          <span class="rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-200">
-            Information Systems
-          </span>
-        </div>
 
-        <div class="mt-4 hidden text-[11px] text-slate-200 md:block">
-          <div
-            class="grid grid-cols-5 gap-2 border-b border-slate-800 pb-2 text-[10px] uppercase tracking-wide text-slate-400">
-            <span>Day</span>
-            <span>08:30–10:20</span>
-            <span>10:30–12:20</span>
-            <span>12:30–14:20</span>
-            <span>14:30–18:20</span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2 border-b border-slate-800 py-2">
-            <span class="font-semibold text-slate-100">Mon</span>
-            <span>
-              CSS 331 · Lecture<br />
-              <span class="text-slate-400">E221</span>
-            </span>
-            <span>
-              CSS 331 · Lab<br />
-              <span class="text-slate-400">E221</span>
-            </span>
-            <span>
-              MDE 132 · Turk. Lang<br />
-              <span class="text-slate-400">H 02</span>
-            </span>
-            <span>
-              MAT 151 · Lecture<br />
-              <span class="text-slate-400">D218</span>
-            </span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2 border-b border-slate-800 py-2">
-            <span class="font-semibold text-slate-100">Thu</span>
-            <span>
-              CSS 108 · Lecture<br />
-              <span class="text-slate-400">D116</span>
-            </span>
-            <span>
-              CSS 108 · Lab<br />
-              <span class="text-slate-400">D116</span>
-            </span>
-            <span>
-              MAT 137 · Practice<br />
-              <span class="text-slate-400">F305</span>
-            </span>
-            <span class="text-slate-500">—</span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2 py-2">
-            <span class="font-semibold text-slate-100">Fri</span>
-            <span>
-              MDE 191 · Lecture<br />
-              <span class="text-slate-400">E117</span>
-            </span>
-            <span>
-              MDE 191 · Practice<br />
-              <span class="text-slate-400">F204</span>
-            </span>
-            <span>
-              MAT 151 · Practice<br />
-              <span class="text-slate-400">F102</span>
-            </span>
-            <span class="text-slate-500">—</span>
-          </div>
-        </div>
-
-        <div class="mt-4 space-y-3 text-[11px] text-slate-200 md:hidden">
-          <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Mon</p>
-            <p>CSS 331 – E221 · morning</p>
-            <p>MDE 132 – H 02 · midday</p>
-            <p>MAT 151 – D218 · afternoon</p>
-          </div>
-          <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Thu</p>
-            <p>CSS 108 – D116 · morning</p>
-            <p>MAT 137 – F305 · midday</p>
-          </div>
-          <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Fri</p>
-            <p>MDE 191 – E117/F204 · morning</p>
-            <p>MAT 151 – F102 · afternoon</p>
-          </div>
-        </div>
-
-        <p class="mt-3 text-[11px] text-slate-400">
-          You can keep this section in sync with your AISU schedule – for now it’s a static preview.
-        </p>
-      </div>
-
-      <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
-        <div class="flex items-center justify-between gap-2">
-          <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-              Transcript
-            </p>
-            <p class="text-sm font-semibold text-slate-50">
-              Bachelor · Information Systems
-            </p>
-          </div>
-          <div class="text-right text-[11px] text-slate-300">
-            <p><span class="text-slate-400">GPA:</span> 2.88</p>
-            <p><span class="text-slate-400">Faculty:</span> School of Information Technology and Applied Mathematics</p>
-          </div>
-        </div>
-
-        <div class="mt-4 space-y-4">
-          <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
-            <div class="flex items-center justify-between">
-              <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                2023–2024 · Term 1
-              </p>
-              <span class="text-[11px] text-slate-400">GPA: 2.85</span>
-            </div>
-            <ul class="mt-2 space-y-1 text-[11px] text-slate-200">
-              <li><span class="font-semibold text-orange-300">CSS 105</span> – Fundamentals of Programming (D+)</li>
-              <li><span class="font-semibold">INF 106</span> – Information and Communication Technologies (B)</li>
-              <li><span class="font-semibold">MAT 156</span> – Discrete Mathematics (C+)</li>
-              <li><span class="font-semibold">MDE 131</span> – Turkish Language 1 (B+)</li>
-              <li><span class="font-semibold">MDE 171</span> – History of Kazakhstan (B+)</li>
-              <li><span class="font-semibold">MDE 190</span> – Foreign Language 1 (English, B1) (A-)</li>
-              <li><span class="font-semibold">MDE 291</span> – Physical Education 1 (A-)</li>
-            </ul>
-          </div>
-
-          <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
-            <div class="flex items-center justify-between">
-              <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                2023–2024 · Term 2
-              </p>
-              <span class="text-[11px] text-slate-400">GPA: 2.88</span>
-            </div>
-            <ul class="mt-2 space-y-1 text-[11px] text-slate-200">
-              <li><span class="font-semibold">CSS 108</span> – Programming Technologies & Practice (C+)</li>
-              <li><span class="font-semibold">CSS 331</span> – Operating Systems (C+)</li>
-              <li><span class="font-semibold">MAT 137</span> – Mathematics for IS 1 (B)</li>
-              <li><span class="font-semibold">MAT 151</span> – Linear Algebra (B)</li>
-              <li><span class="font-semibold">MDE 132</span> – Turkish Language 2 (A1) (B)</li>
-              <li><span class="font-semibold">MDE 170</span> – Community engagement (Pass)</li>
-              <li><span class="font-semibold">MDE 191</span> – Foreign Language 2 (English B1+) (A-)</li>
-              <li><span class="font-semibold">MDE 292</span> – Physical Education 2 (B+)</li>
-            </ul>
-          </div>
-        </div>
-
-        <p class="mt-3 text-[11px] text-slate-400">
-          This block is based on your current transcript. In the real app it can be synced with the
-          university system or uploaded as PDF.
-        </p>
-      </div>
-    </section>
   </main>
 
   <footer class="border-t border-slate-800 bg-slate-950/90">
@@ -570,61 +294,400 @@
     </div>
   </footer>
 
+  <!-- ✅ CLEAN + FIXED SCRIPT -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // ⚠️ DEMO-MODE logic
-      // We set the user details to Yeskendir Kaldybek by default for this view
+      const API = 'http://localhost:3000';
 
-      const token = localStorage.getItem('unitalent_token') || 'demo-token';
+      // =========================
+      // ✅ Unified storage helpers
+      // =========================
+      const storeGet = (key) =>
+        localStorage.getItem(key) ?? sessionStorage.getItem(key);
 
+      const storeRemove = (key) => {
+        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
+      };
+
+      function readUniTalentAuth() {
+        const token = storeGet('unitalent_token');
+        const userRaw = storeGet('unitalent_user');
+
+        if (!token || !userRaw) return { token: null, user: null };
+
+        try {
+          return { token, user: JSON.parse(userRaw) };
+        } catch {
+          storeRemove('unitalent_token');
+          storeRemove('unitalent_user');
+          return { token: null, user: null };
+        }
+      }
+
+      function clearAllAuth() {
+        storeRemove('unitalent_token');
+        storeRemove('unitalent_user');
+
+        [
+          'unitalent_student_name',
+          'unitalent_student_email',
+          'unitalent_student_username',
+          'unitalent_employer_name',
+          'unitalent_employer_bin',
+          'unitalent_employer_city',
+          'unitalent_employer_size'
+        ].forEach(storeRemove);
+      }
+
+      // =========================
+      // ✅ Student auth guard
+      // =========================
+      const { token, user } = readUniTalentAuth();
+
+      if (!token || !user) {
+        clearAllAuth();
+        window.location.href = 'student-login.html';
+        return;
+      }
+
+      if (user.role !== 'STUDENT') {
+        window.location.href =
+          user.role === 'EMPLOYER'
+            ? 'employer-dashboard.html'
+            : 'student-login.html';
+        return;
+      }
+
+      // =========================
+      // Local profile (optional UI-only)
+      // =========================
+      function getLocalProfile() {
+        try {
+          return JSON.parse(localStorage.getItem('unitalent_student_profile') || 'null');
+        } catch {
+          return null;
+        }
+      }
+
+      function escapeHtml(str = '') {
+        return String(str)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+      }
+
+      function formatDate(iso) {
+        try {
+          const d = new Date(iso);
+          if (Number.isNaN(d.getTime())) return null;
+          return d.toLocaleDateString();
+        } catch {
+          return null;
+        }
+      }
+
+      // =========================
+      // UI elements
+      // =========================
       const dashboardTitle = document.getElementById('dashboard-title');
       const navUserPill = document.getElementById('nav-user-pill');
       const avatarInitials = document.getElementById('profile-avatar-initials');
       const profileLine1 = document.getElementById('profile-line-1');
       const profileLine2 = document.getElementById('profile-line-2');
+      const logoutBtn = document.getElementById('logout-btn');
 
-      // Use specific data from the image unless localStorage has an overwrite
-      const storedName = localStorage.getItem('unitalent_student_name');
-      const storedEmail = localStorage.getItem('unitalent_student_email');
-      const storedMajor = localStorage.getItem('unitalent_student_major');
+      const kpiApps = document.getElementById('kpi-apps');
+      const kpiAppsSub = document.getElementById('kpi-apps-sub');
+      const kpiInterviews = document.getElementById('kpi-interviews');
+      const kpiSaved = document.getElementById('kpi-saved');
 
-      // Defaults based on the provided Transcript Image
-      const defaultName = 'Yeskendir Kaldybek';
-      const defaultMajor = 'Information Systems';
-      const defaultEmail = '230103282@stu.sdu.edu.kz'; // Inferred from ID, generic format
+      const appsList = document.getElementById('apps-list');
+      const appsStatus = document.getElementById('apps-status');
 
-      const displayName = storedName && storedName.trim() ? storedName : defaultName;
-      const displayMajor = storedMajor || defaultMajor;
+      const progressText = document.getElementById('profile-progress-text');
+      const progressBar = document.getElementById('profile-progress-bar');
+      const improveProfileBtn = document.getElementById('improve-profile-btn');
 
-      if (dashboardTitle) {
-        dashboardTitle.textContent = `Welcome back, ${displayName} 👋`;
-      }
+      const recommendedList = document.getElementById('recommended-list');
 
-      if (navUserPill) {
-        navUserPill.textContent = displayName;
-      }
+      // =========================
+      // Name + major
+      // =========================
+      const localProfile = getLocalProfile() || {};
+
+      const fullName =
+        [localProfile.firstName, localProfile.lastName].filter(Boolean).join(' ') ||
+        [user.firstName, user.lastName].filter(Boolean).join(' ') ||
+        user.email ||
+        'Student';
+
+      const major = localProfile.major || 'Major not specified';
+
+      if (dashboardTitle) dashboardTitle.textContent = `Welcome back, ${fullName} 👋`;
+      if (navUserPill) navUserPill.textContent = fullName;
+      if (profileLine1) profileLine1.textContent = fullName;
+      if (profileLine2) profileLine2.textContent = major;
 
       if (avatarInitials) {
-        const initials = displayName.split(' ')
+        const initials = fullName
+          .split(' ')
           .filter(Boolean)
-          .map(part => part[0])
+          .map(s => s[0])
           .join('')
           .slice(0, 2)
           .toUpperCase();
-        avatarInitials.textContent = initials || 'YK';
+        avatarInitials.textContent = initials || 'ST';
       }
 
-      if (profileLine1) {
-        profileLine1.textContent = displayName;
+      // =========================
+      // ✅ Profile completeness
+      // =========================
+      function calcProgress(p) {
+        const fields = [
+          p.firstName,
+          p.lastName,
+          p.university,
+          p.major,
+          p.studyYear,
+          p.skills,
+          p.bio
+        ];
+        const filled = fields.filter(v => String(v || '').trim().length > 0).length;
+        return Math.round((filled / fields.length) * 100);
       }
 
-      if (profileLine2) {
-        profileLine2.textContent = displayMajor;
+      function renderProfileProgress() {
+        const p = {
+          firstName: localProfile.firstName || user.firstName || '',
+          lastName: localProfile.lastName || user.lastName || '',
+          university: localProfile.university || '',
+          major: localProfile.major || '',
+          studyYear: localProfile.studyYear || '',
+          skills: localProfile.skills || '',
+          bio: localProfile.bio || ''
+        };
+
+        const pct = calcProgress(p);
+        if (progressText) progressText.textContent = `${pct}% complete`;
+        if (progressBar) progressBar.style.width = `${pct}%`;
       }
 
-      console.log('Student dashboard loaded with Transcript data.');
+      renderProfileProgress();
+
+      improveProfileBtn?.addEventListener('click', () => {
+        window.location.href = 'student-profile.html';
+      });
+
+      // =========================
+      // ✅ Logout
+      // =========================
+      logoutBtn?.addEventListener('click', () => {
+        clearAllAuth();
+        window.location.href = 'index.html';
+      });
+
+      // =========================
+      // ✅ Applications UI
+      // =========================
+      function renderApps(apps = []) {
+        if (!appsList) return;
+
+        if (!apps.length) {
+          appsList.innerHTML = `
+          <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-5 text-sm text-slate-300">
+            You haven’t applied yet.
+            <a href="jobs.html" class="text-indigo-300 hover:text-indigo-200">Browse jobs</a>
+          </div>
+        `;
+          return;
+        }
+
+        appsList.innerHTML = apps.map(app => {
+          const job = app.job || {};
+          const title = escapeHtml(job.title || 'Untitled role');
+          const location = escapeHtml(job.location || 'Location not specified');
+          const salary = escapeHtml(job.salary || 'Salary not specified');
+
+          const statusRaw = (app.status || 'APPLIED').toString();
+          const status = escapeHtml(statusRaw);
+
+          const created = formatDate(app.createdAt);
+          const createdText = created ? `Sent on ${created}` : 'Sent recently';
+
+          return `
+          <article class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p class="text-[11px] uppercase tracking-wide text-emerald-400">Applied</p>
+              <h3 class="mt-1 text-sm font-semibold text-slate-50">${title}</h3>
+              <p class="text-[11px] text-slate-400">${location}</p>
+              <p class="mt-1 text-[11px] text-slate-300">${createdText}</p>
+              <p class="mt-1 text-[11px] text-slate-500">${salary}</p>
+            </div>
+            <div class="flex flex-col items-end gap-1">
+              <span class="rounded-full bg-slate-800 px-2 py-1 text-[10px] font-medium text-slate-200">
+                Status: ${status}
+              </span>
+              <a href="jobs.html" class="text-[11px] text-indigo-300 hover:text-indigo-200">
+                View job
+              </a>
+            </div>
+          </article>
+        `;
+        }).join('');
+      }
+
+      // =========================
+      // ✅ Load applications
+      // =========================
+      async function loadMyApplications() {
+        try {
+          if (appsStatus) appsStatus.textContent = 'Loading your applications...';
+          if (kpiAppsSub) kpiAppsSub.textContent = 'Loading...';
+
+          const res = await fetch(`${API}/api/applications/my`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+
+          if (res.status === 401) {
+            clearAllAuth();
+            window.location.href = 'student-login.html';
+            return;
+          }
+
+          const data = await res.json().catch(() => ([]));
+
+          if (!res.ok) {
+            throw new Error(data?.message || 'Failed to load applications');
+          }
+
+          const apps = Array.isArray(data) ? data : [];
+
+          if (kpiApps) kpiApps.textContent = String(apps.length);
+          if (kpiAppsSub) {
+            kpiAppsSub.textContent =
+              apps.length ? 'Updated from backend' : 'No applications yet';
+          }
+
+          const interviews = apps.filter(a =>
+            String(a.status || '').toUpperCase().includes('INTERVIEW')
+          ).length;
+
+          if (kpiInterviews) kpiInterviews.textContent = String(interviews);
+
+          renderApps(apps);
+          if (appsStatus) appsStatus.textContent = '';
+
+          loadRecommendations();
+        } catch (err) {
+          console.error(err);
+          if (appsStatus) appsStatus.textContent = err.message;
+          renderApps([]);
+          if (kpiApps) kpiApps.textContent = '0';
+          if (kpiAppsSub) kpiAppsSub.textContent = 'Backend error';
+          if (kpiInterviews) kpiInterviews.textContent = '0';
+        }
+      }
+
+      // =========================
+      // ✅ Load saved jobs KPI (BACKEND)
+      // =========================
+      async function loadSavedKPI() {
+        try {
+          if (kpiSaved) kpiSaved.textContent = '0';
+
+          const res = await fetch(`${API}/api/saved-jobs/my`, {
+            headers: { Authorization: 'Bearer ' + token }
+          });
+
+          if (res.status === 401) {
+            clearAllAuth();
+            window.location.href = 'student-login.html';
+            return;
+          }
+
+          const data = await res.json().catch(() => ([]));
+          const saved = Array.isArray(data) ? data : [];
+
+          if (kpiSaved) kpiSaved.textContent = String(saved.length);
+        } catch (err) {
+          console.error(err);
+          if (kpiSaved) kpiSaved.textContent = '0';
+        }
+      }
+
+      // =========================
+      // ✅ Simple recommendations
+      // =========================
+      async function loadRecommendations() {
+        if (!recommendedList) return;
+
+        try {
+          const res = await fetch(`${API}/api/jobs`);
+          const jobs = await res.json().catch(() => ([]));
+          if (!res.ok) return;
+
+          const all = Array.isArray(jobs) ? jobs : [];
+          const skillsText = (localProfile.skills || '').toLowerCase();
+
+          let rec = all.slice(0, 2);
+
+          if (skillsText) {
+            const skillWords = skillsText.split(',').map(s => s.trim()).filter(Boolean);
+            const scored = all.map(j => {
+              const hay = `${j.title || ''} ${j.description || ''}`.toLowerCase();
+              const score = skillWords.reduce((acc, w) => acc + (hay.includes(w) ? 1 : 0), 0);
+              return { j, score };
+            }).sort((a, b) => b.score - a.score);
+
+            rec = scored.slice(0, 2).map(x => x.j);
+          }
+
+          if (!rec.length) {
+            recommendedList.innerHTML = `
+            <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3 text-[11px] text-slate-300">
+              No recommendations yet.
+            </div>
+          `;
+            return;
+          }
+
+          recommendedList.innerHTML = rec.map(job => {
+            const title = escapeHtml(job.title || 'Untitled role');
+            const location = escapeHtml(job.location || 'Location not specified');
+
+            return `
+            <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
+              <p class="text-[11px] uppercase tracking-wide text-emerald-400">
+                Recommended
+              </p>
+              <h3 class="mt-1 text-sm font-semibold text-slate-50">${title}</h3>
+              <p class="text-[11px] text-slate-400">${location}</p>
+              <a href="jobs.html"
+                class="mt-2 block w-full rounded-full bg-indigo-500 px-3 py-1.5 text-center text-[11px] font-semibold text-white hover:bg-indigo-400">
+                View job
+              </a>
+            </article>
+          `;
+          }).join('');
+        } catch {
+          // silent
+        }
+      }
+
+      // =========================
+      // Run
+      // =========================
+      loadMyApplications();
+      loadSavedKPI();
     });
   </script>
+
+
+  <script type="module" src="js/auth.js"></script>
+
 
 </body>
 

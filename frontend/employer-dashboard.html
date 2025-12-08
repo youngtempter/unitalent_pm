@@ -23,9 +23,7 @@
   <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Abstract animated background -->
   <style>
@@ -71,7 +69,7 @@
   </style>
 </head>
 
-<body class="font-sans text-slate-100">
+<body class="font-sans text-slate-100" data-guard="EMPLOYER">
   <!-- Background -->
   <div class="animated-bg"></div>
 
@@ -80,8 +78,7 @@
     <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
       <!-- Logo -->
       <a href="index.html" class="flex items-center gap-2">
-        <div
-          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
+        <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
           <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
         </div>
         <div class="leading-tight">
@@ -97,25 +94,34 @@
         <a href="student-login.html" class="hover:text-indigo-300">For students</a>
         <a href="employer-login.html" class="text-indigo-300">For employers</a>
         <a href="index.html#about" class="hover:text-indigo-300">About</a>
+
+        <a href="employer-interviews.html"
+          class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:ring-emerald-400">
+          Interviews
+        </a>
+
       </div>
 
-      <!-- Employer identity -->
+      <!-- Employer identity + Logout -->
       <div class="hidden items-center gap-3 md:flex">
         <span class="text-xs text-slate-400">Logged in as</span>
-        <span id="nav-employer-pill"
-          class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100">
+
+        <span id="nav-employer-pill" class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100">
           Employer · Company
         </span>
+
+        <button id="logout-btn"
+          class="rounded-full bg-slate-900/80 px-3 py-1 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:ring-rose-400">
+          Logout
+        </button>
       </div>
 
       <!-- Mobile menu button -->
       <button
         class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
         <span class="sr-only">Open menu</span>
-        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
-          viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-            d="M4 6h16M4 12h16M4 18h16" />
+        <svg class="h-5 w-5" xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
     </nav>
@@ -136,8 +142,7 @@
     <section class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div class="space-y-1">
         <p class="text-xs text-slate-400">Employer dashboard</p>
-        <h1 id="employer-dashboard-title"
-          class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
+        <h1 id="employer-dashboard-title" class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
           Welcome, Employer 👋
         </h1>
         <p class="text-sm text-slate-400">
@@ -145,8 +150,7 @@
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-3 text-xs">
-        <div
-          class="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2">
+        <div class="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2">
           <div id="employer-avatar-initials"
             class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
             EM
@@ -173,41 +177,40 @@
         <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
           Active job posts
         </p>
-        <p class="mt-2 text-2xl font-bold text-slate-50">3</p>
+        <p id="stat-active-jobs" class="mt-2 text-2xl font-bold text-slate-50">0</p>
         <p class="mt-1 text-[11px] text-slate-400">
-          1 role closing this week
+          Based on your posted jobs
         </p>
       </div>
       <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
         <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
           Total applications
         </p>
-        <p class="mt-2 text-2xl font-bold text-slate-50">24</p>
+        <p id="stat-total-apps" class="mt-2 text-2xl font-bold text-slate-50">0</p>
         <p class="mt-1 text-[11px] text-slate-400">
-          5 new applications in the last 7 days
+          Across all your jobs
         </p>
       </div>
       <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
         <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
           Interviews scheduled
         </p>
-        <p class="mt-2 text-2xl font-bold text-slate-50">3</p>
-        <p class="mt-1 text-[11px] text-emerald-300">
-          Next: Thu, 15:00 · Zoom
+        <p id="stat-interviews" class="mt-2 text-2xl font-bold text-slate-50">0</p>
+        <p class="mt-1 text-[11px] text-slate-400">
+          Demo placeholder (connect later)
         </p>
       </div>
     </section>
 
     <!-- Main layout -->
     <section class="mt-8 grid gap-6 md:grid-cols-[minmax(0,1.7fr),minmax(0,1fr)]">
-      <!-- LEFT: job posts & applications -->
+      <!-- LEFT -->
       <div class="space-y-4">
-        <!-- Header row -->
         <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 class="text-sm font-semibold text-slate-50">My job posts</h2>
             <p class="text-xs text-slate-400">
-              Manage roles, status and see how many students applied.
+              Manage roles and see how many students applied.
             </p>
           </div>
           <div class="flex flex-wrap gap-2 text-xs">
@@ -217,136 +220,37 @@
             </button>
             <button id="btn-view-all-applicants"
               class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400">
-              View all applicants
+              View applicants (first job)
             </button>
           </div>
         </div>
 
-        <!-- Job posts list -->
-        <div
+        <!-- ✅ Dynamic job posts list -->
+        <div id="employer-jobs-list"
           class="space-y-3 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
-          <!-- Job 1 -->
-          <article
-            class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p class="text-[11px] uppercase tracking-wide text-emerald-400">Active · Internship · IT</p>
-              <h3 class="mt-1 text-sm font-semibold text-slate-50">
-                Junior Frontend Developer
-              </h3>
-              <p class="text-[11px] text-slate-400">
-                Almaty · Hybrid · 120 000 ₸ / month · 6 months
-              </p>
-              <p class="mt-1 text-[11px] text-slate-300">
-                Looking for students with basic HTML, CSS and JavaScript. React is a plus.
-              </p>
-            </div>
-            <div class="flex flex-col items-end gap-1 text-[11px]">
-              <p class="text-slate-300">
-                <span class="font-semibold text-slate-100">12</span> applications
-              </p>
-              <p class="text-slate-400">3 in review · 1 shortlisted</p>
-              <div class="mt-1 flex gap-2">
-                <button
-                  class="js-view-applicants rounded-full bg-indigo-500 px-3 py-1.5 font-semibold text-white hover:bg-indigo-400"
-                  data-job-id="1">
-                  View applicants
-                </button>
-                <button
-                  class="rounded-full bg-slate-900 px-3 py-1.5 text-slate-200 ring-1 ring-slate-700 hover:ring-indigo-400">
-                  Edit
-                </button>
-              </div>
-            </div>
-          </article>
-
-          <!-- Job 2 -->
-          <article
-            class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p class="text-[11px] uppercase tracking-wide text-emerald-400">Active · Part-time · Marketing</p>
-              <h3 class="mt-1 text-sm font-semibold text-slate-50">
-                Social Media Content Assistant
-              </h3>
-              <p class="text-[11px] text-slate-400">
-                Remote · Student-friendly schedule
-              </p>
-              <p class="mt-1 text-[11px] text-slate-300">
-                Supports social media campaigns for student audiences on Instagram and TikTok.
-              </p>
-            </div>
-            <div class="flex flex-col items-end gap-1 text-[11px]">
-              <p class="text-slate-300">
-                <span class="font-semibold text-slate-100">7</span> applications
-              </p>
-              <p class="text-slate-400">1 interview scheduled</p>
-              <div class="mt-1 flex gap-2">
-                <button
-                  class="js-view-applicants rounded-full bg-indigo-500 px-3 py-1.5 font-semibold text-white hover:bg-indigo-400"
-                  data-job-id="2">
-                  View applicants
-                </button>
-                <button
-                  class="rounded-full bg-slate-900 px-3 py-1.5 text-slate-200 ring-1 ring-slate-700 hover:ring-indigo-400">
-                  Edit
-                </button>
-              </div>
-            </div>
-          </article>
-
-          <!-- Job 3 -->
-          <article class="flex flex-col gap-3 text-xs md:flex-row md:items-center md:justify-between">
-            <div>
-              <p class="text-[11px] uppercase tracking-wide text-slate-500">Closed · Internship · Data</p>
-              <h3 class="mt-1 text-sm font-semibold text-slate-50">
-                Data Analytics Intern
-              </h3>
-              <p class="text-[11px] text-slate-400">
-                Astana · On-site
-              </p>
-              <p class="mt-1 text-[11px] text-slate-300">
-                Position filled · Job post closed 2 weeks ago.
-              </p>
-            </div>
-            <div class="flex flex-col items-end gap-1 text-[11px]">
-              <p class="text-slate-300">
-                <span class="font-semibold text-slate-100">5</span> total applications
-              </p>
-              <div class="mt-1 flex gap-2">
-                <button
-                  class="rounded-full bg-slate-900 px-3 py-1.5 text-slate-200 ring-1 ring-slate-700 hover:ring-indigo-400">
-                  View summary
-                </button>
-                <button
-                  class="rounded-full bg-slate-900 px-3 py-1.5 text-slate-400 ring-1 ring-slate-800 hover:bg-slate-800">
-                  Duplicate post
-                </button>
-              </div>
-            </div>
-          </article>
+          <div class="rounded-2xl border border-slate-800 bg-slate-950/40 p-4 text-[11px] text-slate-400">
+            Loading your jobs...
+          </div>
         </div>
 
         <!-- Recent activity -->
-        <div
-          class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
+        <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
           <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-slate-50">Recent activity</h2>
-            <span class="text-[11px] text-slate-400">Last 7 days</span>
+            <span class="text-[11px] text-slate-400">Latest updates</span>
           </div>
-          <ul class="mt-3 space-y-2 text-[11px] text-slate-300">
-            <li>• New application for <span class="text-slate-100">Junior Frontend Developer</span> from <span
-                class="text-indigo-200">Aruzhan · SDU</span>.</li>
-            <li>• Interview scheduled for <span class="text-slate-100">Social Media Content Assistant</span> with <span
-                class="text-indigo-200">Nurbek · KBTU</span>.</li>
-            <li>• Job post <span class="text-slate-100">Data Analytics Intern</span> was closed.</li>
+          <ul id="recent-activity-list" class="mt-3 space-y-2 text-[11px] text-slate-300">
+            <li>• Loading activity...</li>
+            <!-- Example of interview update -->
+            <li>• Interview scheduled with <span class="text-indigo-200">Student A</span> for <span class="text-indigo-200">Frontend Developer</span></li>
           </ul>
         </div>
       </div>
 
-      <!-- RIGHT: candidates & hiring tips -->
+      <!-- RIGHT -->
       <aside class="space-y-4">
-        <!-- Candidate spotlight -->
-        <div
-          class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
+        <!-- Candidate spotlight (demo) -->
+        <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
           <div class="flex items-center justify-between">
             <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
               Candidate spotlight
@@ -356,22 +260,20 @@
             </button>
           </div>
           <div class="mt-3 flex items-start gap-3">
-            <div
-              class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
+            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
               AY
             </div>
             <div class="space-y-1">
               <p class="text-sm font-semibold text-slate-50">
-                Aruzhan Y. · 2nd year CS
+                Demo Student · Frontend track
               </p>
               <p class="text-[11px] text-slate-400">
-                SDU · Interested in frontend internships · Applied to Junior Frontend Developer.
+                This block is UI demo. Connect real data later.
               </p>
               <div class="mt-1 flex flex-wrap gap-1 text-[10px] text-slate-200">
                 <span class="rounded-full bg-slate-800 px-2 py-0.5">HTML/CSS</span>
                 <span class="rounded-full bg-slate-800 px-2 py-0.5">JavaScript</span>
                 <span class="rounded-full bg-slate-800 px-2 py-0.5">React basics</span>
-                <span class="rounded-full bg-slate-800 px-2 py-0.5">Figma</span>
               </div>
             </div>
           </div>
@@ -381,30 +283,32 @@
           </button>
         </div>
 
-        <!-- Simple funnel overview -->
-        <div
-          class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
+        <!-- Funnel overview -->
+        <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
           <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
             Hiring funnel overview
           </p>
           <div class="mt-3 space-y-3">
             <div class="flex items-center justify-between">
               <span>Applications received</span>
-              <span class="font-semibold text-slate-100">24</span>
+              <span id="funnel-received" class="font-semibold text-slate-100">0</span>
             </div>
             <div class="flex items-center justify-between">
               <span>In review</span>
-              <span class="font-semibold text-slate-100">8</span>
+              <span id="funnel-review" class="font-semibold text-slate-100">0</span>
             </div>
             <div class="flex items-center justify-between">
               <span>Interviews</span>
-              <span class="font-semibold text-slate-100">3</span>
+              <span id="funnel-interviews" class="font-semibold text-slate-100">0</span>
             </div>
             <div class="flex items-center justify-between">
               <span>Offers made</span>
-              <span class="font-semibold text-slate-100">1</span>
+              <span id="funnel-offers" class="font-semibold text-slate-100">0</span>
             </div>
           </div>
+          <p class="mt-3 text-[10px] text-slate-500">
+            Demo logic: “In review / Interviews / Offers” are placeholders until you add real statuses.
+          </p>
         </div>
 
         <!-- Hiring tips -->
@@ -414,8 +318,7 @@
             Tip for better student hires
           </p>
           <p class="mt-1">
-            Be explicit about what students will learn, not only what they must already know. Clear growth opportunities
-            attract stronger applications.
+            Be explicit about what students will learn, not only what they must already know.
           </p>
           <ul class="mt-2 space-y-1.5">
             <li>• Mention tech stack and mentorship.</li>
@@ -440,98 +343,374 @@
     </div>
   </footer>
 
-  <!-- JS: employer dashboard behaviour -->
+  <!-- ✅ JS: employer dashboard behaviour -->
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // токен работодателя (будет установлен на login)
-      const token = localStorage.getItem('unitalent_employer_token');
+    document.addEventListener('DOMContentLoaded', async () => {
+      const API = "http://localhost:3000";
 
-      // Если хочешь жёстко кикать неавторизованных – раскомментируй:
-      // if (!token) {
-      //   window.location.href = 'employer-login.html';
-      //   return;
-      // }
+      // -------------------------
+      // Storage helper
+      // -------------------------
+      const storeGet = (key) =>
+        localStorage.getItem(key) ?? sessionStorage.getItem(key);
 
-      function notify(msg) {
-        alert(msg); // потом можно заменить на красивый toast
-      }
+      // -------------------------
+      // Auth helpers
+      // -------------------------
+      function readUniTalentAuth() {
+        const token = storeGet('unitalent_token');
+        const userRaw = storeGet('unitalent_user');
 
-      // Заполнить имя компании из localStorage (после login / signup)
-      const storedName = localStorage.getItem('unitalent_employer_name');
-      if (storedName) {
-        const pill = document.getElementById('nav-employer-pill');
-        const title = document.getElementById('employer-dashboard-title');
-        const nameLine = document.getElementById('employer-name-line');
-        const avatar = document.getElementById('employer-avatar-initials');
+        if (!token || !userRaw) return { token: null, user: null };
 
-        if (pill) pill.textContent = storedName + ' · Employer';
-        if (title) title.textContent = `Welcome, ${storedName} 👋`;
-        if (nameLine) nameLine.textContent = storedName;
-
-        if (avatar) {
-          const trimmed = storedName.trim();
-          let initials = 'EM';
-          if (trimmed.length > 0) {
-            const parts = trimmed.split(' ');
-            if (parts.length === 1) {
-              initials = parts[0].slice(0, 2).toUpperCase();
-            } else {
-              initials =
-                (parts[0][0] || '') +
-                (parts[1][0] || '');
-              initials = initials.toUpperCase();
-            }
-          }
-          avatar.textContent = initials;
+        try {
+          return { token, user: JSON.parse(userRaw) };
+        } catch {
+          localStorage.removeItem('unitalent_token');
+          localStorage.removeItem('unitalent_user');
+          sessionStorage.removeItem('unitalent_token');
+          sessionStorage.removeItem('unitalent_user');
+          return { token: null, user: null };
         }
       }
 
-      // + Post new job
-      const postBtn = document.getElementById('btn-post-job');
+      function requireEmployerPage() {
+        const { token, user } = readUniTalentAuth();
+
+        if (!token || !user) {
+          window.location.href = 'employer-login.html';
+          return null;
+        }
+
+        if (user.role !== 'EMPLOYER') {
+          window.location.href =
+            user.role === 'STUDENT' ? 'student-login.html' : 'employer-login.html';
+          return null;
+        }
+
+        return { token, user };
+      }
+
+      // -------------------------
+      // HARD ROLE GUARD
+      // -------------------------
+      const auth = requireEmployerPage();
+      if (!auth) return;
+      const { token, user } = auth;
+
+      // -------- Helpers --------
+      const $ = (id) => document.getElementById(id);
+
+      function notify(msg) {
+        alert(msg);
+      }
+
+      function escapeHtml(str = '') {
+        return String(str)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+      }
+
+      async function apiGet(path) {
+        const res = await fetch(`${API}${path}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json().catch(() => null);
+
+        if (!res.ok) {
+          const msg = data?.message || `Request failed (${res.status})`;
+          throw new Error(msg);
+        }
+        return data;
+      }
+
+      function initialsFromName(name) {
+        const trimmed = String(name || '').trim();
+        if (!trimmed) return 'EM';
+        const initials = trimmed
+          .split(' ')
+          .filter(Boolean)
+          .map(p => p[0])
+          .join('')
+          .slice(0, 2)
+          .toUpperCase();
+        return initials || 'EM';
+      }
+
+      function studentName(app) {
+        const fn = app?.student?.firstName;
+        const ln = app?.student?.lastName;
+        const full = [fn, ln].filter(Boolean).join(' ');
+        return full || app?.student?.email || 'Student';
+      }
+
+      // -------- Display name --------
+      const storedName = storeGet('unitalent_employer_name');
+      const fallbackFullName =
+        [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email;
+
+      const displayName = storedName || fallbackFullName || 'Employer';
+
+      const pill = $('nav-employer-pill');
+      const title = $('employer-dashboard-title');
+      const nameLine = $('employer-name-line');
+      const subtitleLine = $('employer-subtitle-line');
+      const avatar = $('employer-avatar-initials');
+
+      if (pill) pill.textContent = `${displayName} · Employer`;
+      if (title) title.textContent = `Welcome, ${displayName} 👋`;
+      if (nameLine) nameLine.textContent = displayName;
+
+      const cityStored = storeGet('unitalent_employer_city');
+      if (subtitleLine) {
+        subtitleLine.textContent = cityStored
+          ? `${cityStored} · hiring students and graduates`
+          : 'City · hiring students and graduates';
+      }
+
+      if (avatar) avatar.textContent = initialsFromName(displayName);
+
+      // -------- LOGOUT --------
+      const logoutBtn = $('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          localStorage.removeItem('unitalent_token');
+          localStorage.removeItem('unitalent_user');
+          sessionStorage.removeItem('unitalent_token');
+          sessionStorage.removeItem('unitalent_user');
+
+          const keys = [
+            'unitalent_student_name',
+            'unitalent_student_email',
+            'unitalent_student_username',
+            'unitalent_employer_name',
+            'unitalent_employer_bin',
+            'unitalent_employer_city',
+            'unitalent_employer_size'
+          ];
+
+          keys.forEach(k => {
+            localStorage.removeItem(k);
+            sessionStorage.removeItem(k);
+          });
+
+          window.location.href = 'index.html';
+        });
+      }
+
+      // Navigation buttons
+      const postBtn = $('btn-post-job');
       if (postBtn) {
         postBtn.addEventListener('click', () => {
           window.location.href = 'employer-new-job.html';
         });
       }
 
-      // View all applicants
-      const allApplicantsBtn = document.getElementById('btn-view-all-applicants');
-      if (allApplicantsBtn) {
-        allApplicantsBtn.addEventListener('click', () => {
-          window.location.href = 'employer-applicants.html';
-        });
-      }
-
-      // View applicants for specific job
-      document.querySelectorAll('.js-view-applicants').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const jobId = btn.dataset.jobId;
-          if (!jobId) return;
-          window.location.href = `employer-applicants.html?jobId=${encodeURIComponent(jobId)}`;
-        });
-      });
-
-      // Shortlist candidate demo
-      const shortlistBtn = document.getElementById('btn-shortlist-candidate');
-      if (shortlistBtn) {
-        shortlistBtn.addEventListener('click', () => {
-          // здесь позже можно сделать POST на backend
-          notify('Candidate shortlisted (demo). Connect API later.');
-        });
-      }
-
-      // Edit company profile
-      const editCompanyBtn = document.getElementById('btn-edit-company');
+      const editCompanyBtn = $('btn-edit-company');
       if (editCompanyBtn) {
         editCompanyBtn.addEventListener('click', () => {
           window.location.href = 'employer-profile.html';
         });
       }
 
-      // Если позже backend будет отдавать профиль работодателя,
-      // можно сделать fetch('/api/employers/me') и обновить имя / аватар
+      const shortlistBtn = $('btn-shortlist-candidate');
+      if (shortlistBtn) {
+        shortlistBtn.addEventListener('click', () => {
+          notify('Candidate shortlisted (demo). Connect API later.');
+        });
+      }
+
+      // -------- DATA LOAD --------
+      const statActive = $('stat-active-jobs');
+      const statApps = $('stat-total-apps');
+      const statInterviews = $('stat-interviews');
+
+      const funnelReceived = $('funnel-received');
+      const funnelReview = $('funnel-review');
+      const funnelInterviews = $('funnel-interviews');
+      const funnelOffers = $('funnel-offers');
+
+      const jobsListEl = $('employer-jobs-list');
+      const activityListEl = $('recent-activity-list');
+
+      let myJobs = [];
+      let myApps = [];
+
+      try {
+        myJobs = await apiGet('/api/jobs/my');
+      } catch (e) {
+        console.warn('Failed to load employer jobs:', e.message);
+        myJobs = [];
+      }
+
+      try {
+        myApps = await apiGet('/api/applications/employer/my');
+      } catch (e) {
+        console.warn('Failed to load employer applications:', e.message);
+        myApps = [];
+      }
+
+      // -------- Stats fill --------
+      if (statActive) statActive.textContent = String(myJobs.length);
+      if (statApps) statApps.textContent = String(myApps.length);
+      if (statInterviews) statInterviews.textContent = "0";
+
+      if (funnelReceived) funnelReceived.textContent = String(myApps.length);
+      if (funnelReview) funnelReview.textContent = "0";
+      if (funnelInterviews) funnelInterviews.textContent = "0";
+      if (funnelOffers) funnelOffers.textContent = "0";
+
+      // -------- View applicants (first job) --------
+      const allApplicantsBtn = $('btn-view-all-applicants');
+      if (allApplicantsBtn) {
+        allApplicantsBtn.addEventListener('click', () => {
+          const firstJob = Array.isArray(myJobs) ? myJobs[0] : null;
+          if (!firstJob?.id) {
+            notify('You have no jobs yet. Post a job first.');
+            return;
+          }
+          window.location.href = `employer-applicants.html?jobId=${encodeURIComponent(firstJob.id)}`;
+        });
+      }
+
+      // ----------------------------
+      // COUNT APPLICATIONS PER JOB
+      // ----------------------------
+      function countAppsForJob(jobId) {
+        if (!Array.isArray(myApps)) return 0;
+        return myApps.filter(a => a?.jobId === jobId).length;
+      }
+
+      // ----------------------------
+      // RENDER JOB ITEM (WITH DELETE)
+      // ----------------------------
+      function renderJobItem(job) {
+        const title = escapeHtml(job?.title || 'Untitled job');
+        const location = escapeHtml(job?.location || 'Location not specified');
+        const salary = escapeHtml(job?.salary || 'Salary not specified');
+        const appsCount = countAppsForJob(job.id);
+
+        return `
+      <article class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0
+        md:flex-row md:items-center md:justify-between">
+
+        <div>
+          <p class="text-[11px] uppercase tracking-wide text-emerald-400">Active · Job</p>
+          <h3 class="mt-1 text-sm font-semibold text-slate-50">${title}</h3>
+          <p class="text-[11px] text-slate-400">${location} · ${salary}</p>
+          <p class="mt-1 text-[11px] text-slate-300">
+            ${escapeHtml((job?.description || '').slice(0, 160))}
+            ${(job?.description || '').length > 160 ? '...' : ''}
+          </p>
+        </div>
+
+        <div class="flex flex-col items-end gap-1 text-[11px]">
+          <p class="text-slate-300">
+            <span class="font-semibold text-slate-100">${appsCount}</span> applications
+          </p>
+          <p class="text-slate-400">Track applicants in detail</p>
+
+          <div class="mt-1 flex gap-2">
+
+            <a class="rounded-full bg-indigo-500 px-3 py-1.5 font-semibold text-white hover:bg-indigo-400"
+               href="employer-applicants.html?jobId=${encodeURIComponent(job.id)}">
+              View applicants
+            </a>
+
+            <a class="rounded-full bg-slate-900 px-3 py-1.5 text-slate-200 ring-1 ring-slate-700 hover:ring-indigo-400"
+               href="employer-edit-job.html?id=${encodeURIComponent(job.id)}">
+              Edit
+            </a>
+
+            <button
+              data-delete="${job.id}"
+              class="rounded-full bg-rose-600 px-3 py-1.5 text-white hover:bg-rose-500">
+              Delete
+            </button>
+
+          </div>
+        </div>
+      </article>
+    `;
+      }
+
+      // ----------------------------
+      // RENDER JOB LIST
+      // ----------------------------
+      if (jobsListEl) {
+        if (!Array.isArray(myJobs) || myJobs.length === 0) {
+          jobsListEl.innerHTML = `
+        <div class="rounded-2xl border border-slate-800 bg-slate-950/40 p-4 text-[11px] text-slate-400">
+          You have no job posts yet. Click <b>“Post new job”</b> to create your first listing.
+        </div>`;
+        } else {
+          jobsListEl.innerHTML = myJobs.map(renderJobItem).join('');
+        }
+      }
+
+      // ----------------------------
+      // DELETE JOB HANDLER
+      // ----------------------------
+      document.addEventListener("click", async (e) => {
+        const btn = e.target.closest("button[data-delete]");
+        if (!btn) return;
+
+        const jobId = btn.getAttribute("data-delete");
+
+        if (!confirm("Are you sure you want to delete this job?")) return;
+
+        try {
+          const res = await fetch(`${API}/api/jobs/${jobId}`, {
+            method: "DELETE",
+            headers: {
+              "Authorization": "Bearer " + token
+            }
+          });
+
+          const data = await res.json().catch(() => ({}));
+
+          if (!res.ok) {
+            alert(data.message || "Failed to delete job");
+            return;
+          }
+
+          alert("Job deleted successfully.");
+          window.location.reload();
+
+        } catch (err) {
+          console.error(err);
+          alert("Error deleting job.");
+        }
+      });
+
+      // ----------------------------
+      // RECENT ACTIVITY
+      // ----------------------------
+      if (activityListEl) {
+        if (!Array.isArray(myApps) || myApps.length === 0) {
+          activityListEl.innerHTML = `
+        <li>• No recent activity yet.</li>
+        <li>• Once students apply, updates will appear here.</li>`;
+        } else {
+          const top = myApps.slice(0, 3);
+          activityListEl.innerHTML = top.map(app => {
+            const sName = escapeHtml(studentName(app));
+            const jTitle = escapeHtml(app?.job?.title || `Job #${app?.jobId}`);
+            return `• New application for <span class="text-slate-100">${jTitle}</span> 
+                from <span class="text-indigo-200">${sName}</span>.`;
+          }).map(li => `<li>${li}</li>`).join('');
+        }
+      }
+
     });
   </script>
+
+  <!-- Shared auth (auto navbar guards based on data-guard) -->
+  <script type="module" src="js/auth.js"></script>
+
 </body>
 
 </html>

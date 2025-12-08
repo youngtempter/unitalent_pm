@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>UniTalent – My Interviews</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      position: relative;
+      overflow-x: hidden;
+      background: #020617;
+    }
+
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      pointer-events: none;
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
+      overflow: hidden;
+    }
+
+    .animated-bg::before {
+      content: "";
+      position: absolute;
+      left: -50%;
+      bottom: -40%;
+      width: 200%;
+      height: 200%;
+      background-image: radial-gradient(#64748b 1px, transparent 1px);
+      background-size: 26px 26px;
+      opacity: 0.6;
+      transform-origin: center;
+      transform: perspective(900px) rotateX(72deg) translateY(0);
+      animation: moveGrid 18s linear infinite;
+    }
+
+    @keyframes moveGrid {
+      0% { transform: perspective(900px) rotateX(72deg) translateY(0); }
+      100% { transform: perspective(900px) rotateX(72deg) translateY(140px); }
+    }
+  </style>
+</head>
+
+<body class="font-sans text-slate-100" data-guard="STUDENT">
+  <div class="animated-bg"></div>
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
+      <a href="index.html" class="flex items-center gap-2">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
+          <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
+        </div>
+        <div class="leading-tight">
+          <p class="text-base font-semibold tracking-tight">UniTalent</p>
+          <p class="text-[11px] text-slate-400">Student Career Platform</p>
+        </div>
+      </a>
+
+      <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
+        <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
+        <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
+        <a href="student-dashboard.html" class="hover:text-indigo-300">Dashboard</a>
+        <a href="student-interviews.html" class="text-indigo-300">Interviews</a>
+      </div>
+
+      <div class="hidden items-center gap-3 md:flex">
+        <span class="text-xs text-slate-400">Logged in as</span>
+        <span id="nav-user-pill" class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100">
+          Student
+        </span>
+
+        <button id="logout-btn"
+          class="rounded-full bg-slate-900/80 px-3 py-1 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:ring-rose-400">
+          Logout
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 pb-16 pt-6 md:pt-8">
+    <!-- Breadcrumb -->
+    <div class="mb-4 text-xs text-slate-400">
+      <a href="index.html" class="hover:text-indigo-300">Home</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <a href="student-dashboard.html" class="hover:text-indigo-300">Dashboard</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <span class="text-slate-300">Interviews</span>
+    </div>
+
+    <!-- Header -->
+    <section class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div>
+        <p class="text-xs text-slate-400">Student area</p>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
+          My Interviews
+        </h1>
+        <p class="mt-1 text-sm text-slate-400">
+          Simple view based on your application statuses.
+        </p>
+      </div>
+
+      <div class="flex gap-2">
+        <a href="jobs.html"
+          class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:ring-indigo-400">
+          Browse jobs
+        </a>
+      </div>
+    </section>
+
+    <!-- Status -->
+    <p id="page-status" class="mt-4 text-[11px] text-slate-400">
+      Loading interviews...
+    </p>
+
+    <!-- List -->
+    <section id="interviews-list"
+      class="mt-3 space-y-3 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
+      <!-- dynamic -->
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800 bg-slate-950/90">
+    <div
+      class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
+      <p>© 2025 UniTalent. All rights reserved.</p>
+      <div class="flex flex-wrap gap-4">
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
+        <span>Terms · Privacy</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ✅ SIMPLE SCRIPT -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const API = 'http://localhost:3000';
+
+      // =========================
+      // ✅ Unified storage helpers
+      // =========================
+      const storeGet = (key) =>
+        localStorage.getItem(key) ?? sessionStorage.getItem(key);
+
+      const storeRemove = (key) => {
+        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
+      };
+
+      function readUniTalentAuth() {
+        const token = storeGet('unitalent_token');
+        const userRaw = storeGet('unitalent_user');
+
+        if (!token || !userRaw) return { token: null, user: null };
+
+        try {
+          return { token, user: JSON.parse(userRaw) };
+        } catch {
+          storeRemove('unitalent_token');
+          storeRemove('unitalent_user');
+          return { token: null, user: null };
+        }
+      }
+
+      function clearAllAuth() {
+        storeRemove('unitalent_token');
+        storeRemove('unitalent_user');
+      }
+
+      function escapeHtml(str = '') {
+        return String(str)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+      }
+
+      function formatDate(iso) {
+        try {
+          const d = new Date(iso);
+          if (Number.isNaN(d.getTime())) return 'Recently';
+          return d.toLocaleDateString();
+        } catch {
+          return 'Recently';
+        }
+      }
+
+      // =========================
+      // ✅ Guard
+      // =========================
+      const { token, user } = readUniTalentAuth();
+      if (!token || !user || user.role !== 'STUDENT') {
+        clearAllAuth();
+        window.location.href = 'student-login.html';
+        return;
+      }
+
+      // =========================
+      // UI
+      // =========================
+      const statusEl = document.getElementById('page-status');
+      const listEl = document.getElementById('interviews-list');
+      const navUserPill = document.getElementById('nav-user-pill');
+      const logoutBtn = document.getElementById('logout-btn');
+
+      const fullName =
+        [user.firstName, user.lastName].filter(Boolean).join(' ') ||
+        user.email ||
+        'Student';
+
+      if (navUserPill) navUserPill.textContent = fullName;
+
+      logoutBtn?.addEventListener('click', () => {
+        clearAllAuth();
+        window.location.href = 'index.html';
+      });
+
+      // =========================
+      // Render
+      // =========================
+      function renderInterviewApps(apps) {
+        if (!listEl) return;
+
+        if (!apps.length) {
+          listEl.innerHTML = `
+            <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-5 text-sm text-slate-300">
+              No interviews yet.
+              <a href="jobs.html" class="text-indigo-300 hover:text-indigo-200">Apply to more jobs</a>
+            </div>
+          `;
+          return;
+        }
+
+        listEl.innerHTML = apps.map(app => {
+          const job = app.job || {};
+          const title = escapeHtml(job.title || 'Untitled role');
+          const location = escapeHtml(job.location || 'Location not specified');
+          const salary = escapeHtml(job.salary || 'Salary not specified');
+          const status = escapeHtml(app.status || 'INTERVIEW');
+          const created = formatDate(app.createdAt);
+
+          return `
+            <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+              <p class="text-[11px] uppercase tracking-wide text-emerald-400">
+                Interview
+              </p>
+              <h3 class="mt-1 text-sm font-semibold text-slate-50">${title}</h3>
+              <p class="text-[11px] text-slate-400">${location}</p>
+              <p class="mt-1 text-[11px] text-slate-500">${salary}</p>
+
+              <div class="mt-3 flex flex-wrap items-center gap-2">
+                <span class="rounded-full bg-slate-800 px-2 py-1 text-[10px] font-medium text-slate-200">
+                  Status: ${status}
+                </span>
+                <span class="text-[10px] text-slate-400">
+                  Updated: ${created}
+                </span>
+              </div>
+
+              <a href="jobs.html"
+                class="mt-3 inline-flex rounded-full bg-indigo-500 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-indigo-400">
+                View jobs page
+              </a>
+            </article>
+          `;
+        }).join('');
+      }
+
+      // =========================
+      // Load from backend
+      // =========================
+      async function loadInterviewApps() {
+        try {
+          if (statusEl) statusEl.textContent = 'Loading interviews...';
+
+          const res = await fetch(`${API}/api/applications/my`, {
+            headers: { Authorization: 'Bearer ' + token }
+          });
+
+          if (res.status === 401) {
+            clearAllAuth();
+            window.location.href = 'student-login.html';
+            return;
+          }
+
+          const data = await res.json().catch(() => ([]));
+          if (!res.ok) throw new Error(data?.message || 'Failed to load applications');
+
+          const apps = Array.isArray(data) ? data : [];
+
+          // ✅ simple filter
+          const interviews = apps.filter(a =>
+            String(a.status || '').toUpperCase().includes('INTERVIEW')
+          );
+
+          renderInterviewApps(interviews);
+
+          if (statusEl) {
+            statusEl.textContent = interviews.length
+              ? `You have ${interviews.length} interview-related application(s).`
+              : 'No interviews found yet.';
+          }
+
+        } catch (err) {
+          console.error(err);
+          if (statusEl) statusEl.textContent = err.message;
+          renderInterviewApps([]);
+        }
+      }
+
+      loadInterviewApps();
+    });
+  </script>
+
+</body>
+</html>

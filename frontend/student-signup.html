@@ -69,7 +69,7 @@
   </style>
 </head>
 
-<body class="font-sans text-slate-100">
+<body class="font-sans text-slate-100" data-guard="GUEST">
   <!-- Abstract animated background -->
   <div class="animated-bg"></div>
 
@@ -97,15 +97,26 @@
         <a href="index.html#about" class="hover:text-indigo-300">About</a>
       </div>
 
-      <!-- Auth buttons -->
-      <div class="hidden items-center gap-3 md:flex">
-        <a href="student-login.html" class="text-sm font-medium text-slate-200 hover:text-indigo-300">
+      <!-- ✅ Auth buttons (dynamic) -->
+      <div id="authArea" class="hidden items-center gap-3 md:flex">
+        <!-- Guest -->
+        <a id="loginBtn" href="student-login.html" class="text-sm font-medium text-slate-200 hover:text-indigo-300">
           Log in
         </a>
-        <a href="student-signup.html"
+        <a id="signupBtn" href="student-signup.html"
           class="rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
           Sign up
         </a>
+
+        <!-- Authed -->
+        <a id="dashboardBtn" href="#"
+          class="hidden rounded-full bg-slate-950/70 px-4 py-2 text-sm font-semibold text-slate-50 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400">
+          Dashboard
+        </a>
+        <button id="logoutBtn"
+          class="hidden rounded-full border border-slate-700 bg-slate-950/60 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-rose-400 hover:text-rose-200">
+          Log out
+        </button>
       </div>
 
       <!-- Mobile menu button (visual only) -->
@@ -113,8 +124,7 @@
         class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
         <span class="sr-only">Open menu</span>
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-            d="M4 6h16M4 12h16M4 18h16" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
     </nav>
@@ -221,10 +231,8 @@
           </ul>
         </div>
 
-        <div
-          class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-slate-900/70">
-          <img
-            src="https://images.pexels.com/photos/1181353/pexels-photo-1181353.jpeg?auto=compress&cs=tinysrgb&w=1200"
+        <div class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-slate-900/70">
+          <img src="https://images.pexels.com/photos/1181353/pexels-photo-1181353.jpeg?auto=compress&cs=tinysrgb&w=1200"
             alt="Student working on laptop" class="h-40 w-full object-cover" />
           <div class="p-4 text-xs">
             <p class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
@@ -255,100 +263,216 @@
     </div>
   </footer>
 
-  <!-- JS: send form to backend with JWT handling -->
+  <!-- ✅ JS: navbar auth state + student signup -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const form = document.getElementById('studentSignupForm');
-      const messageEl = document.getElementById('formMessage');
+      const API = "http://localhost:3000";
+
+      // -------------------------
+      // ✅ Student auth helpers (persistent)
+      // -------------------------
+      function getToken() {
+        return localStorage.getItem("unitalent_token");
+      }
+
+      function getUser() {
+        try {
+          return JSON.parse(localStorage.getItem("unitalent_user") || "null");
+        } catch {
+          return null;
+        }
+      }
+
+      function clearAuth() {
+        localStorage.removeItem("unitalent_token");
+        localStorage.removeItem("unitalent_user");
+      }
+
+      // -------------------------
+      // Navbar auth UI
+      // -------------------------
+      const authArea = document.getElementById("authArea");
+      const loginBtn = document.getElementById("loginBtn");
+      const signupBtn = document.getElementById("signupBtn");
+      const dashboardBtn = document.getElementById("dashboardBtn");
+      const logoutBtn = document.getElementById("logoutBtn");
+
+      authArea?.classList.remove("hidden");
+
+      function setGuestUI() {
+        loginBtn?.classList.remove("hidden");
+        signupBtn?.classList.remove("hidden");
+        dashboardBtn?.classList.add("hidden");
+        logoutBtn?.classList.add("hidden");
+      }
+
+      function setAuthedUI(user) {
+        loginBtn?.classList.add("hidden");
+        signupBtn?.classList.add("hidden");
+        dashboardBtn?.classList.remove("hidden");
+        logoutBtn?.classList.remove("hidden");
+
+        if (dashboardBtn) {
+          dashboardBtn.href =
+            user?.role === "EMPLOYER"
+              ? "employer-dashboard.html"
+              : "student-dashboard.html";
+        }
+      }
+
+      const existingToken = getToken();
+      const existingUser = getUser();
+
+      if (existingToken && existingUser) {
+        setAuthedUI(existingUser);
+
+        // Already logged in? Leave signup page
+        if (existingUser.role === "STUDENT") {
+          window.location.href = "student-dashboard.html";
+          return;
+        }
+        if (existingUser.role === "EMPLOYER") {
+          window.location.href = "employer-dashboard.html";
+          return;
+        }
+      } else {
+        setGuestUI();
+      }
+
+      logoutBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        clearAuth();
+        window.location.href = "index.html";
+      });
+
+      // -------------------------
+      // Student signup logic
+      // -------------------------
+      const form = document.getElementById("studentSignupForm");
+      const messageEl = document.getElementById("formMessage");
+
+      function setMessage(text, cls) {
+        if (!messageEl) return;
+        messageEl.textContent = text || "";
+        messageEl.className = cls || "mt-1 text-[11px] sm:text-xs";
+      }
 
       if (!form) return;
 
-      form.addEventListener('submit', async (e) => {
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        messageEl.textContent = '';
-        messageEl.className = 'mt-1 text-[11px] sm:text-xs';
 
-        const firstName = document.getElementById('firstName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
-        const username = document.getElementById('username').value.trim();
-        const email = document.getElementById('studentEmail').value.trim();
-        const password = document.getElementById('password').value;
+        const submitBtn =
+          form.querySelector('button[type="submit"]') ||
+          document.getElementById("signup-submit-btn");
 
-        // DTO exactly like in backend: firstName, lastName, username, email, password
+        setMessage("", "mt-1 text-[11px] sm:text-xs");
+
+        const firstName = document.getElementById("firstName")?.value.trim() || "";
+        const lastName = document.getElementById("lastName")?.value.trim() || "";
+        const username = document.getElementById("username")?.value.trim() || "";
+        const email = document.getElementById("studentEmail")?.value.trim() || "";
+        const password = document.getElementById("password")?.value || "";
+
+        if (username.length < 3) {
+          setMessage(
+            "Username should be at least 3 characters.",
+            "mt-1 text-[11px] sm:text-xs text-red-400"
+          );
+          return;
+        }
+
+        if (!email || !password) {
+          setMessage(
+            "Please provide email and password.",
+            "mt-1 text-[11px] sm:text-xs text-red-400"
+          );
+          return;
+        }
+
         const payload = {
           firstName,
           lastName,
           username,
           email,
-          password
+          password,
+          role: "STUDENT"
         };
 
         try {
-          messageEl.textContent = 'Creating your account...';
-          messageEl.classList.add('text-slate-300');
+          setMessage(
+            "Creating your account...",
+            "mt-1 text-[11px] sm:text-xs text-slate-300"
+          );
+          if (submitBtn) submitBtn.disabled = true;
 
-          const response = await fetch('http://localhost:8080/api/auth/register', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
+          const res = await fetch(`${API}/api/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
 
-          const rawBody = await response.text();
+          const data = await res.json().catch(() => ({}));
 
-          if (!response.ok) {
-            let errMsg = 'Registration failed';
-            try {
-              const errJson = JSON.parse(rawBody);
-              if (errJson.message) errMsg = errJson.message;
-              if (errJson.error) errMsg = errJson.error;
-            } catch (_) {
-              if (rawBody) errMsg = rawBody;
-            }
-
-            messageEl.textContent = 'Error: ' + errMsg;
-            messageEl.classList.remove('text-slate-300');
-            messageEl.classList.add('text-red-400');
+          if (!res.ok) {
+            const errMsg = data?.message || data?.error || "Registration failed";
+            setMessage(
+              "Error: " + errMsg,
+              "mt-1 text-[11px] sm:text-xs text-red-400"
+            );
             return;
           }
 
-          let data = null;
-          try {
-            data = JSON.parse(rawBody);
-          } catch (_) {
-            data = null;
+          // Clean auth first
+          clearAuth();
+
+          // ✅ Save token + user (persistent)
+          if (data?.token) {
+            localStorage.setItem("unitalent_token", data.token);
           }
 
-          // если бэк вернёт токен
-          if (data && data.token) {
-            localStorage.setItem('unitalent_token', data.token);
+          if (data?.user) {
+            localStorage.setItem("unitalent_user", JSON.stringify(data.user));
+          } else {
+            // fallback minimal user for UI
+            localStorage.setItem(
+              "unitalent_user",
+              JSON.stringify({
+                firstName,
+                lastName,
+                username,
+                email,
+                role: "STUDENT"
+              })
+            );
           }
 
-          // сохраним имя/почту для дашборда
-          if (firstName || lastName) {
-            localStorage.setItem('unitalent_student_name', `${firstName} ${lastName}`.trim());
-          }
-          if (email) {
-            localStorage.setItem('unitalent_student_email', email);
-          }
+          // Optional convenience keys (keep if you use them elsewhere)
+          const fullName = `${firstName} ${lastName}`.trim();
+          if (fullName) localStorage.setItem("unitalent_student_name", fullName);
+          if (email) localStorage.setItem("unitalent_student_email", email);
+          if (username) localStorage.setItem("unitalent_student_username", username);
 
-          messageEl.textContent = 'Registration successful! Redirecting...';
-          messageEl.classList.remove('text-red-400');
-          messageEl.classList.add('text-emerald-400');
+          setMessage(
+            "Registration successful! Redirecting...",
+            "mt-1 text-[11px] sm:text-xs text-emerald-400"
+          );
 
-          setTimeout(() => {
-            window.location.href = 'student-dashboard.html';
-          }, 800);
+          window.location.href = "student-dashboard.html";
         } catch (err) {
           console.error(err);
-          messageEl.textContent = 'Network error. Check if backend is running.';
-          messageEl.classList.remove('text-slate-300');
-          messageEl.classList.add('text-red-400');
+          setMessage(
+            "Network error. Check if backend is running.",
+            "mt-1 text-[11px] sm:text-xs text-red-400"
+          );
+        } finally {
+          if (submitBtn) submitBtn.disabled = false;
         }
       });
     });
   </script>
+  <script type="module" src="js/auth.js"></script>
+
 </body>
 
 </html>

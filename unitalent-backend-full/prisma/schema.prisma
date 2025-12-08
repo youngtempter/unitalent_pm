@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  EMPLOYER
+  ADMIN
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      Role     @default(STUDENT)
+
+  firstName String?
+  lastName  String?
+  username  String?  @unique
+
+  // Student profile fields
+  phone      String?
+  university String?
+  major      String?
+  studyYear  String?
+  city       String?
+  skills     String?
+  bio        String?
+  github     String?
+  linkedin   String?
+  portfolio  String?
+
+  // Employer profile fields
+  bin         String?
+  companySize String?
+  industry    String?
+
+  employerJobs        Job[]         @relation("EmployerJobs")
+  applications        Application[] @relation("StudentApplications")
+  invitationsSent     Invitation[]  @relation("InvitesSent")
+  invitationsReceived Invitation[]  @relation("InvitesReceived")
+
+  // ⭐ Saved jobs
+  savedJobs SavedJob[]
+
+  createdAt DateTime @default(now())
+}
+
+model Job {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  location    String?
+  salary      String?
+  type        String?  // INTERNSHIP, PART_TIME, FULL_TIME
+  workMode    String?  // ON_SITE, HYBRID, REMOTE
+  requirements String? @db.Text
+
+  employerId  Int
+  employer    User     @relation("EmployerJobs", fields: [employerId], references: [id])
+
+  applications Application[]
+  invitations  Invitation[]
+
+  // ⭐ Which students saved this job
+  savedBy SavedJob[]
+
+  createdAt DateTime @default(now())
+}
+
+model Application {
+  id            Int      @id @default(autoincrement())
+  studentId     Int
+  jobId         Int
+  interviewDate DateTime? // New field for interview date
+
+  student       User     @relation("StudentApplications", fields: [studentId], references: [id])
+  job           Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  status        String   @default("APPLIED")
+  createdAt     DateTime @default(now())
+
+  @@unique([studentId, jobId])
+}
+
+model Invitation {
+  id         Int      @id @default(autoincrement())
+  employerId Int
+  studentId  Int
+  jobId      Int?
+
+  employer   User     @relation("InvitesSent", fields: [employerId], references: [id])
+  student    User     @relation("InvitesReceived", fields: [studentId], references: [id])
+  job        Job?     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  status     String   @default("SENT")
+  createdAt  DateTime @default(now())
+}
+
+model SavedJob {
+  id        Int      @id @default(autoincrement())
+  studentId Int
+  jobId     Int
+
+  student   User @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  job       Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, jobId], name: "studentId_jobId")
+}

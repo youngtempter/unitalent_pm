@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>UniTalent – Applicants</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body class="font-sans bg-slate-950 text-slate-100" data-guard="EMPLOYER">
+  <!-- Background blobs -->
+  <div class="pointer-events-none fixed inset-0 -z-10">
+    <div class="absolute -top-40 -left-32 h-72 w-72 rounded-full bg-indigo-500/40 blur-3xl"></div>
+    <div class="absolute top-40 -right-20 h-80 w-80 rounded-full bg-emerald-500/30 blur-3xl"></div>
+  </div>
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
+      <a href="index.html" class="flex items-center gap-2">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
+          <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
+        </div>
+        <div class="leading-tight">
+          <p class="text-base font-semibold tracking-tight">UniTalent</p>
+          <p class="text-[11px] text-slate-400">Employer Portal</p>
+        </div>
+      </a>
+
+      <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
+        <a href="employer-new-job.html" class="hover:text-indigo-300">Post a job</a>
+        <a href="jobs.html" class="hover:text-indigo-300">Public jobs</a>
+        <a href="#" class="text-indigo-300">Applicants</a>
+      </div>
+
+      <div class="hidden items-center gap-3 md:flex">
+        <button id="logoutBtn"
+          class="rounded-full border border-slate-700 bg-slate-950/60 px-4 py-2 text-xs font-semibold text-slate-200 hover:border-rose-400 hover:text-rose-200">
+          Log out
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 pb-16 pt-8 md:pt-10">
+    <!-- Breadcrumb -->
+    <div class="mb-4 text-xs text-slate-400">
+      <a href="index.html" class="hover:text-indigo-300">Home</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <span class="text-slate-300">Employer</span>
+      <span class="mx-1 text-slate-500">/</span>
+      <span class="text-slate-300">Applicants</span>
+    </div>
+
+    <section class="space-y-4">
+      <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
+            Applicants
+          </h1>
+          <p id="jobTitle" class="mt-1 text-sm text-slate-400">
+            Loading job info...
+          </p>
+        </div>
+
+        <div id="status" class="flex items-center gap-2 text-xs text-slate-400">
+          <span class="inline-flex h-2 w-2 rounded-full bg-slate-500"></span>
+          <span>Loading applicants...</span>
+        </div>
+      </div>
+
+      <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70">
+        <div class="flex items-center justify-between">
+          <p class="text-xs text-slate-400">
+            Total applicants:
+            <span id="count" class="font-semibold text-slate-200">0</span>
+          </p>
+
+          <a href="employer-new-job.html"
+            class="rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1 text-[11px] text-slate-200 hover:border-indigo-400 hover:text-indigo-200">
+            Post another job
+          </a>
+        </div>
+      </div>
+
+      <div id="list" class="space-y-3"></div>
+    </section>
+  </main>
+
+  <footer class="border-t border-slate-800 bg-slate-950/90">
+    <div
+      class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
+      <p>© 2025 UniTalent. All rights reserved.</p>
+      <div class="flex flex-wrap gap-4">
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
+        <span>Terms · Privacy</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Date Picker Modal -->
+  <div id="datePickerModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-80">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Select Interview Date</h3>
+      <input type="date" id="interviewDateInput" class="w-full px-3 py-2 border rounded-lg text-gray-700 mb-4" />
+      <div class="flex justify-between">
+        <button id="cancelBtn" class="bg-gray-400 text-white px-4 py-2 rounded-lg">Cancel</button>
+        <button id="confirmBtn" class="bg-indigo-500 text-white px-4 py-2 rounded-lg">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const API = 'http://localhost:3000';
+
+      const statusEl = document.getElementById('status');
+      const listEl = document.getElementById('list');
+      const countEl = document.getElementById('count');
+      const jobTitleEl = document.getElementById('jobTitle');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      // -------------------------
+      // Storage helper
+      // -------------------------
+      const storeGet = (key) =>
+        localStorage.getItem(key) ?? sessionStorage.getItem(key);
+
+      // -------------------------
+      // ✅ Auth helpers (single source)
+      // -------------------------
+      function readUniTalentAuth() {
+        const token = storeGet('unitalent_token');
+        const userRaw = storeGet('unitalent_user');
+
+        if (!token || !userRaw) return { token: null, user: null };
+
+        try {
+          return { token, user: JSON.parse(userRaw) };
+        } catch {
+          localStorage.removeItem('unitalent_token');
+          localStorage.removeItem('unitalent_user');
+          sessionStorage.removeItem('unitalent_token');
+          sessionStorage.removeItem('unitalent_user');
+          return { token: null, user: null };
+        }
+      }
+
+      function requireEmployerPage() {
+        const { token, user } = readUniTalentAuth();
+
+        if (!token || !user) {
+          window.location.href = 'employer-login.html';
+          return null;
+        }
+
+        if (user.role !== 'EMPLOYER') {
+          window.location.href =
+            user.role === 'STUDENT' ? 'student-login.html' : 'employer-login.html';
+          return null;
+        }
+
+        return { token, user };
+      }
+
+      // -------------------------
+      // UI helpers
+      // -------------------------
+      function setStatus(ok, text) {
+        if (!statusEl) return;
+        statusEl.innerHTML = ` 
+          <span class="inline-flex h-2 w-2 rounded-full ${ok ? 'bg-emerald-400' : 'bg-rose-400'}"></span> 
+          <span>${text}</span> 
+        `;
+      }
+
+      function escapeHtml(str = '') {
+        return String(str)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+      }
+
+      function studentName(app) {
+        const fn = app.student?.firstName;
+        const ln = app.student?.lastName;
+        const full = [fn, ln].filter(Boolean).join(' ');
+        return full || app.student?.email || 'Student';
+      }
+
+      // -------------------------
+      // ✅ HARD ROLE GUARD
+      // -------------------------
+      const auth = requireEmployerPage();
+      if (!auth) return;
+      const { token } = auth;
+
+      // -------------------------
+      // Logout
+      // -------------------------
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          // shared auth
+          localStorage.removeItem('unitalent_token');
+          localStorage.removeItem('unitalent_user');
+          sessionStorage.removeItem('unitalent_token');
+          sessionStorage.removeItem('unitalent_user');
+
+          // optional employer UI keys
+          localStorage.removeItem('unitalent_employer_name');
+          localStorage.removeItem('unitalent_employer_bin');
+          localStorage.removeItem('unitalent_employer_city');
+          localStorage.removeItem('unitalent_employer_size');
+          sessionStorage.removeItem('unitalent_employer_name');
+          sessionStorage.removeItem('unitalent_employer_bin');
+          sessionStorage.removeItem('unitalent_employer_city');
+          sessionStorage.removeItem('unitalent_employer_size');
+
+          window.location.href = 'employer-login.html';
+        });
+      }
+
+      // -------------------------
+      // Read jobId
+      // -------------------------
+      const params = new URLSearchParams(window.location.search);
+      const jobId = Number(params.get('jobId'));
+
+      if (!jobId) {
+        setStatus(false, 'jobId missing in URL');
+        if (jobTitleEl) jobTitleEl.textContent = 'Open this page like: employer-applicants.html?jobId=1';
+        if (listEl) {
+          listEl.innerHTML = ` 
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 text-sm text-slate-300">
+              Missing <b>jobId</b>. Please open with a valid jobId query parameter.
+            </div> 
+          `;
+        }
+        return;
+      }
+
+      // -------------------------
+      // Load applicants
+      // -------------------------
+      try {
+        setStatus(true, 'Loading applicants...');
+
+        const res = await fetch(`${API}/api/applications?jobId=${jobId}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          const msg =
+            data?.message ||
+            (res.status === 401 ? 'Invalid/expired token' :
+              res.status === 403 ? 'Forbidden: not your job' :
+                'Failed to load applicants');
+          throw new Error(msg);
+        }
+
+        const apps = Array.isArray(data) ? data : [];
+
+        if (jobTitleEl) {
+          const title = apps[0]?.job?.title ? apps[0].job.title : `Job #${jobId}`;
+          jobTitleEl.textContent = `Applicants for: ${title}`;
+        }
+
+        if (countEl) countEl.textContent = apps.length;
+
+        if (!apps.length) {
+          if (listEl) {
+            listEl.innerHTML = ` 
+              <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 text-sm text-slate-300">
+                No applicants yet.
+              </div> 
+            `;
+          }
+          setStatus(true, 'No applicants yet');
+          return;
+        }
+
+        if (listEl) {
+          listEl.innerHTML = apps.map(app => {
+            const name = escapeHtml(studentName(app));
+            const email = escapeHtml(app.student?.email || '');
+            const status = escapeHtml(app.status || 'APPLIED');
+
+            return ` 
+              <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/60">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <p class="text-sm font-semibold text-slate-50">${name}</p>
+                    <p class="text-xs text-slate-400">${email}</p>
+                  </div>
+                  <span class="rounded-full bg-emerald-500/15 px-2 py-1 text-[11px] font-medium text-emerald-300">
+                    ${status}
+                  </span>
+                </div>
+                <p class="mt-2 text-[11px] text-slate-500">
+                  Application ID: ${app.id}
+                </p>
+                <div class="mt-2 flex gap-2">
+                  <a 
+                    href="employer-student-profile.html?studentId=${app.student?.id}"
+                    class="rounded-full border border-indigo-500/60 bg-indigo-500/10 px-4 py-2 text-xs font-semibold text-indigo-200 hover:bg-indigo-500/20">
+                    View Profile
+                  </a>
+                  <button 
+                    class="bg-indigo-500 text-white rounded-full px-4 py-2 text-xs font-semibold hover:bg-indigo-400"
+                    data-application-id="${app.id}" id="invite-btn-${app.id}">
+                    Invite to Interview
+                  </button>
+                </div>
+              </div> 
+            `;
+          }).join('');
+        }
+
+        setStatus(true, `Loaded ${apps.length} applicants`);
+
+      } catch (err) {
+        console.error(err);
+        setStatus(false, err.message);
+
+        if (jobTitleEl) jobTitleEl.textContent = `Applicants for Job #${jobId}`;
+
+        if (listEl) {
+          listEl.innerHTML = ` 
+            <div class="rounded-2xl border border-rose-500/40 bg-rose-500/10 p-4 text-sm text-rose-200">
+              ${escapeHtml(err.message)}
+            </div> 
+          `;
+        }
+      }
+
+      // Add invite functionality
+      document.querySelectorAll('[id^="invite-btn-"]').forEach(button => {
+        button.addEventListener('click', () => {
+          // Open the date picker modal
+          const modal = document.getElementById('datePickerModal');
+          const confirmBtn = document.getElementById('confirmBtn');
+          const cancelBtn = document.getElementById('cancelBtn');
+          const interviewDateInput = document.getElementById('interviewDateInput');
+
+          modal.classList.remove('hidden');
+
+          // Handle confirm button click
+          confirmBtn.addEventListener('click', async () => {
+            const interviewDate = interviewDateInput.value;
+
+            if (!interviewDate) {
+              alert("Please enter a valid interview date.");
+              return;
+            }
+
+            const applicationId = button.getAttribute('data-application-id');
+
+            try {
+              const res = await fetch(`${API}/api/applications/${applicationId}/interview`, {
+                method: 'PATCH',
+                headers: {
+                  'Authorization': 'Bearer ' + token,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ interviewDate })
+              });
+
+              const data = await res.json();
+
+              if (res.ok) {
+                alert("Interview scheduled successfully.");
+                window.location.reload(); // Refresh the page to reflect changes
+              } else {
+                alert("Failed to schedule interview: " + (data.message || 'Unknown error'));
+              }
+            } catch (err) {
+              alert("Error: " + err.message);
+            }
+            modal.classList.add('hidden');
+          });
+
+          // Handle cancel button click
+          cancelBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+          });
+        });
+      });
+    });
+  </script>
+
+  <script type="module" src="js/auth.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>UniTalent – Edit Job</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      position: relative;
+      overflow-x: hidden;
+      background: #020617;
+    }
+
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      pointer-events: none;
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
+      overflow: hidden;
+    }
+
+    .animated-bg::before {
+      content: "";
+      position: absolute;
+      left: -50%;
+      bottom: -40%;
+      width: 200%;
+      height: 200%;
+      background-image: radial-gradient(#64748b 1px, transparent 1px);
+      background-size: 26px 26px;
+      opacity: 0.5;
+      transform-origin: center;
+      transform: perspective(900px) rotateX(72deg) translateY(0);
+      animation: moveGrid 18s linear infinite;
+    }
+
+    @keyframes moveGrid {
+      0% {
+        transform: perspective(900px) rotateX(72deg) translateY(0);
+      }
+
+      100% {
+        transform: perspective(900px) rotateX(72deg) translateY(140px);
+      }
+    }
+  </style>
+</head>
+
+<body class="font-sans text-slate-100" data-guard="EMPLOYER">
+  <div class="animated-bg"></div>
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
+      <a href="index.html" class="flex items-center gap-2">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
+          <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
+        </div>
+        <div class="leading-tight">
+          <p class="text-base font-semibold tracking-tight">UniTalent</p>
+          <p class="text-[11px] text-slate-400">Student Career Platform</p>
+        </div>
+      </a>
+
+      <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
+        <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
+        <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
+        <a href="student-login.html" class="hover:text-indigo-300">For students</a>
+        <a href="employer-dashboard.html" class="text-indigo-300">For employers</a>
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+      </div>
+
+      <div id="authArea" class="hidden items-center gap-3 md:flex">
+        <a id="loginBtn" href="employer-login.html"
+          class="text-sm font-medium text-slate-200 hover:text-indigo-300">
+          Log in
+        </a>
+        <a id="signupBtn" href="employer-login.html"
+          class="rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
+          Sign up
+        </a>
+
+        <a id="dashboardBtn" href="#"
+          class="hidden rounded-full bg-slate-950/70 px-4 py-2 text-sm font-semibold text-slate-50 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400">
+          Dashboard
+        </a>
+        <button id="logoutBtn"
+          class="hidden rounded-full border border-slate-700 bg-slate-950/60 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-rose-400 hover:text-rose-200">
+          Log out
+        </button>
+      </div>
+
+      <button
+        class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
+        <span class="sr-only">Open menu</span>
+        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 pb-16 pt-6 md:pt-8">
+    <!-- Breadcrumb -->
+    <div class="mb-4 text-xs text-slate-400">
+      <a href="index.html" class="hover:text-indigo-300">Home</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <a href="employer-dashboard.html" class="hover:text-indigo-300">Employer dashboard</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <span class="text-slate-300">Edit job</span>
+    </div>
+
+    <!-- Page header -->
+    <section class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div>
+        <p class="text-xs text-slate-400">Employer · Edit job</p>
+        <h1 id="pageTitle" class="mt-1 text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
+          Edit job
+        </h1>
+        <p class="mt-1 text-sm text-slate-400">
+          Update the title, description or details of your posting. Changes will be visible
+          immediately on the Jobs page.
+        </p>
+      </div>
+
+      <div class="text-xs text-right text-slate-400">
+        <p id="editStatus">Loading job...</p>
+      </div>
+    </section>
+
+    <!-- Form -->
+    <section
+      class="mt-6 rounded-3xl border border-slate-800 bg-slate-900/80 p-5 text-xs shadow-xl shadow-slate-900/70 md:p-6">
+      <form id="editJobForm" class="space-y-4">
+        <div class="grid gap-4 md:grid-cols-2">
+          <!-- Title -->
+          <div class="md:col-span-2">
+            <label class="mb-1 block text-[11px] font-semibold text-slate-200">
+              Job title
+            </label>
+            <input id="jobTitle" type="text"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
+              placeholder="e.g. Junior Frontend Developer" required />
+          </div>
+
+          <!-- Location -->
+          <div>
+            <label class="mb-1 block text-[11px] font-semibold text-slate-200">
+              Location
+            </label>
+            <input id="jobLocation" type="text"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
+              placeholder="e.g. Almaty · Hybrid" />
+          </div>
+
+          <!-- Type -->
+          <div>
+            <label class="mb-1 block text-[11px] font-semibold text-slate-200">
+              Type
+            </label>
+            <select id="jobType"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 focus:outline-none">
+              <option value="">Not specified</option>
+              <option value="INTERNSHIP">Internship</option>
+              <option value="PART_TIME">Part-time</option>
+              <option value="FULL_TIME">Full-time</option>
+            </select>
+          </div>
+
+          <!-- Work mode -->
+          <div>
+            <label class="mb-1 block text-[11px] font-semibold text-slate-200">
+              Work mode
+            </label>
+            <select id="jobWorkMode"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 focus:outline-none">
+              <option value="">Not specified</option>
+              <option value="ON_SITE">On-site</option>
+              <option value="HYBRID">Hybrid</option>
+              <option value="REMOTE">Remote</option>
+            </select>
+          </div>
+
+          <!-- Salary -->
+          <div>
+            <label class="mb-1 block text-[11px] font-semibold text-slate-200">
+              Salary / stipend (optional)
+            </label>
+            <input id="jobSalary" type="text"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
+              placeholder="e.g. 200 000 KZT / month" />
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="mb-1 block text-[11px] font-semibold text-slate-200">
+            Description
+          </label>
+          <textarea id="jobDescription" rows="4"
+            class="w-full rounded-2xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
+            placeholder="Short overview of responsibilities and what the student will do."
+            required></textarea>
+        </div>
+
+        <!-- Requirements -->
+        <div>
+          <label class="mb-1 block text-[11px] font-semibold text-slate-200">
+            Requirements (optional)
+          </label>
+          <textarea id="jobRequirements" rows="3"
+            class="w-full rounded-2xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
+            placeholder="e.g. 2nd–4th year student, basic JS, Git, English B1+"></textarea>
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <div class="text-[11px] text-slate-400">
+            <span>Changes are saved to the UniTalent backend.</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="cancelBtn"
+              class="rounded-full border border-slate-700 bg-slate-950/60 px-4 py-2 text-[11px] font-semibold text-slate-200 hover:border-indigo-400 hover:text-indigo-200">
+              Cancel
+            </button>
+            <button type="submit" id="saveBtn"
+              class="rounded-full bg-indigo-500 px-5 py-2 text-[11px] font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
+              Save changes
+            </button>
+          </div>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800 bg-slate-950/90">
+    <div
+      class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
+      <p>© 2025 UniTalent. All rights reserved.</p>
+      <div class="flex flex-wrap gap-4">
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
+        <span>Terms · Privacy</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- PAGE-SPECIFIC LOGIC -->
+  <script type="module">
+    import { readUniTalentAuth, clearAllAuth } from "./js/auth.js";
+
+    const API = "http://localhost:3000";
+
+    const params = new URLSearchParams(window.location.search);
+    const jobId = params.get("id");
+
+    const statusEl = document.getElementById("editStatus");
+    const pageTitle = document.getElementById("pageTitle");
+
+    const form = document.getElementById("editJobForm");
+    const titleInput = document.getElementById("jobTitle");
+    const locationInput = document.getElementById("jobLocation");
+    const typeSelect = document.getElementById("jobType");
+    const workModeSelect = document.getElementById("jobWorkMode");
+    const salaryInput = document.getElementById("jobSalary");
+    const descInput = document.getElementById("jobDescription");
+    const reqInput = document.getElementById("jobRequirements");
+    const saveBtn = document.getElementById("saveBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+
+    if (!jobId) {
+      if (statusEl) statusEl.textContent = "Missing job ID in URL.";
+      // nothing else to do
+    } else {
+      init();
+    }
+
+    function setStatus(text, isError = false) {
+      if (!statusEl) return;
+      statusEl.textContent = text;
+      statusEl.className = "text-xs " + (isError ? "text-rose-300" : "text-slate-400");
+    }
+
+    async function init() {
+      // Check auth and role
+      const { token, user, role } = readUniTalentAuth();
+
+      if (!token || !user) {
+        clearAllAuth();
+        window.location.href = "employer-login.html";
+        return;
+      }
+
+      if (role !== "EMPLOYER") {
+        // Redirect students away
+        window.location.href =
+          role === "STUDENT" ? "student-dashboard.html" : "employer-login.html";
+        return;
+      }
+
+      // Wire up buttons
+      cancelBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = "employer-dashboard.html";
+      });
+
+      form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        await handleSave(token);
+      });
+
+      await loadJob(token);
+    }
+
+    async function loadJob(token) {
+      try {
+        setStatus("Loading job from backend...");
+
+        const res = await fetch(`${API}/api/jobs/${jobId}`, {
+          headers: {
+            "Authorization": "Bearer " + token
+          }
+        });
+
+        // 401 → token bad
+        if (res.status === 401) {
+          clearAllAuth();
+          window.location.href = "employer-login.html";
+          return;
+        }
+
+        if (res.status === 403) {
+          setStatus("You can edit only your own jobs. (Forbidden)", true);
+          return;
+        }
+
+        if (res.status === 404) {
+          setStatus("Job not found (maybe deleted).", true);
+          return;
+        }
+
+        const data = await res.json().catch(() => null);
+
+        if (!res.ok || !data) {
+          throw new Error(data?.message || "Failed to load job");
+        }
+
+        // Fill UI
+        titleInput.value = data.title || "";
+        locationInput.value = data.location || "";
+        salaryInput.value = data.salary || "";
+        descInput.value = data.description || "";
+        reqInput.value = data.requirements || "";
+
+        if (data.type && typeSelect) {
+          typeSelect.value = data.type;
+        }
+
+        if (data.workMode && workModeSelect) {
+          workModeSelect.value = data.workMode;
+        }
+
+        if (pageTitle) {
+          pageTitle.textContent = `Edit job: ${data.title || "Job"}`;
+        }
+
+        setStatus("Loaded job from UniTalent backend.");
+      } catch (err) {
+        console.error(err);
+        setStatus(err.message || "Error while loading job.", true);
+      }
+    }
+
+    async function handleSave(token) {
+      if (!form) return;
+      if (!saveBtn) return;
+
+      try {
+        saveBtn.disabled = true;
+        saveBtn.textContent = "Saving...";
+        setStatus("Saving changes...");
+
+        const payload = {
+          title: titleInput.value.trim(),
+          location: locationInput.value.trim(),
+          salary: salaryInput.value.trim(),
+          description: descInput.value.trim(),
+          requirements: reqInput.value.trim(),
+          type: typeSelect.value || null,
+          workMode: workModeSelect.value || null
+        };
+
+        const res = await fetch(`${API}/api/jobs/${jobId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (res.status === 401) {
+          clearAllAuth();
+          window.location.href = "employer-login.html";
+          return;
+        }
+
+        if (res.status === 403) {
+          throw new Error("You are not allowed to edit this job.");
+        }
+
+        if (!res.ok) {
+          throw new Error(data?.message || "Failed to update job.");
+        }
+
+        setStatus("Job updated successfully ✅");
+        saveBtn.textContent = "Saved";
+
+        setTimeout(() => {
+          window.location.href = "employer-dashboard.html";
+        }, 900);
+      } catch (err) {
+        console.error(err);
+        setStatus(err.message || "Error while saving job.", true);
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Save changes";
+      }
+    }
+  </script>
+
+  <!-- Shared auth (auto navbar + guards based on data-guard) -->
+  <script type="module" src="js/auth.js"></script>
+</body>
+
+</html>
