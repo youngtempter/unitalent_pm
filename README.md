@@ -197,12 +197,16 @@ Tokens are returned upon successful login/registration and should be stored clie
 | `POST` | `/api/auth/login` | Student login | ❌ | - |
 | `POST` | `/api/auth/employer/register` | Employer registration | ❌ | - |
 | `POST` | `/api/auth/employer/login` | Employer login | ❌ | - |
+| `PATCH` | `/api/auth/me/credentials` | Change email and/or password | ✅ | Any |
 
 **Request Body Examples:**
 - Registration: `{ email, password, firstName?, lastName?, username? }`
 - Login: `{ email, password }`
+- Change Credentials: `{ currentPassword: string, newEmail?: string, newPassword?: string }`
 
 **Response:** `{ token: string, user: { id, email, role, ... } }`
+
+**Note:** Change credentials endpoint requires current password verification and returns a fresh token with updated user data.
 
 ### Jobs
 | Method | Endpoint | Description | Auth Required | Role |
@@ -240,16 +244,32 @@ Tokens are returned upon successful login/registration and should be stored clie
 | `GET` | `/api/applications?jobId=:id` | Get applicants for specific job | ✅ | EMPLOYER |
 | `GET` | `/api/applications/my` | Get student's own applications | ✅ | STUDENT |
 | `GET` | `/api/applications/employer/my` | Get all applications across employer's jobs | ✅ | EMPLOYER |
+| `GET` | `/api/applications/employer/interviews` | Get scheduled interviews for employer's jobs | ✅ | EMPLOYER |
+| `GET` | `/api/applications/employer/funnel` | Get hiring funnel statistics | ✅ | EMPLOYER |
+| `GET` | `/api/applications/employer/interviews/upcoming/count` | Get count of upcoming interviews | ✅ | EMPLOYER |
+| `GET` | `/api/applications/my/interviews/upcoming/count` | Get count of student's upcoming interviews | ✅ | STUDENT |
 | `PATCH` | `/api/applications/:id` | Update application status | ✅ | EMPLOYER |
 | `PATCH` | `/api/applications/:id/interview` | Schedule interview | ✅ | EMPLOYER |
 | `PATCH` | `/api/applications/:id/interview/cancel` | Cancel interview | ✅ | STUDENT |
+| `PATCH` | `/api/applications/:id/offer` | Send job offer to applicant | ✅ | EMPLOYER |
 
 **Request Body Examples:**
 - Apply: `{ jobId: number }`
 - Update status: `{ status: string, interviewDate?: string }`
 - Schedule interview: `{ interviewDate: string (ISO format) }`
+- Send offer: No body required (updates status to "OFFERED")
 
-**Application Statuses:** `APPLIED`, `INTERVIEW`, `ACCEPTED`, `REJECTED`
+**Application Statuses:** `APPLIED`, `IN_REVIEW`, `INTERVIEW`, `OFFERED`, `ACCEPTED`, `REJECTED`
+
+**Hiring Funnel Response:**
+```json
+{
+  "applicationsReceived": number,
+  "inReview": number,
+  "interviews": number,
+  "offersMade": number
+}
+```
 
 ### Student Profiles
 | Method | Endpoint | Description | Auth Required | Role |
@@ -325,7 +345,11 @@ Tokens are returned upon successful login/registration and should be stored clie
 |--------|----------|-------------|---------------|------|
 | `POST` | `/api/contact` | Submit contact form | ❌ | - |
 
-**Request Body:** `{ name: string, email: string, message: string (min 10 chars) }`
+**Request Body:** `{ name: string (min 2 chars), email: string, message: string (min 10 chars) }`
+
+**Response:** `{ ok: true, message: "Message received" }`
+
+**Note:** Messages are stored in the `ContactMessage` table in the database. The endpoint validates input and returns appropriate error messages for invalid data.
 
 ### Health Check
 | Method | Endpoint | Description | Auth Required | Role |
@@ -421,6 +445,16 @@ Jobs saved by students for later viewing.
 - `student` → User
 - `job` → Job
 
+#### ContactMessage
+Contact form submissions from the public contact page.
+
+**Fields:**
+- `id` (Int, Primary Key)
+- `name` (String, Required, min 2 chars)
+- `email` (String, Required, valid email format)
+- `message` (String, Required, min 10 chars, stored as Text)
+- `createdAt` (DateTime, Default: now())
+
 ### Database Migrations
 
 The project includes migration history in `prisma/migrations/`:
@@ -432,6 +466,7 @@ The project includes migration history in `prisma/migrations/`:
 - Saved jobs feature
 - Interview date field
 - Additional job fields
+- Contact messages table
 
 See `unitalent-backend-full/prisma/schema.prisma` for the complete schema definition.
 
@@ -439,33 +474,46 @@ See `unitalent-backend-full/prisma/schema.prisma` for the complete schema defini
 
 ### For Students
 - 🔐 Secure registration and login with password validation
+- 🔑 Change email and password securely (with current password verification)
 - 📝 Comprehensive profile management (education, skills, portfolio links)
 - 🔍 Advanced job search with filters (location, type, work mode)
+- 📄 Paginated job listings (6 jobs per page with Previous/Next navigation)
 - 💾 Save favorite jobs for later
 - 📤 One-click job applications
-- 📊 Track application status (Applied, Interview, Accepted, Rejected)
+- 📊 Track application status (Applied, In Review, Interview, Offer Received, Accepted, Rejected)
 - 📅 View and manage interview schedules
+- 📈 View upcoming interviews count on dashboard
 - 🎯 Browse personalized job recommendations
 - 📧 Receive employer invitations
+- 👁️ Password visibility toggle on login/signup forms
 
 ### For Employers
 - 🏢 Company profile management
+- 🔑 Change email and password securely (with current password verification)
 - 📋 Create, edit, and delete job postings
 - 🔍 Browse and search student profiles
 - 👥 View applicants for each job posting
 - 📊 Manage all applications in one dashboard
+- 📈 Hiring funnel statistics (applications received, in review, interviews, offers made)
 - 📅 Schedule interviews with applicants
+- 📅 View all scheduled interviews in one place
+- 📈 View upcoming interviews count on dashboard
+- 💼 Send job offers to applicants
 - ✉️ Send invitations to promising students
-- 📈 Track application statistics
+- 👁️ Password visibility toggle on login/signup forms
 
 ### Platform Features
 - 🎨 Modern, responsive UI with Tailwind CSS
 - 🔒 Secure authentication with JWT tokens
 - 🛡️ Role-based access control
 - 🔍 Full-text search capabilities
+- 📄 Pagination for job listings
 - 📱 Mobile-friendly design
 - ⚡ Fast, RESTful API
 - 🗄️ Robust database with Prisma ORM
+- 📧 Functional contact form with database storage
+- 👁️ Password visibility toggles for better UX
+- 📊 Real-time hiring funnel statistics
 
 ## 🔒 Security Features
 
@@ -478,13 +526,14 @@ See `unitalent-backend-full/prisma/schema.prisma` for the complete schema defini
 - ✅ **Input Validation**: Email format, password strength requirements
 - ✅ **Token Verification**: Middleware validates JWT on protected routes
 - ✅ **Unique Constraints**: Database-level uniqueness for emails, usernames
+- ✅ **Credential Change Security**: Current password verification required for email/password changes
 
 ## 🖥️ Frontend Pages
 
 ### Public Pages
 - **index.html** - Landing page with featured jobs, how it works, testimonials
-- **jobs.html** - Public job listings with search and filter functionality
-- **contact.html** - Contact form for inquiries
+- **jobs.html** - Public job listings with search, filter, and pagination (6 jobs per page)
+- **contact.html** - Functional contact form that saves messages to database
 
 ### Student Pages
 - **student-login.html** - Student authentication
@@ -641,6 +690,19 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 📧 Contact
 
 For questions or support, please open an issue on GitHub.
+
+## 🆕 Recent Features & Improvements
+
+### Latest Updates
+- ✅ **Contact Form**: Fully functional contact form with database persistence
+- ✅ **Credential Management**: Users can securely change email and password
+- ✅ **Hiring Funnel Analytics**: Employers can track application pipeline statistics
+- ✅ **Job Offers**: Employers can send job offers directly to applicants
+- ✅ **Interview Management**: Enhanced interview scheduling and viewing for both students and employers
+- ✅ **Pagination**: Job listings now support pagination (6 jobs per page)
+- ✅ **Password Visibility Toggle**: Eye icon to show/hide passwords on login/signup forms
+- ✅ **Application Statuses**: Added `IN_REVIEW` and `OFFERED` statuses for better workflow tracking
+- ✅ **Dashboard KPIs**: Upcoming interviews count widgets on student and employer dashboards
 
 ## 🙏 Acknowledgments
 
