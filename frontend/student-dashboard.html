@@ -213,9 +213,11 @@
           <h2 class="text-sm font-semibold text-slate-50">
             My applications
           </h2>
-          <a href="jobs.html" class="text-xs text-indigo-300 hover:text-indigo-200">
-            Browse more jobs →
-          </a>
+          <div class="flex items-center gap-2">
+            <a href="jobs.html" class="text-xs text-indigo-300 hover:text-indigo-200">
+              Browse more jobs →
+            </a>
+          </div>
         </div>
 
         <p id="apps-status" class="text-[11px] text-slate-400">Loading your applications...</p>
@@ -617,9 +619,19 @@
                 class="rounded-full bg-rose-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-rose-500 disabled:opacity-70">
                 Cancel interview
               </button>
+              ` : (statusUpper === 'APPLIED' || statusUpper === 'IN_REVIEW') ? `
+              <div class="flex flex-col gap-1 items-end">
+                <button data-withdraw="${app.id}"
+                  class="rounded-full bg-slate-700 px-3 py-1.5 text-[11px] font-semibold text-slate-200 hover:bg-slate-600 disabled:opacity-70">
+                  Withdraw
+                </button>
+                <a href="job-details.html?jobId=${app.job?.id || ''}" class="text-[11px] text-indigo-300 hover:text-indigo-200">
+                  View Details →
+                </a>
+              </div>
               ` : `
-              <a href="jobs.html" class="text-[11px] text-indigo-300 hover:text-indigo-200">
-                View job
+              <a href="job-details.html?jobId=${app.job?.id || ''}" class="text-[11px] text-indigo-300 hover:text-indigo-200">
+                View Details →
               </a>
               `}
             </div>
@@ -633,6 +645,74 @@
             cancelInterview(appId, btn);
           });
         });
+
+        document.querySelectorAll('button[data-withdraw]')?.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const appId = btn.getAttribute('data-withdraw');
+            withdrawApplication(appId, btn);
+          });
+        });
+      }
+
+      // =========================
+      // ✅ Withdraw application
+      // =========================
+      async function withdrawApplication(appId, buttonEl) {
+        if (!confirm('Are you sure you want to withdraw this application? This action cannot be undone.')) return;
+        
+        if (buttonEl) {
+          buttonEl.disabled = true;
+          buttonEl.textContent = 'Withdrawing...';
+        }
+
+        try {
+          const res = await fetch(`${API}/api/applications/${appId}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': 'Bearer ' + token,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          const data = await res.json().catch(() => ({}));
+
+          if (res.status === 401) {
+            clearAllAuth();
+            window.location.href = 'student-login.html';
+            return;
+          }
+
+          if (!res.ok) {
+            const errorMsg = data?.message || 'Failed to withdraw application';
+            if (typeof toast !== 'undefined') {
+              toast.error(errorMsg);
+            } else {
+              alert(errorMsg);
+            }
+            return;
+          }
+
+          if (typeof toast !== 'undefined') {
+            toast.success('Application withdrawn successfully');
+          } else {
+            alert('Application withdrawn successfully');
+          }
+
+          await loadMyApplications();
+        } catch (err) {
+          console.error(err);
+          const errorMsg = 'Network error. Please try again.';
+          if (typeof toast !== 'undefined') {
+            toast.error(errorMsg);
+          } else {
+            alert(errorMsg);
+          }
+        } finally {
+          if (buttonEl) {
+            buttonEl.disabled = false;
+            buttonEl.textContent = 'Withdraw';
+          }
+        }
       }
 
       // =========================
@@ -805,9 +885,8 @@
     });
   </script>
 
-
+  <script src="js/toast.js"></script>
   <script type="module" src="js/auth.js"></script>
-
 
 </body>
 

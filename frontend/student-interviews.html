@@ -409,10 +409,13 @@
 
           const apps = Array.isArray(data) ? data : [];
 
-          // ✅ simple filter
-          const interviews = apps.filter(a =>
-            String(a.status || '').toUpperCase().includes('INTERVIEW')
-          );
+          // ✅ Filter: Show applications with interviewDate OR status is INTERVIEW or OFFERED
+          const interviews = apps.filter(a => {
+            const hasInterviewDate = a.interviewDate && new Date(a.interviewDate) > new Date(0);
+            const statusUpper = String(a.status || '').toUpperCase();
+            const isInterviewStatus = statusUpper === 'INTERVIEW' || statusUpper === 'OFFERED';
+            return hasInterviewDate || isInterviewStatus;
+          });
 
           renderInterviewApps(interviews);
 

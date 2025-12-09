@@ -127,7 +127,17 @@
                 class="w-full bg-transparent text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none" />
             </div>
           </div>
-          <div class="flex justify-end">
+          <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-end">
+            <div class="w-full md:w-auto">
+              <label class="mb-1 block text-xs text-slate-300">Sort by</label>
+              <select id="sortBy"
+                class="w-full rounded-2xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 focus:outline-none">
+                <option value="any">Any</option>
+                <option value="recent">Recently posted</option>
+                <option value="oldest">Oldest first</option>
+                <option value="views">Most viewed</option>
+              </select>
+            </div>
             <button id="searchBtn"
               class="mt-1 w-full rounded-full bg-indigo-500 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400 md:mt-6 md:w-auto">
               Search
@@ -361,7 +371,11 @@
 
       if (u.role === 'STUDENT') {
         e.preventDefault();
-        alert('You are logged in as STUDENT. Please log in with an EMPLOYER account to post jobs.');
+        if (typeof toast !== 'undefined') {
+          toast.error('You are logged in as STUDENT. Please log in with an EMPLOYER account to post jobs.');
+        } else {
+          alert('You are logged in as STUDENT. Please log in with an EMPLOYER account to post jobs.');
+        }
       }
     }
 
@@ -381,6 +395,7 @@
     const filterLocation = document.getElementById('filterLocation');
     const filterType = document.getElementById('filterType');
     const filterWorkMode = document.getElementById('filterWorkMode');
+    const sortBy = document.getElementById('sortBy');
 
     let allJobs = [];
     let lastRendered = [];
@@ -498,38 +513,69 @@
         const saveText = isSaved ? "❤️ Saved" : "♡ Save";
         const saveCls = isSaved ? "saved border-rose-400/60 text-rose-200" : "";
 
+        // Check if expired
+        const now = new Date();
+        const isExpired = job.expiresAt && new Date(job.expiresAt) < now;
+        const expiredBadge = isExpired ? '<span class="inline-block rounded-full bg-rose-500/20 text-rose-300 px-2 py-0.5 text-[10px] font-medium ml-2">Expired</span>' : '';
+
+        // Check application deadline
+        const deadlinePassed = job.applicationDeadline && new Date(job.applicationDeadline) < now;
+        const deadlineBadge = deadlinePassed ? '<span class="inline-block rounded-full bg-amber-500/20 text-amber-300 px-2 py-0.5 text-[10px] font-medium ml-2">Deadline passed</span>' : '';
+        const deadlineInfo = job.applicationDeadline && !deadlinePassed ? `<p class="text-[10px] text-amber-300 mt-1">⏰ Deadline: ${new Date(job.applicationDeadline).toLocaleDateString()}</p>` : '';
+
+        // View count
+        const views = job.views || 0;
+        const viewsText = views > 0 ? `${views} view${views !== 1 ? 's' : ''}` : '';
+
+        // Posted date
+        const postedDate = job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'Recently';
+
         return `
-          <article class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/60">
+          <article class="rounded-2xl border ${isExpired ? 'border-rose-500/30' : 'border-slate-800'} bg-slate-900/80 p-4 shadow-lg shadow-slate-900/60">
             <div class="flex flex-col gap-3 md:flex-row md:justify-between">
-              <div class="space-y-1">
-                <p class="text-[11px] uppercase tracking-wide text-emerald-400">
-                  Internal job · UniTalent
-                </p>
+              <div class="space-y-1 flex-1">
+                <div class="flex items-center gap-2">
+                  <p class="text-[11px] uppercase tracking-wide text-emerald-400">
+                    Internal job · UniTalent
+                  </p>
+                  ${expiredBadge}
+                  ${deadlineBadge}
+                </div>
                 <h2 class="text-sm font-semibold text-slate-50">${title}</h2>
                 <p class="text-xs text-slate-400">
                   ${employerName} · ${location}
                 </p>
                 <p class="mt-2 text-xs text-slate-300">${desc}</p>
+                ${deadlineInfo}
+                <div class="mt-2 flex items-center gap-3 text-[10px] text-slate-500">
+                  ${viewsText ? `<span>👁️ ${viewsText}</span>` : ''}
+                  <span>Posted ${postedDate}</span>
+                </div>
               </div>
 
               <div class="flex flex-col items-end justify-between gap-2 text-xs">
                 <div class="text-right">
                   <p class="font-semibold text-slate-100">${salary}</p>
-                  <p class="text-[11px] text-slate-400">Posted recently</p>
                 </div>
 
-                <div class="flex gap-2">
-                  <a href="student-login.html"
-                    class="js-apply-btn rounded-full bg-indigo-500 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-indigo-400"
-                    data-job-id="${job.id}">
-                    Apply now
-                  </a>
+                <div class="flex flex-col gap-2">
+                  <div class="flex gap-2">
+                    <a href="student-login.html"
+                      class="js-apply-btn rounded-full bg-indigo-500 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-indigo-400 ${deadlinePassed || isExpired ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}"
+                      data-job-id="${job.id}">
+                      ${deadlinePassed ? 'Deadline passed' : isExpired ? 'Expired' : 'Apply now'}
+                    </a>
 
-                  <button
-                    class="js-save-btn ${saveCls} rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1.5 text-[11px] text-slate-200 hover:border-indigo-400 hover:text-indigo-200"
-                    data-job-id="${job.id}">
-                    ${saveText}
-                  </button>
+                    <button
+                      class="js-save-btn ${saveCls} rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1.5 text-[11px] text-slate-200 hover:border-indigo-400 hover:text-indigo-200"
+                      data-job-id="${job.id}">
+                      ${saveText}
+                    </button>
+                  </div>
+                  <a href="job-details.html?jobId=${job.id}"
+                    class="inline-block w-full rounded-full border border-indigo-500/60 bg-indigo-500/10 px-3 py-1.5 text-center text-[11px] font-semibold text-indigo-200 hover:bg-indigo-500/20">
+                    View Details →
+                  </a>
                 </div>
               </div>
             </div>
@@ -553,6 +599,12 @@
         if (location) params.append('location', location);
         if (type) params.append('type', type);
         if (workMode) params.append('workMode', workMode);
+        
+        const sortBy = document.getElementById('sortBy')?.value || 'any';
+        // Only append sortBy if it's not "any" (use default backend sorting)
+        if (sortBy && sortBy !== 'any') {
+          params.append('sortBy', sortBy);
+        }
 
         const queryString = params.toString();
         const url = `${API}/api/jobs${queryString ? '?' + queryString : ''}`;
@@ -755,7 +807,7 @@
     }
 
     // Auto-apply filters when they change
-    [filterLocation, filterType, filterWorkMode].forEach(el => {
+    [filterLocation, filterType, filterWorkMode, sortBy].forEach(el => {
       if (el) {
         el.addEventListener('change', applySearch);
         if (el.tagName === 'INPUT') {

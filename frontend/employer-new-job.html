@@ -175,6 +175,22 @@
             <p class="mt-1 text-[11px] text-slate-500">List specific skills, experience level, or prerequisites.</p>
           </div>
 
+          <!-- Application Deadline + Job Expiration -->
+          <div class="grid gap-3 md:grid-cols-2">
+            <div>
+              <label class="mb-1 block text-xs font-medium text-slate-300">Application Deadline (optional)</label>
+              <input id="applicationDeadlineInput" type="datetime-local"
+                class="w-full rounded-2xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-sm text-slate-100 focus:border-indigo-500 focus:outline-none" />
+              <p class="mt-1 text-[11px] text-slate-500">When applications close</p>
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-medium text-slate-300">Job Expiration (optional)</label>
+              <input id="expiresAtInput" type="datetime-local"
+                class="w-full rounded-2xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-sm text-slate-100 focus:border-indigo-500 focus:outline-none" />
+              <p class="mt-1 text-[11px] text-slate-500">When job listing expires</p>
+            </div>
+          </div>
+
           <!-- Inline form message -->
           <div id="formMsg" class="hidden rounded-2xl border px-3 py-2 text-xs"></div>
 
@@ -239,6 +255,8 @@
       const workModeInput = document.getElementById('workModeInput');
       const salaryInput = document.getElementById('salaryInput');
       const requirementsInput = document.getElementById('requirementsInput');
+      const applicationDeadlineInput = document.getElementById('applicationDeadlineInput');
+      const expiresAtInput = document.getElementById('expiresAtInput');
 
       const formMsg = document.getElementById('formMsg');
 
@@ -376,6 +394,8 @@
           const workMode = (workModeInput?.value || '').trim();
           const salary = (salaryInput?.value || '').trim();
           const requirements = (requirementsInput?.value || '').trim();
+          const applicationDeadline = applicationDeadlineInput?.value || null;
+          const expiresAt = expiresAtInput?.value || null;
 
           if (!title || !description) {
             showFormMsg('err', 'Title and description are required.');
@@ -389,7 +409,9 @@
             type: type || undefined,
             workMode: workMode || undefined,
             salary: salary || undefined,
-            requirements: requirements || undefined
+            requirements: requirements || undefined,
+            applicationDeadline: applicationDeadline || undefined,
+            expiresAt: expiresAt || undefined
           };
 
           const oldBtnText = submitBtn?.textContent || 'Publish job';
@@ -432,6 +454,8 @@
             if (workModeInput) workModeInput.value = '';
             if (salaryInput) salaryInput.value = '';
             if (requirementsInput) requirementsInput.value = '';
+            if (applicationDeadlineInput) applicationDeadlineInput.value = '';
+            if (expiresAtInput) expiresAtInput.value = '';
 
           } catch (err) {
             console.error(err);

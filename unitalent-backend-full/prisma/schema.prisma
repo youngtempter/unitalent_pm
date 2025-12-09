@@ -40,6 +40,9 @@ model User {
   companySize String?
   industry    String?
 
+  // Profile picture
+  avatarUrl   String?
+
   employerJobs        Job[]         @relation("EmployerJobs")
   applications        Application[] @relation("StudentApplications")
   invitationsSent     Invitation[]  @relation("InvitesSent")
@@ -47,6 +50,9 @@ model User {
 
   // ⭐ Saved jobs
   savedJobs SavedJob[]
+
+  // Password reset tokens
+  passwordResets PasswordReset[]
 
   createdAt DateTime @default(now())
 }
@@ -60,6 +66,11 @@ model Job {
   type        String?  // INTERNSHIP, PART_TIME, FULL_TIME
   workMode    String?  // ON_SITE, HYBRID, REMOTE
   requirements String? @db.Text
+
+  // New fields
+  expiresAt           DateTime?  // Job expiration date
+  applicationDeadline DateTime?  // Application deadline
+  views               Int        @default(0)  // View count
 
   employerId  Int
   employer    User     @relation("EmployerJobs", fields: [employerId], references: [id])
@@ -83,7 +94,11 @@ model Application {
   job           Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   status        String   @default("APPLIED")
+  notes         String?  @db.Text  // Employer notes on application
   createdAt     DateTime @default(now())
+
+  // Status history logs
+  logs          ApplicationLog[]
 
   @@unique([studentId, jobId])
 }
@@ -121,4 +136,32 @@ model ContactMessage {
   email     String
   message   String   @db.Text
   createdAt DateTime @default(now())
+}
+
+model PasswordReset {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+model ApplicationLog {
+  id            Int      @id @default(autoincrement())
+  applicationId Int
+  status        String   // Status changed to
+  changedBy     Int      // User ID who made the change
+  notes         String?  @db.Text  // Optional note about the change
+  createdAt     DateTime @default(now())
+
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@index([changedBy])
 }

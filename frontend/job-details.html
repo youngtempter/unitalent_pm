@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>UniTalent – Job Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body class="font-sans bg-slate-950 text-slate-100">
+  <!-- Background blobs -->
+  <div class="pointer-events-none fixed inset-0 -z-10">
+    <div class="absolute -top-40 -left-32 h-72 w-72 rounded-full bg-indigo-500/40 blur-3xl"></div>
+    <div class="absolute top-40 -right-20 h-80 w-80 rounded-full bg-emerald-500/30 blur-3xl"></div>
+  </div>
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
+      <a href="index.html" class="flex items-center gap-2">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
+          <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
+        </div>
+        <div class="leading-tight">
+          <p class="text-base font-semibold tracking-tight">UniTalent</p>
+          <p class="text-[11px] text-slate-400">Student Career Platform</p>
+        </div>
+      </a>
+
+      <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
+        <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
+        <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
+        <a href="student-login.html" class="hover:text-indigo-300">For students</a>
+        <a href="employer-login.html" class="hover:text-indigo-300">For employers</a>
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+      </div>
+
+      <div id="authArea" class="hidden items-center gap-3 md:flex">
+        <!-- Guest -->
+        <a id="loginBtn" href="student-login.html" class="text-sm font-medium text-slate-200 hover:text-indigo-300">
+          Log in
+        </a>
+        <a id="signupBtn" href="student-signup.html"
+          class="rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
+          Sign up
+        </a>
+
+        <!-- Authed -->
+        <a id="dashboardBtn" href="#"
+          class="hidden rounded-full bg-slate-950/70 px-4 py-2 text-sm font-semibold text-slate-50 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400">
+          Dashboard
+        </a>
+        <button id="logoutBtn"
+          class="hidden rounded-full border border-slate-700 bg-slate-950/60 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-rose-400 hover:text-rose-200">
+          Log out
+        </button>
+      </div>
+
+      <button
+        class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
+        <span class="sr-only">Open menu</span>
+        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <main class="mx-auto max-w-4xl px-4 pb-16 pt-8 md:pt-10">
+    <!-- Breadcrumb -->
+    <div class="mb-4 text-xs text-slate-400">
+      <a href="index.html" class="hover:text-indigo-300">Home</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
+      <span class="mx-1 text-slate-500">/</span>
+      <span class="text-slate-300">Job Details</span>
+    </div>
+
+    <!-- Status indicator -->
+    <div id="status" class="mb-4 flex items-center gap-2 text-xs text-slate-400">
+      <span class="inline-flex h-2 w-2 rounded-full bg-slate-500"></span>
+      <span>Loading job details...</span>
+    </div>
+
+    <!-- Job Details -->
+    <div id="jobDetails" class="space-y-6">
+      <!-- Content will be loaded here -->
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800 bg-slate-950/90">
+    <div
+      class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
+      <p>© 2025 UniTalent. All rights reserved.</p>
+      <div class="flex flex-wrap gap-4">
+        <a href="index.html#about" class="hover:text-indigo-300">About</a>
+        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
+        <span>Terms · Privacy</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const API = 'http://localhost:3000';
+
+      // -------------------------
+      // Auth helpers
+      // -------------------------
+      function readAuthPair(storage) {
+        const token = storage.getItem('unitalent_token');
+        const userRaw = storage.getItem('unitalent_user');
+        if (!token || !userRaw) return null;
+
+        try {
+          return { token, user: JSON.parse(userRaw), storage };
+        } catch {
+          storage.removeItem('unitalent_token');
+          storage.removeItem('unitalent_user');
+          return null;
+        }
+      }
+
+      function readUniTalentAuth() {
+        return (
+          readAuthPair(localStorage) ||
+          readAuthPair(sessionStorage) ||
+          { token: null, user: null, storage: null }
+        );
+      }
+
+      function clearAllAuth() {
+        ['unitalent_token', 'unitalent_user'].forEach(k => {
+          localStorage.removeItem(k);
+          sessionStorage.removeItem(k);
+        });
+      }
+
+      // -------------------------
+      // Navbar auth UI
+      // -------------------------
+      const authArea = document.getElementById("authArea");
+      const loginBtn = document.getElementById("loginBtn");
+      const signupBtn = document.getElementById("signupBtn");
+      const dashboardBtn = document.getElementById("dashboardBtn");
+      const logoutBtn = document.getElementById("logoutBtn");
+
+      authArea?.classList.remove("hidden");
+
+      function setGuestUI() {
+        loginBtn?.classList.remove("hidden");
+        signupBtn?.classList.remove("hidden");
+        dashboardBtn?.classList.add("hidden");
+        logoutBtn?.classList.add("hidden");
+      }
+
+      function setAuthedUI(user) {
+        loginBtn?.classList.add("hidden");
+        signupBtn?.classList.add("hidden");
+        dashboardBtn?.classList.remove("hidden");
+        logoutBtn?.classList.remove("hidden");
+
+        dashboardBtn.href =
+          user?.role === "EMPLOYER"
+            ? "employer-dashboard.html"
+            : "student-dashboard.html";
+      }
+
+      const { token, user } = readUniTalentAuth();
+      if (token && user) setAuthedUI(user);
+      else setGuestUI();
+
+      logoutBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        clearAllAuth();
+        window.location.href = "index.html";
+      });
+
+      // -------------------------
+      // UI helpers
+      // -------------------------
+      const statusEl = document.getElementById('status');
+      const jobDetailsEl = document.getElementById('jobDetails');
+
+      function setStatus(ok, text) {
+        if (!statusEl) return;
+        statusEl.innerHTML = `
+          <span class="inline-flex h-2 w-2 rounded-full ${ok ? 'bg-emerald-400' : 'bg-rose-400'}"></span>
+          <span>${text}</span>
+        `;
+      }
+
+      function escapeHtml(str = '') {
+        return String(str)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return null;
+        try {
+          const date = new Date(dateString);
+          if (isNaN(date.getTime())) return null;
+          return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          });
+        } catch {
+          return null;
+        }
+      }
+
+      function formatDateTime(dateString) {
+        if (!dateString) return null;
+        try {
+          const date = new Date(dateString);
+          if (isNaN(date.getTime())) return null;
+          return date.toLocaleString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        } catch {
+          return null;
+        }
+      }
+
+      function employerDisplay(job) {
+        const fn = job.employer?.firstName;
+        const ln = job.employer?.lastName;
+        const full = [fn, ln].filter(Boolean).join(' ');
+        return full || job.employer?.email || 'Company';
+      }
+
+      // -------------------------
+      // Load job details
+      // -------------------------
+      const params = new URLSearchParams(window.location.search);
+      const jobId = Number(params.get('jobId'));
+
+      if (!jobId) {
+        setStatus(false, 'Job ID missing in URL');
+        if (jobDetailsEl) {
+          jobDetailsEl.innerHTML = `
+            <div class="rounded-2xl border border-rose-500/40 bg-rose-500/10 p-6 text-sm text-rose-200">
+              Missing job ID. Please open this page with a valid jobId parameter.
+              <br><br>
+              <a href="jobs.html" class="text-indigo-300 hover:text-indigo-200 underline">
+                ← Back to Jobs
+              </a>
+            </div>
+          `;
+        }
+        return;
+      }
+
+      let savedJobIds = new Set();
+      let currentJob = null;
+
+      // Load saved jobs for student
+      async function loadSavedJobIds() {
+        const { token: t, user: u } = readUniTalentAuth();
+        if (!t || !u || u.role !== "STUDENT") return new Set();
+
+        try {
+          const res = await fetch(`${API}/api/saved-jobs/my`, {
+            headers: { Authorization: "Bearer " + t }
+          });
+
+          if (res.status === 401) {
+            clearAllAuth();
+            return new Set();
+          }
+
+          const data = await res.json().catch(() => []);
+          const ids = new Set(
+            Array.isArray(data)
+              ? data.map(x => Number(x.jobId)).filter(Boolean)
+              : []
+          );
+
+          return ids;
+        } catch (e) {
+          console.error(e);
+          return new Set();
+        }
+      }
+
+      async function loadJobDetails() {
+        try {
+          setStatus(true, 'Loading job details...');
+
+          const res = await fetch(`${API}/api/jobs/${jobId}`);
+          const data = await res.json().catch(() => ({}));
+
+          if (!res.ok) {
+            throw new Error(data?.message || 'Failed to load job details');
+          }
+
+          currentJob = data;
+
+          // Load saved jobs for student
+          savedJobIds = await loadSavedJobIds();
+          const isSaved = savedJobIds.has(Number(jobId));
+
+          renderJobDetails(data, isSaved);
+          setStatus(true, 'Job details loaded');
+        } catch (err) {
+          console.error(err);
+          setStatus(false, err.message);
+          if (jobDetailsEl) {
+            jobDetailsEl.innerHTML = `
+              <div class="rounded-2xl border border-rose-500/40 bg-rose-500/10 p-6 text-sm text-rose-200">
+                ${escapeHtml(err.message)}
+                <br><br>
+                <a href="jobs.html" class="text-indigo-300 hover:text-indigo-200 underline">
+                  ← Back to Jobs
+                </a>
+              </div>
+            `;
+          }
+        }
+      }
+
+      function renderJobDetails(job, isSaved) {
+        if (!jobDetailsEl) return;
+
+        const title = escapeHtml(job.title || 'Untitled role');
+        const description = escapeHtml(job.description || 'No description provided.');
+        const location = escapeHtml(job.location || 'Location not specified');
+        const salary = escapeHtml(job.salary || 'Salary not specified');
+        const type = escapeHtml(job.type || 'Not specified');
+        const workMode = escapeHtml(job.workMode || 'Not specified');
+        const requirements = escapeHtml(job.requirements || 'No specific requirements listed.');
+        const employerName = escapeHtml(employerDisplay(job));
+        const employerEmail = escapeHtml(job.employer?.email || '');
+
+        // Dates
+        const now = new Date();
+        const isExpired = job.expiresAt && new Date(job.expiresAt) < now;
+        const deadlinePassed = job.applicationDeadline && new Date(job.applicationDeadline) < now;
+        const postedDate = formatDate(job.createdAt) || 'Recently';
+        const expiresDate = job.expiresAt ? formatDate(job.expiresAt) : null;
+        const deadlineDate = job.applicationDeadline ? formatDate(job.applicationDeadline) : null;
+
+        // View count
+        const views = job.views || 0;
+        const viewsText = views > 0 ? `${views} view${views !== 1 ? 's' : ''}` : '';
+
+        // Status badges
+        const expiredBadge = isExpired 
+          ? '<span class="inline-block rounded-full bg-rose-500/20 text-rose-300 px-3 py-1 text-xs font-medium">Expired</span>' 
+          : '';
+        const deadlineBadge = deadlinePassed 
+          ? '<span class="inline-block rounded-full bg-amber-500/20 text-amber-300 px-3 py-1 text-xs font-medium">Application Deadline Passed</span>' 
+          : '';
+
+        const saveText = isSaved ? "❤️ Saved" : "♡ Save";
+        const saveCls = isSaved ? "saved border-rose-400/60 text-rose-200" : "";
+
+        const { token: t, user: u } = readUniTalentAuth();
+        const canApply = t && u && u.role === 'STUDENT' && !deadlinePassed && !isExpired;
+        const applyButtonText = deadlinePassed ? 'Deadline passed' : isExpired ? 'Expired' : 'Apply now';
+
+        jobDetailsEl.innerHTML = `
+          <!-- Header Card -->
+          <div class="rounded-3xl border ${isExpired ? 'border-rose-500/30' : 'border-slate-800'} bg-slate-900/80 p-6 shadow-xl shadow-slate-900/70">
+            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+              <div class="flex-1 space-y-3">
+                <div class="flex flex-wrap items-center gap-2">
+                  <p class="text-xs uppercase tracking-wide text-emerald-400">
+                    Job Posting · UniTalent
+                  </p>
+                  ${expiredBadge}
+                  ${deadlineBadge}
+                </div>
+                <h1 class="text-2xl font-bold text-slate-50 sm:text-3xl">${title}</h1>
+                <div class="flex flex-wrap items-center gap-3 text-sm text-slate-400">
+                  <span>👤 ${employerName}</span>
+                  <span>📍 ${location}</span>
+                  <span>💰 ${salary}</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-4 text-xs text-slate-500">
+                  ${viewsText ? `<span>👁️ ${viewsText}</span>` : ''}
+                  <span>Posted ${postedDate}</span>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-2 md:items-end">
+                ${canApply ? `
+                <a href="student-login.html"
+                  class="js-apply-btn inline-flex items-center justify-center rounded-full bg-indigo-500 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-400 ${deadlinePassed || isExpired ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}"
+                  data-job-id="${job.id}">
+                  ${applyButtonText}
+                </a>
+                ` : !t ? `
+                <a href="student-login.html"
+                  class="inline-flex items-center justify-center rounded-full bg-indigo-500 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-400">
+                  Log in to Apply
+                </a>
+                ` : ''}
+                
+                ${t && u && u.role === 'STUDENT' ? `
+                <button
+                  class="js-save-btn ${saveCls} inline-flex items-center justify-center rounded-full border border-slate-700 bg-slate-950/60 px-6 py-3 text-sm text-slate-200 hover:border-indigo-400 hover:text-indigo-200"
+                  data-job-id="${job.id}">
+                  ${saveText}
+                </button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+
+          <!-- Job Information -->
+          <div class="grid gap-6 md:grid-cols-3">
+            <!-- Main Content -->
+            <div class="md:col-span-2 space-y-6">
+              <!-- Description -->
+              <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl shadow-slate-900/70">
+                <h2 class="text-lg font-semibold text-slate-50 mb-4">Job Description</h2>
+                <div class="prose prose-invert max-w-none text-sm text-slate-300 whitespace-pre-wrap">
+                  ${description}
+                </div>
+              </div>
+
+              <!-- Requirements -->
+              <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl shadow-slate-900/70">
+                <h2 class="text-lg font-semibold text-slate-50 mb-4">Requirements</h2>
+                <div class="prose prose-invert max-w-none text-sm text-slate-300 whitespace-pre-wrap">
+                  ${requirements}
+                </div>
+              </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+              <!-- Job Details Card -->
+              <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl shadow-slate-900/70">
+                <h3 class="text-sm font-semibold text-slate-50 mb-4">Job Details</h3>
+                <div class="space-y-3 text-sm">
+                  <div>
+                    <p class="text-xs text-slate-400 mb-1">Job Type</p>
+                    <p class="text-slate-200">${type}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-400 mb-1">Work Mode</p>
+                    <p class="text-slate-200">${workMode}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-400 mb-1">Location</p>
+                    <p class="text-slate-200">${location}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-400 mb-1">Salary</p>
+                    <p class="text-slate-200">${salary}</p>
+                  </div>
+                  ${deadlineDate ? `
+                  <div>
+                    <p class="text-xs text-slate-400 mb-1">Application Deadline</p>
+                    <p class="text-slate-200 ${deadlinePassed ? 'text-rose-300' : 'text-emerald-300'}">
+                      ${deadlineDate} ${deadlinePassed ? '(Passed)' : ''}
+                    </p>
+                  </div>
+                  ` : ''}
+                  ${expiresDate ? `
+                  <div>
+                    <p class="text-xs text-slate-400 mb-1">Job Expires</p>
+                    <p class="text-slate-200 ${isExpired ? 'text-rose-300' : ''}">
+                      ${expiresDate} ${isExpired ? '(Expired)' : ''}
+                    </p>
+                  </div>
+                  ` : ''}
+                </div>
+              </div>
+
+              <!-- Employer Info -->
+              <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl shadow-slate-900/70">
+                <h3 class="text-sm font-semibold text-slate-50 mb-4">Employer</h3>
+                <div class="space-y-2 text-sm">
+                  <p class="text-slate-200">${employerName}</p>
+                  ${employerEmail ? `
+                  <p class="text-xs text-slate-400">${employerEmail}</p>
+                  ` : ''}
+                </div>
+              </div>
+
+              <!-- Back to Jobs -->
+              <a href="jobs.html"
+                class="block w-full rounded-full border border-slate-700 bg-slate-950/60 px-4 py-3 text-center text-sm font-semibold text-slate-200 hover:border-indigo-400 hover:text-indigo-200">
+                ← Back to Jobs
+              </a>
+            </div>
+          </div>
+        `;
+
+        // Attach event listeners
+        attachEventListeners();
+      }
+
+      function attachEventListeners() {
+        // Apply button
+        const applyBtn = document.querySelector('.js-apply-btn');
+        if (applyBtn) {
+          applyBtn.addEventListener('click', async (e) => {
+            const { token: t, user: u } = readUniTalentAuth();
+
+            if (!t) {
+              // not logged in -> allow default href to login
+              return;
+            }
+
+            if (u?.role && u.role !== 'STUDENT') {
+              e.preventDefault();
+              setStatus(false, 'Only STUDENT accounts can apply.');
+              return;
+            }
+
+            e.preventDefault();
+
+            const jobId = Number(applyBtn.dataset.jobId);
+            if (!jobId) return;
+
+            const originalText = applyBtn.textContent;
+
+            try {
+              applyBtn.textContent = 'Applying...';
+              applyBtn.classList.add('opacity-70', 'pointer-events-none');
+
+              const res = await fetch(`${API}/api/applications`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + t
+                },
+                body: JSON.stringify({ jobId })
+              });
+
+              if (res.status === 401) {
+                clearAllAuth();
+                window.location.href = 'student-login.html';
+                return;
+              }
+
+              const data = await res.json().catch(() => ({}));
+
+              if (!res.ok) {
+                const msg =
+                  data?.message ||
+                  (res.status === 403 ? 'Forbidden.' : 'Failed to apply.');
+                throw new Error(msg);
+              }
+
+              applyBtn.textContent = 'Applied ✓';
+              applyBtn.classList.remove('bg-indigo-500', 'hover:bg-indigo-400');
+              applyBtn.classList.add('bg-emerald-500');
+              setStatus(true, 'Application sent successfully ✅');
+            } catch (err) {
+              console.error(err);
+              applyBtn.textContent = originalText || 'Apply now';
+              applyBtn.classList.remove('opacity-70', 'pointer-events-none');
+              setStatus(false, err.message);
+            }
+          });
+        }
+
+        // Save button
+        const saveBtn = document.querySelector('.js-save-btn');
+        if (saveBtn) {
+          saveBtn.addEventListener('click', async (e) => {
+            const { token: t, user: u } = readUniTalentAuth();
+
+            if (!t || !u) {
+              window.location.href = 'student-login.html';
+              return;
+            }
+
+            if (u.role !== 'STUDENT') {
+              setStatus(false, 'Only STUDENT accounts can save jobs.');
+              return;
+            }
+
+            const jobId = Number(saveBtn.dataset.jobId);
+            if (!jobId) return;
+
+            const isSaved = savedJobIds.has(jobId);
+            const originalText = saveBtn.textContent;
+            saveBtn.disabled = true;
+            saveBtn.classList.add('opacity-60');
+
+            try {
+              let res;
+
+              if (isSaved) {
+                res = await fetch(`${API}/api/saved-jobs/${jobId}`, {
+                  method: 'DELETE',
+                  headers: {
+                    Authorization: 'Bearer ' + t
+                  }
+                });
+              } else {
+                res = await fetch(`${API}/api/saved-jobs`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + t
+                  },
+                  body: JSON.stringify({ jobId })
+                });
+              }
+
+              if (res.status === 401) {
+                clearAllAuth();
+                window.location.href = 'student-login.html';
+                return;
+              }
+
+              const data = await res.json().catch(() => ({}));
+
+              if (!res.ok) {
+                if (res.status === 409) {
+                  savedJobIds.add(jobId);
+                  saveBtn.textContent = '❤️ Saved';
+                  saveBtn.classList.add('saved', 'border-rose-400/60', 'text-rose-200');
+                  setStatus(true, 'Already saved ✅');
+                  return;
+                }
+                throw new Error(data?.message || 'Failed to update saved jobs');
+              }
+
+              if (isSaved) {
+                savedJobIds.delete(jobId);
+                saveBtn.textContent = '♡ Save';
+                saveBtn.classList.remove('saved', 'border-rose-400/60', 'text-rose-200');
+                setStatus(true, 'Removed from saved ✅');
+              } else {
+                savedJobIds.add(jobId);
+                saveBtn.textContent = '❤️ Saved';
+                saveBtn.classList.add('saved', 'border-rose-400/60', 'text-rose-200');
+                setStatus(true, 'Job saved ✅');
+              }
+            } catch (err) {
+              console.error(err);
+              saveBtn.textContent = originalText;
+              setStatus(false, err.message || 'Failed to save job');
+            } finally {
+              saveBtn.disabled = false;
+              saveBtn.classList.remove('opacity-60');
+            }
+          });
+        }
+      }
+
+      // Load job details
+      loadJobDetails();
+    });
+  </script>
+
+  <script type="module" src="js/auth.js"></script>
+  <script src="js/toast.js"></script>
+
+</body>
+
+</html>
+

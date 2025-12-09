@@ -22,18 +22,35 @@ router.post("/", auth, requireRole("STUDENT"), async (req, res) => {
       return res.status(404).json({ message: "Job not found" });
     }
 
+    // Check if application deadline has passed
+    if (job.applicationDeadline && new Date(job.applicationDeadline) < new Date()) {
+      return res.status(400).json({ message: "Application deadline has passed for this job" });
+    }
+
     const existing = await prisma.application.findFirst({
       where: { jobId, studentId: req.user.id }
     });
 
     if (existing) {
-      return res.status(409).json({ message: "You already applied to this job" });
+      return res.status(409).json({ 
+        message: "You have already applied to this job. Each student can only apply once per job posting." 
+      });
     }
 
     const app = await prisma.application.create({
       data: {
         jobId,
         studentId: req.user.id
+      }
+    });
+
+    // Log initial status
+    await prisma.applicationLog.create({
+      data: {
+        applicationId: app.id,
+        status: "APPLIED",
+        changedBy: req.user.id,
+        notes: "Application submitted"
       }
     });
 
@@ -153,9 +170,53 @@ router.get("/employer/my", auth, requireRole("EMPLOYER"), async (req, res) => {
 });
 
 /**
+ * ✅ STUDENT withdraws application
+ * DELETE /api/applications/:id
+ */
+router.delete("/:id", auth, requireRole("STUDENT"), async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({ message: "Invalid application id" });
+    }
+
+    const app = await prisma.application.findUnique({
+      where: { id },
+      include: { job: true }
+    });
+
+    if (!app) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    if (app.studentId !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden: not your application" });
+    }
+
+    // Only allow withdrawal for certain statuses
+    const withdrawableStatuses = ["APPLIED", "IN_REVIEW"];
+    if (!withdrawableStatuses.includes(app.status)) {
+      return res.status(400).json({ 
+        message: `Cannot withdraw application with status: ${app.status}. Only applications with status APPLIED or IN_REVIEW can be withdrawn.` 
+      });
+    }
+
+    // Delete application (cascade will handle logs)
+    await prisma.application.delete({
+      where: { id }
+    });
+
+    res.json({ message: "Application withdrawn successfully" });
+  } catch (e) {
+    res.status(500).json({ message: "Failed to withdraw application", error: e.message });
+  }
+});
+
+/**
  * ✅ EMPLOYER updates application status
  * PATCH /api/applications/:id
- * body: { status }
+ * body: { status, interviewDate? }
  */
 router.patch("/:id", auth, requireRole("EMPLOYER"), async (req, res) => {
   try {
@@ -183,13 +244,28 @@ router.patch("/:id", auth, requireRole("EMPLOYER"), async (req, res) => {
       return res.status(403).json({ message: "Forbidden: not your application" });
     }
 
+    const oldStatus = app.status;
+    const newStatus = String(status).trim();
+
     const updated = await prisma.application.update({
       where: { id },
       data: {
-        status: String(status).trim(),
-        interviewDate: interviewDate || app.interviewDate // Add interview date if provided
+        status: newStatus,
+        interviewDate: interviewDate || app.interviewDate
       }
     });
+
+    // Log status change if it changed
+    if (oldStatus !== newStatus) {
+      await prisma.applicationLog.create({
+        data: {
+          applicationId: id,
+          status: newStatus,
+          changedBy: req.user.id,
+          notes: `Status changed from ${oldStatus} to ${newStatus}`
+        }
+      });
+    }
 
     res.json(updated);
   } catch (e) {
@@ -230,11 +306,24 @@ router.patch("/:id/interview", auth, requireRole("EMPLOYER"), async (req, res) =
       return res.status(400).json({ message: "Invalid interview date" });
     }
 
+    const appBefore = await prisma.application.findUnique({ where: { id } });
+    const oldStatus = appBefore?.status || "APPLIED";
+
     const updated = await prisma.application.update({
       where: { id },
       data: {
         status: "INTERVIEW",
         interviewDate: interviewDateObj
+      }
+    });
+
+    // Log status change
+    await prisma.applicationLog.create({
+      data: {
+        applicationId: id,
+        status: "INTERVIEW",
+        changedBy: req.user.id,
+        notes: `Interview scheduled for ${interviewDateObj.toISOString()}`
       }
     });
 
@@ -439,17 +528,152 @@ router.patch("/:id/offer", auth, requireRole("EMPLOYER"), async (req, res) => {
       return res.status(403).json({ message: "Forbidden: not your application" });
     }
 
+    const appBefore = await prisma.application.findUnique({ where: { id } });
+    const oldStatus = appBefore?.status || "APPLIED";
+
     const updated = await prisma.application.update({
       where: { id },
       data: {
         status: "OFFERED"
-        // Note: if note field exists in future, add it here
+      }
+    });
+
+    // Log status change
+    await prisma.applicationLog.create({
+      data: {
+        applicationId: id,
+        status: "OFFERED",
+        changedBy: req.user.id,
+        notes: "Job offer sent to applicant"
       }
     });
 
     res.json(updated);
   } catch (e) {
     res.status(500).json({ message: "Failed to send offer", error: e.message });
+  }
+});
+
+/**
+ * ✅ EMPLOYER: Bulk update applications
+ * PATCH /api/applications/bulk
+ * body: { applicationIds: [1,2,3], status: "REJECTED" } or { ids: [1,2,3], status: "REJECTED" }
+ */
+router.patch("/bulk", auth, requireRole("EMPLOYER"), async (req, res) => {
+  try {
+    const { applicationIds, ids, status } = req.body;
+    
+    // Accept both applicationIds and ids for compatibility
+    const idArray = applicationIds || ids;
+
+    if (!Array.isArray(idArray) || idArray.length === 0) {
+      return res.status(400).json({ message: "No applications selected" });
+    }
+
+    if (!status) {
+      return res.status(400).json({ message: "status is required" });
+    }
+
+    const validApplicationIds = idArray.map(id => Number(id)).filter(id => Number.isInteger(id) && id > 0);
+    
+    if (validApplicationIds.length === 0) {
+      return res.status(400).json({ message: "No applications selected" });
+    }
+
+    // Verify all applications belong to this employer
+    const apps = await prisma.application.findMany({
+      where: {
+        id: { in: validApplicationIds }
+      },
+      include: { job: true }
+    });
+
+    const invalidApps = apps.filter(app => app.job.employerId !== req.user.id);
+    if (invalidApps.length > 0) {
+      return res.status(403).json({ message: "Some applications do not belong to you" });
+    }
+
+    // Update all applications
+    const updated = await prisma.application.updateMany({
+      where: {
+        id: { in: validApplicationIds }
+      },
+      data: {
+        status: String(status).trim()
+      }
+    });
+
+    // Log status changes for each application
+    const logPromises = apps.map(app => {
+      if (app.status !== status) {
+        return prisma.applicationLog.create({
+          data: {
+            applicationId: app.id,
+            status: String(status).trim(),
+            changedBy: req.user.id,
+            notes: `Bulk status update from ${app.status} to ${status}`
+          }
+        });
+      }
+      return Promise.resolve();
+    });
+
+    await Promise.all(logPromises);
+
+    res.json({ 
+      message: `Updated ${updated.count} application(s)`,
+      count: updated.count 
+    });
+  } catch (e) {
+    res.status(500).json({ message: "Failed to bulk update", error: e.message });
+  }
+});
+
+/**
+ * ✅ Get application status history
+ * GET /api/applications/:id/logs
+ */
+router.get("/:id/logs", auth, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({ message: "Invalid application id" });
+    }
+
+    const app = await prisma.application.findUnique({
+      where: { id },
+      include: { job: true }
+    });
+
+    if (!app) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    // Check permissions: student can see their own, employer can see their job's applications
+    const isStudent = req.user.role === "STUDENT" && app.studentId === req.user.id;
+    const isEmployer = req.user.role === "EMPLOYER" && app.job.employerId === req.user.id;
+
+    if (!isStudent && !isEmployer) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const logs = await prisma.applicationLog.findMany({
+      where: { applicationId: id },
+      include: {
+        application: {
+          select: {
+            id: true,
+            status: true
+          }
+        }
+      },
+      orderBy: { createdAt: "desc" }
+    });
+
+    res.json(logs);
+  } catch (e) {
+    res.status(500).json({ message: "Failed to load logs", error: e.message });
   }
 });
 

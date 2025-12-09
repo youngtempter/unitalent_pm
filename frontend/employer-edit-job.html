@@ -237,6 +237,26 @@
             placeholder="e.g. 2nd–4th year student, basic JS, Git, English B1+"></textarea>
         </div>
 
+        <!-- Application Deadline + Job Expiration -->
+        <div class="grid gap-3 md:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-[11px] font-semibold text-slate-200">
+              Application Deadline (optional)
+            </label>
+            <input id="jobApplicationDeadline" type="datetime-local"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 focus:outline-none" />
+            <p class="mt-1 text-[10px] text-slate-500">When applications close</p>
+          </div>
+          <div>
+            <label class="mb-1 block text-[11px] font-semibold text-slate-200">
+              Job Expiration (optional)
+            </label>
+            <input id="jobExpiresAt" type="datetime-local"
+              class="w-full rounded-2xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 focus:outline-none" />
+            <p class="mt-1 text-[10px] text-slate-500">When job listing expires</p>
+          </div>
+        </div>
+
         <!-- Actions -->
         <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
           <div class="text-[11px] text-slate-400">
@@ -290,6 +310,8 @@
     const salaryInput = document.getElementById("jobSalary");
     const descInput = document.getElementById("jobDescription");
     const reqInput = document.getElementById("jobRequirements");
+    const applicationDeadlineInput = document.getElementById("jobApplicationDeadline");
+    const expiresAtInput = document.getElementById("jobExpiresAt");
     const saveBtn = document.getElementById("saveBtn");
     const cancelBtn = document.getElementById("cancelBtn");
 
@@ -341,7 +363,7 @@
       try {
         setStatus("Loading job from backend...");
 
-        const res = await fetch(`${API}/api/jobs/${jobId}`, {
+        const res = await fetch(`${API}/api/jobs/${jobId}/edit`, {
           headers: {
             "Authorization": "Bearer " + token
           }
@@ -376,6 +398,25 @@
         salaryInput.value = data.salary || "";
         descInput.value = data.description || "";
         reqInput.value = data.requirements || "";
+        
+        // Set deadline and expiration dates
+        if (data.applicationDeadline) {
+          const deadlineDate = new Date(data.applicationDeadline);
+          if (applicationDeadlineInput) {
+            applicationDeadlineInput.value = deadlineDate.toISOString().slice(0, 16);
+          }
+        } else if (applicationDeadlineInput) {
+          applicationDeadlineInput.value = "";
+        }
+        
+        if (data.expiresAt) {
+          const expiresDate = new Date(data.expiresAt);
+          if (expiresAtInput) {
+            expiresAtInput.value = expiresDate.toISOString().slice(0, 16);
+          }
+        } else if (expiresAtInput) {
+          expiresAtInput.value = "";
+        }
 
         if (data.type && typeSelect) {
           typeSelect.value = data.type;
@@ -412,7 +453,9 @@
           description: descInput.value.trim(),
           requirements: reqInput.value.trim(),
           type: typeSelect.value || null,
-          workMode: workModeSelect.value || null
+          workMode: workModeSelect.value || null,
+          applicationDeadline: applicationDeadlineInput?.value || undefined,
+          expiresAt: expiresAtInput?.value || undefined
         };
 
         const res = await fetch(`${API}/api/jobs/${jobId}`, {

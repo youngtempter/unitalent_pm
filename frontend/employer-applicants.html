@@ -94,16 +94,18 @@
       </div>
 
       <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <p class="text-xs text-slate-400">
             Total applicants:
             <span id="count" class="font-semibold text-slate-200">0</span>
           </p>
 
+          <div class="flex flex-wrap items-center gap-2">
           <a href="employer-new-job.html"
             class="rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1 text-[11px] text-slate-200 hover:border-indigo-400 hover:text-indigo-200">
             Post another job
           </a>
+          </div>
         </div>
       </div>
 
@@ -328,8 +330,8 @@
             const status = escapeHtml(app.status || 'APPLIED');
             const statusUpper = (app.status || 'APPLIED').toUpperCase();
             
-            // Show Send Offer button only if status is NOT OFFERED, ACCEPTED, REJECTED
-            const canSendOffer = !['OFFERED', 'ACCEPTED', 'REJECTED'].includes(statusUpper);
+            // Show Send Offer button if status is NOT OFFERED (allow re-offering after ACCEPTED/REJECTED)
+            const canSendOffer = statusUpper !== 'OFFERED';
             
             // Status badge color based on status
             let statusBadgeClass = 'bg-emerald-500/15 text-emerald-300';
@@ -345,36 +347,46 @@
 
             return ` 
               <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/60">
+                <div class="flex items-start gap-3">
+                  <div class="flex-1">
                 <div class="flex items-start justify-between">
                   <div>
                     <p class="text-sm font-semibold text-slate-50">${name}</p>
                     <p class="text-xs text-slate-400">${email}</p>
                   </div>
-                  <span class="rounded-full ${statusBadgeClass} px-2 py-1 text-[11px] font-medium">
+                      <span class="rounded-full ${statusBadgeClass} px-2 py-1 text-[11px] font-medium">
                     ${status}
                   </span>
                 </div>
                 <p class="mt-2 text-[11px] text-slate-500">
                   Application ID: ${app.id}
                 </p>
-                <div class="mt-3 flex flex-wrap gap-2">
+
+                    <div class="mt-3 flex flex-wrap gap-2">
                   <a 
                     href="employer-student-profile.html?studentId=${app.student?.id}"
                     class="rounded-full border border-indigo-500/60 bg-indigo-500/10 px-4 py-2 text-xs font-semibold text-indigo-200 hover:bg-indigo-500/20">
                     View Profile
                   </a>
-                  ${canSendOffer ? `
+                      <button 
+                        class="rounded-full border border-slate-600 bg-slate-950/60 px-4 py-2 text-xs font-semibold text-slate-200 hover:border-indigo-400 hover:text-indigo-200 view-history-btn"
+                        data-app-id="${app.id}">
+                        View History
+                      </button>
+                      ${canSendOffer ? `
                   <button 
                     class="bg-indigo-500 text-white rounded-full px-4 py-2 text-xs font-semibold hover:bg-indigo-400"
                     data-application-id="${app.id}" id="invite-btn-${app.id}">
                     Invite to Interview
                   </button>
-                  <button 
-                    class="bg-emerald-500 text-white rounded-full px-4 py-2 text-xs font-semibold hover:bg-emerald-400"
-                    data-application-id="${app.id}" id="offer-btn-${app.id}">
-                    Send Offer
-                  </button>
-                  ` : ''}
+                      <button 
+                        class="bg-emerald-500 text-white rounded-full px-4 py-2 text-xs font-semibold hover:bg-emerald-400"
+                        data-application-id="${app.id}" id="offer-btn-${app.id}">
+                        Send Offer
+                      </button>
+                      ` : ''}
+                    </div>
+                  </div>
                 </div>
               </div> 
             `;
@@ -415,7 +427,11 @@
             const interviewDate = interviewDateInput.value;
 
             if (!interviewDate) {
+              if (typeof toast !== 'undefined') {
+                toast.error("Please enter a valid interview date.");
+              } else {
               alert("Please enter a valid interview date.");
+              }
               return;
             }
 
@@ -434,13 +450,26 @@
               const data = await res.json();
 
               if (res.ok) {
-                alert("Interview scheduled successfully.");
+                if (typeof toast !== 'undefined') {
+                  toast.success("Interview scheduled successfully.");
+                } else {
+                  alert("Interview scheduled successfully.");
+                }
                 window.location.reload(); // Refresh the page to reflect changes
               } else {
-                alert("Failed to schedule interview: " + (data.message || 'Unknown error'));
+                const errorMsg = "Failed to schedule interview: " + (data.message || 'Unknown error');
+                if (typeof toast !== 'undefined') {
+                  toast.error(errorMsg);
+                } else {
+                  alert(errorMsg);
+                }
               }
             } catch (err) {
-              alert("Error: " + err.message);
+              if (typeof toast !== 'undefined') {
+                toast.error("Error: " + err.message);
+              } else {
+                alert("Error: " + err.message);
+              }
             }
             modal.classList.add('hidden');
             confirmBtn.removeEventListener('click', handleConfirm);
@@ -500,13 +529,86 @@
             offerButton.textContent = originalText;
             offerButton.disabled = false;
             offerButton.classList.remove('opacity-70');
-            alert('Failed to send offer: ' + err.message);
+            if (typeof toast !== 'undefined') {
+              toast.error('Failed to send offer: ' + err.message);
+            } else {
+              if (typeof toast !== 'undefined') {
+                toast.error('Failed to send offer: ' + err.message);
+              } else {
+                alert('Failed to send offer: ' + err.message);
+              }
+            }
+          }
+        }
+      });
+
+      // -------------------------
+      // History handlers
+      // -------------------------
+      listEl?.addEventListener('click', async (e) => {
+        const viewHistoryBtn = e.target.closest('.view-history-btn');
+        if (viewHistoryBtn) {
+          const appId = viewHistoryBtn.getAttribute('data-app-id');
+
+          try {
+            const res = await fetch(`${API}/api/applications/${appId}/logs`, {
+              headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            const data = await res.json().catch(() => ({}));
+
+            if (!res.ok) {
+              throw new Error(data?.message || 'Failed to load history');
+            }
+
+            const logs = Array.isArray(data) ? data : [];
+            const historyHtml = logs.map(log => {
+              const date = new Date(log.createdAt).toLocaleString();
+              return `
+                <div class="border-b border-slate-800 pb-2 mb-2 last:border-b-0 last:mb-0">
+                  <p class="text-xs font-semibold text-slate-200">${escapeHtml(log.status)}</p>
+                  <p class="text-[11px] text-slate-400">${date}</p>
+                  ${log.notes ? `<p class="text-[11px] text-slate-500 mt-1">${escapeHtml(log.notes)}</p>` : ''}
+                </div>
+              `;
+            }).join('') || '<p class="text-xs text-slate-400">No history available</p>';
+
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4';
+            modal.innerHTML = `
+              <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-lg font-semibold text-slate-50">Application History</h3>
+                  <button class="text-slate-400 hover:text-slate-200 close-history-modal">✕</button>
+                </div>
+                <div class="space-y-2">
+                  ${historyHtml}
+                </div>
+              </div>
+            `;
+
+            document.body.appendChild(modal);
+            modal.querySelector('.close-history-modal')?.addEventListener('click', () => {
+              document.body.removeChild(modal);
+            });
+            modal.addEventListener('click', (e) => {
+              if (e.target === modal) {
+                document.body.removeChild(modal);
+              }
+            });
+          } catch (err) {
+            console.error(err);
+            if (typeof toast !== 'undefined') {
+              toast.error(err.message);
+            } else {
+              alert(err.message);
+            }
           }
         }
       });
     });
   </script>
-
+  <script src="js/toast.js"></script>
   <script type="module" src="js/auth.js"></script>
 
 </body>

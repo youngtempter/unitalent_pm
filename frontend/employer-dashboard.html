@@ -221,10 +221,6 @@
               class="rounded-full bg-indigo-500 px-4 py-2 text-[11px] font-semibold text-white shadow-md shadow-indigo-500/40 hover:bg-indigo-400">
               + Post new job
             </button>
-            <button id="btn-view-all-applicants"
-              class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400">
-              View applicants (first job)
-            </button>
           </div>
         </div>
 
@@ -368,7 +364,11 @@
       const $ = (id) => document.getElementById(id);
 
       function notify(msg) {
-        alert(msg);
+        if (typeof toast !== 'undefined') {
+          toast.error(msg);
+        } else {
+          alert(msg);
+        }
       }
 
       function escapeHtml(str = '') {
@@ -382,7 +382,12 @@
 
       async function apiGet(path) {
         const res = await fetch(`${API}${path}`, {
-          headers: { 'Authorization': 'Bearer ' + token }
+          headers: { 
+            'Authorization': 'Bearer ' + token,
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          },
+          cache: 'no-store'
         });
         const data = await res.json().catch(() => null);
 
@@ -557,19 +562,6 @@
 
       // Funnel stats are loaded separately via loadFunnelStats()
 
-      // -------- View applicants (first job) --------
-      const allApplicantsBtn = $('btn-view-all-applicants');
-      if (allApplicantsBtn) {
-        allApplicantsBtn.addEventListener('click', () => {
-          const firstJob = Array.isArray(myJobs) ? myJobs[0] : null;
-          if (!firstJob?.id) {
-            notify('You have no jobs yet. Post a job first.');
-            return;
-          }
-          window.location.href = `employer-applicants.html?jobId=${encodeURIComponent(firstJob.id)}`;
-        });
-      }
-
       // ----------------------------
       // COUNT APPLICATIONS PER JOB
       // ----------------------------
@@ -703,6 +695,7 @@
   </script>
 
   <!-- Shared auth (auto navbar guards based on data-guard) -->
+  <script src="js/toast.js"></script>
   <script type="module" src="js/auth.js"></script>
 
 </body>

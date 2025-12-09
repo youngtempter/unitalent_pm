@@ -170,7 +170,7 @@
         <div>
           <h2 class="text-sm font-semibold text-slate-50">Contact / Identity</h2>
           <p class="mt-1 text-[11px] text-slate-400">
-            You can use your personal name or company name here (e.g. “TechCorp HR”).
+            You can use your personal name or company name here (e.g. "TechCorp HR").
           </p>
 
           <!-- 🔁 Only ONE field now -->
@@ -438,12 +438,35 @@
         bin: document.getElementById('bin'),
         companySize: document.getElementById('companySize'),
         city: document.getElementById('city'),
-        industry: document.getElementById('industry')
+        industry: document.getElementById('industry'),
+        avatarUrl: document.getElementById('avatarUrl')
       };
+
+      const avatarPreview = document.getElementById('avatar-preview');
+      const avatarImg = document.getElementById('avatar-img');
+      const avatarInitials = document.getElementById('avatar-initials');
+      const saveAvatarBtn = document.getElementById('save-avatar-btn');
 
       // -------------------------
       // Helpers
       // -------------------------
+      function updateAvatarPreview(avatarUrl, firstName) {
+        if (avatarUrl && avatarUrl.trim()) {
+          if (avatarImg) {
+            avatarImg.src = avatarUrl;
+            avatarImg.classList.remove('hidden');
+            if (avatarInitials) avatarInitials.classList.add('hidden');
+          }
+        } else {
+          if (avatarImg) avatarImg.classList.add('hidden');
+          if (avatarInitials) {
+            avatarInitials.classList.remove('hidden');
+            const initials = firstName ? firstName[0].toUpperCase() : 'EM';
+            avatarInitials.textContent = initials;
+          }
+        }
+      }
+
       function buildDisplayName(p) {
         return (
           p?.firstName ||
@@ -471,7 +494,7 @@
           bin: fields.bin?.value.trim() || '',
           companySize: fields.companySize?.value || '',
           city: fields.city?.value.trim() || '',
-          industry: fields.industry?.value.trim() || ''
+          industry: fields.industry?.value.trim() || '',
         };
       }
 
@@ -720,6 +743,7 @@
   </script>
 
   <!-- Shared auth / navbar logic -->
+  <script src="js/toast.js"></script>
   <script type="module" src="js/auth.js"></script>
 </body>
 

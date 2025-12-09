@@ -396,18 +396,24 @@
                     <p class="text-[11px] text-slate-400">Saved recently</p>
                   </div>
 
-                  <div class="flex gap-2">
-                    <button
-                      class="js-apply-btn rounded-full bg-indigo-500 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-indigo-400"
-                      data-job-id="${x.jobId}">
-                      Apply now
-                    </button>
+                  <div class="flex flex-col gap-2">
+                    <div class="flex gap-2">
+                      <button
+                        class="js-apply-btn rounded-full bg-indigo-500 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-indigo-400"
+                        data-job-id="${x.jobId}">
+                        Apply now
+                      </button>
 
-                    <button
-                      class="js-unsave-btn rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1.5 text-[11px] text-slate-200 hover:border-rose-400 hover:text-rose-200"
-                      data-job-id="${x.jobId}">
-                      Remove
-                    </button>
+                      <button
+                        class="js-unsave-btn rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1.5 text-[11px] text-slate-200 hover:border-rose-400 hover:text-rose-200"
+                        data-job-id="${x.jobId}">
+                        Remove
+                      </button>
+                    </div>
+                    <a href="job-details.html?jobId=${x.jobId}"
+                      class="inline-block w-full rounded-full border border-indigo-500/60 bg-indigo-500/10 px-3 py-1.5 text-center text-[11px] font-semibold text-indigo-200 hover:bg-indigo-500/20">
+                      View Details →
+                    </a>
                   </div>
                 </div>
               </div>
