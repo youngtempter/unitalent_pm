@@ -16,24 +16,30 @@ unitalent-reqruitment system/
 │   ├── assets/                        # Static assets (logo, images)
 │   │   └── logo.png
 │   ├── js/                            # JavaScript modules
-│   │   └── auth.js                    # Authentication utilities & guards
+│   │   ├── auth.js                    # Authentication utilities & guards
+│   │   └── toast.js                   # Toast notification system
+│   ├── assets/                        # Static assets
+│   │   └── logo.png                   # Platform logo
 │   ├── index.html                     # Landing page
 │   ├── jobs.html                      # Public job listings
+│   ├── job-details.html               # Job details page (full job information)
 │   ├── contact.html                   # Contact form
+│   ├── forgot-password.html           # Password reset request page
+│   ├── reset-password.html            # Password reset form
 │   ├── student-login.html             # Student login page
 │   ├── student-signup.html            # Student registration
-│   ├── student-dashboard.html          # Student dashboard
-│   ├── student-profile.html            # Student profile management
+│   ├── student-dashboard.html         # Student dashboard
+│   ├── student-profile.html           # Student profile management
 │   ├── student-interviews.html        # Student interview schedule
-│   ├── saved-jobs.html                 # Saved jobs list
-│   ├── employer-login.html             # Employer login page
+│   ├── saved-jobs.html                # Saved jobs list
+│   ├── employer-login.html            # Employer login page
 │   ├── employer-signup.html           # Employer registration
 │   ├── employer-dashboard.html        # Employer dashboard
 │   ├── employer-profile.html          # Employer profile management
 │   ├── employer-new-job.html          # Create new job posting
 │   ├── employer-edit-job.html         # Edit existing job
-│   ├── employer-applicants.html        # View job applicants
-│   ├── employer-browse-students.html   # Browse student profiles
+│   ├── employer-applicants.html       # View job applicants
+│   ├── employer-browse-students.html  # Browse student profiles
 │   ├── employer-student-profile.html  # View individual student profile
 │   ├── employer-interviews.html       # Manage interviews
 │   └── styles.css                     # Custom styles
@@ -81,6 +87,7 @@ unitalent-reqruitment system/
 - **Vanilla JavaScript** (ES6+ modules) - No build step required
 - **LocalStorage/SessionStorage** - Client-side authentication state
 - **Fetch API** - HTTP requests to backend
+- **Toast Notifications** - Custom toast system for user feedback (replaces alerts)
 
 ## 📋 Prerequisites
 
@@ -198,15 +205,23 @@ Tokens are returned upon successful login/registration and should be stored clie
 | `POST` | `/api/auth/employer/register` | Employer registration | ❌ | - |
 | `POST` | `/api/auth/employer/login` | Employer login | ❌ | - |
 | `PATCH` | `/api/auth/me/credentials` | Change email and/or password | ✅ | Any |
+| `POST` | `/api/auth/forgot-password` | Request password reset | ❌ | - |
+| `GET` | `/api/auth/reset-password/:token` | Verify reset token | ❌ | - |
+| `POST` | `/api/auth/reset-password/:token` | Reset password with token | ❌ | - |
 
 **Request Body Examples:**
 - Registration: `{ email, password, firstName?, lastName?, username? }`
 - Login: `{ email, password }`
 - Change Credentials: `{ currentPassword: string, newEmail?: string, newPassword?: string }`
+- Forgot Password: `{ email: string }`
+- Reset Password: `{ newPassword: string }`
 
 **Response:** `{ token: string, user: { id, email, role, ... } }`
 
-**Note:** Change credentials endpoint requires current password verification and returns a fresh token with updated user data.
+**Notes:**
+- Change credentials endpoint requires current password verification and returns a fresh token with updated user data.
+- Password reset tokens expire after 1 hour and can only be used once.
+- Forgot password endpoint always returns success (to prevent email enumeration).
 
 ### Jobs
 | Method | Endpoint | Description | Auth Required | Role |
@@ -214,15 +229,18 @@ Tokens are returned upon successful login/registration and should be stored clie
 | `GET` | `/api/jobs` | Get all jobs (public, with search/filter) | ❌ | - |
 | `POST` | `/api/jobs` | Create new job posting | ✅ | EMPLOYER |
 | `GET` | `/api/jobs/my` | Get employer's own jobs | ✅ | EMPLOYER |
-| `GET` | `/api/jobs/:id` | Get single job for editing | ✅ | EMPLOYER |
+| `GET` | `/api/jobs/:id` | Get single job (public, increments view count) | ❌ | - |
+| `GET` | `/api/jobs/:id/edit` | Get single job for editing | ✅ | EMPLOYER |
 | `PATCH` | `/api/jobs/:id` | Update job details | ✅ | EMPLOYER |
 | `DELETE` | `/api/jobs/:id` | Delete job posting | ✅ | EMPLOYER |
+| `POST` | `/api/jobs/:id/view` | Increment view count | ❌ | - |
 
 **Query Parameters for GET /api/jobs:**
 - `q` - Search keyword (searches title & description)
 - `location` - Filter by location
 - `type` - Filter by job type (INTERNSHIP, PART_TIME, FULL_TIME)
 - `workMode` - Filter by work mode (ON_SITE, HYBRID, REMOTE)
+- `sortBy` - Sort order (`recent`, `oldest`, `views`, or omit for default)
 
 **Request Body for POST/PATCH:**
 ```json
@@ -233,9 +251,13 @@ Tokens are returned upon successful login/registration and should be stored clie
   "salary": "string?",
   "type": "INTERNSHIP | PART_TIME | FULL_TIME",
   "workMode": "ON_SITE | HYBRID | REMOTE",
-  "requirements": "string?"
+  "requirements": "string?",
+  "expiresAt": "ISO date string?",
+  "applicationDeadline": "ISO date string?"
 }
 ```
+
+**Note:** Jobs with `expiresAt` in the past are automatically excluded from public listings. Jobs with `applicationDeadline` in the past cannot receive new applications.
 
 ### Applications
 | Method | Endpoint | Description | Auth Required | Role |
@@ -252,12 +274,21 @@ Tokens are returned upon successful login/registration and should be stored clie
 | `PATCH` | `/api/applications/:id/interview` | Schedule interview | ✅ | EMPLOYER |
 | `PATCH` | `/api/applications/:id/interview/cancel` | Cancel interview | ✅ | STUDENT |
 | `PATCH` | `/api/applications/:id/offer` | Send job offer to applicant | ✅ | EMPLOYER |
+| `DELETE` | `/api/applications/:id` | Withdraw application (STUDENT only) | ✅ | STUDENT |
+| `PATCH` | `/api/applications/bulk` | Bulk update application statuses | ✅ | EMPLOYER |
+| `GET` | `/api/applications/:id/logs` | Get application status history | ✅ | Any |
 
 **Request Body Examples:**
 - Apply: `{ jobId: number }`
 - Update status: `{ status: string, interviewDate?: string }`
 - Schedule interview: `{ interviewDate: string (ISO format) }`
 - Send offer: No body required (updates status to "OFFERED")
+- Bulk update: `{ applicationIds: [1,2,3] or ids: [1,2,3], status: string }`
+
+**Note:** 
+- Students can only withdraw applications with status `APPLIED` or `IN_REVIEW`
+- Bulk update allows employers to update multiple applications at once
+- Application logs track all status changes with timestamps and notes
 
 **Application Statuses:** `APPLIED`, `IN_REVIEW`, `INTERVIEW`, `OFFERED`, `ACCEPTED`, `REJECTED`
 
@@ -390,6 +421,9 @@ Job postings created by employers.
 - `title` (String, Required)
 - `description` (String, Required)
 - `location`, `salary`, `type`, `workMode`, `requirements` (Optional)
+- `expiresAt` (DateTime, Optional) - Job expiration date
+- `applicationDeadline` (DateTime, Optional) - Application deadline
+- `views` (Int, Default: 0) - View count tracker
 - `employerId` (Int, Foreign Key → User)
 - `createdAt` (DateTime)
 
@@ -408,12 +442,14 @@ Job applications submitted by students.
 - `jobId` (Int, Foreign Key → Job, Cascade Delete)
 - `status` (String, Default: "APPLIED")
 - `interviewDate` (DateTime, Optional)
+- `notes` (Text, Optional) - Employer notes on application
 - `createdAt` (DateTime)
 - Unique constraint: `[studentId, jobId]`
 
 **Relations:**
 - `student` → User
 - `job` → Job
+- `logs` → ApplicationLog[]
 
 #### Invitation
 Invitations sent by employers to students.
@@ -455,6 +491,42 @@ Contact form submissions from the public contact page.
 - `message` (String, Required, min 10 chars, stored as Text)
 - `createdAt` (DateTime, Default: now())
 
+#### PasswordReset
+Password reset tokens for secure password recovery.
+
+**Fields:**
+- `id` (Int, Primary Key)
+- `userId` (Int, Foreign Key → User, Cascade Delete)
+- `token` (String, Unique) - Secure random token
+- `expiresAt` (DateTime) - Token expiration (1 hour)
+- `used` (Boolean, Default: false) - Prevents reuse
+- `createdAt` (DateTime)
+
+**Relations:**
+- `user` → User
+
+**Indexes:**
+- `token` (for fast lookup)
+- `userId` (for cleanup)
+
+#### ApplicationLog
+Audit trail for application status changes.
+
+**Fields:**
+- `id` (Int, Primary Key)
+- `applicationId` (Int, Foreign Key → Application, Cascade Delete)
+- `status` (String) - Status changed to
+- `changedBy` (Int) - User ID who made the change
+- `notes` (Text, Optional) - Optional note about the change
+- `createdAt` (DateTime)
+
+**Relations:**
+- `application` → Application
+
+**Indexes:**
+- `applicationId` (for fast lookup)
+- `changedBy` (for audit queries)
+
 ### Database Migrations
 
 The project includes migration history in `prisma/migrations/`:
@@ -465,8 +537,10 @@ The project includes migration history in `prisma/migrations/`:
 - Cascade delete constraints
 - Saved jobs feature
 - Interview date field
-- Additional job fields
+- Additional job fields (expiresAt, applicationDeadline, views)
 - Contact messages table
+- Password reset tokens
+- Application logs and notes
 
 See `unitalent-backend-full/prisma/schema.prisma` for the complete schema definition.
 
@@ -475,22 +549,29 @@ See `unitalent-backend-full/prisma/schema.prisma` for the complete schema defini
 ### For Students
 - 🔐 Secure registration and login with password validation
 - 🔑 Change email and password securely (with current password verification)
+- 🔄 Password reset functionality (forgot password & reset with secure token)
 - 📝 Comprehensive profile management (education, skills, portfolio links)
-- 🔍 Advanced job search with filters (location, type, work mode)
+- 🔍 Advanced job search with filters (location, type, work mode) and sorting (Any, Recent, Oldest, Most Viewed)
 - 📄 Paginated job listings (6 jobs per page with Previous/Next navigation)
+- 📋 View detailed job information (full description, requirements, deadlines)
 - 💾 Save favorite jobs for later
 - 📤 One-click job applications
 - 📊 Track application status (Applied, In Review, Interview, Offer Received, Accepted, Rejected)
-- 📅 View and manage interview schedules
+- 📅 View and manage interview schedules (shows all interviews and offers)
 - 📈 View upcoming interviews count on dashboard
 - 🎯 Browse personalized job recommendations
 - 📧 Receive employer invitations
+- ❌ Withdraw applications (for APPLIED and IN_REVIEW statuses)
 - 👁️ Password visibility toggle on login/signup forms
+- 🔔 Toast notifications for better user feedback
 
 ### For Employers
 - 🏢 Company profile management
 - 🔑 Change email and password securely (with current password verification)
+- 🔄 Password reset functionality (forgot password & reset with secure token)
 - 📋 Create, edit, and delete job postings
+- ⏰ Set job expiration dates and application deadlines
+- 📊 Track job view counts
 - 🔍 Browse and search student profiles
 - 👥 View applicants for each job posting
 - 📊 Manage all applications in one dashboard
@@ -498,22 +579,32 @@ See `unitalent-backend-full/prisma/schema.prisma` for the complete schema defini
 - 📅 Schedule interviews with applicants
 - 📅 View all scheduled interviews in one place
 - 📈 View upcoming interviews count on dashboard
-- 💼 Send job offers to applicants
+- 💼 Send job offers to applicants (can re-offer after status changes)
+- 📝 Add notes to applications
+- 📜 View application status history/logs
+- 🔄 Bulk update application statuses
 - ✉️ Send invitations to promising students
 - 👁️ Password visibility toggle on login/signup forms
+- 🔔 Toast notifications for better user feedback
 
 ### Platform Features
 - 🎨 Modern, responsive UI with Tailwind CSS
 - 🔒 Secure authentication with JWT tokens
+- 🔄 Password reset system with secure tokens (1-hour expiration)
 - 🛡️ Role-based access control
 - 🔍 Full-text search capabilities
-- 📄 Pagination for job listings
+- 📄 Pagination for job listings (6 jobs per page)
+- 📋 Job details page with full information
 - 📱 Mobile-friendly design
 - ⚡ Fast, RESTful API
 - 🗄️ Robust database with Prisma ORM
 - 📧 Functional contact form with database storage
 - 👁️ Password visibility toggles for better UX
 - 📊 Real-time hiring funnel statistics
+- 🔔 Toast notification system (replaces browser alerts)
+- 📜 Application audit trail (status change history)
+- ⏰ Job expiration and deadline management
+- 📊 Job view tracking
 
 ## 🔒 Security Features
 
@@ -532,8 +623,11 @@ See `unitalent-backend-full/prisma/schema.prisma` for the complete schema defini
 
 ### Public Pages
 - **index.html** - Landing page with featured jobs, how it works, testimonials
-- **jobs.html** - Public job listings with search, filter, and pagination (6 jobs per page)
+- **jobs.html** - Public job listings with search, filter, sorting, and pagination (6 jobs per page)
+- **job-details.html** - Detailed job view with full description, requirements, and all job information
 - **contact.html** - Functional contact form that saves messages to database
+- **forgot-password.html** - Password reset request page
+- **reset-password.html** - Password reset form (requires valid token)
 
 ### Student Pages
 - **student-login.html** - Student authentication
@@ -558,9 +652,12 @@ See `unitalent-backend-full/prisma/schema.prisma` for the complete schema defini
 ### Frontend Architecture
 - **Authentication Guard**: Role-based page protection via `data-guard` attribute
 - **Auth Module**: Centralized authentication utilities (`js/auth.js`)
+- **Toast System**: Custom toast notifications (`js/toast.js`) for user feedback
 - **Local Storage**: Token and user data persistence
 - **Dynamic UI**: Navbar and buttons adapt based on authentication state
 - **API Integration**: All pages communicate with backend via Fetch API
+- **Form Validation**: Client-side validation with server-side verification
+- **Error Handling**: Graceful error handling with user-friendly messages
 
 ## 📝 Available Scripts
 
@@ -694,6 +791,17 @@ For questions or support, please open an issue on GitHub.
 ## 🆕 Recent Features & Improvements
 
 ### Latest Updates
+- ✅ **Password Reset System**: Complete password recovery flow with secure tokens (1-hour expiration)
+- ✅ **Job Details Page**: Dedicated page for viewing complete job information with full description and requirements
+- ✅ **Toast Notifications**: Custom toast system replacing browser alerts for better UX
+- ✅ **Application Withdrawal**: Students can withdraw applications with status APPLIED or IN_REVIEW
+- ✅ **Application History**: Complete audit trail of application status changes with timestamps and notes
+- ✅ **Bulk Operations**: Employers can bulk update multiple application statuses at once
+- ✅ **Job Expiration & Deadlines**: Jobs can have expiration dates and application deadlines
+- ✅ **Job View Tracking**: Automatic view count tracking for job postings
+- ✅ **Enhanced Interview View**: Students can see all interviews and offers in one place
+- ✅ **Re-offer Capability**: Employers can send offers again after status changes
+- ✅ **Job Sorting**: Added "Any" option to job sorting (recent, oldest, most viewed, any)
 - ✅ **Contact Form**: Fully functional contact form with database persistence
 - ✅ **Credential Management**: Users can securely change email and password
 - ✅ **Hiring Funnel Analytics**: Employers can track application pipeline statistics
