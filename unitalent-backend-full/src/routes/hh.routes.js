@@ -46,8 +46,52 @@ router.get("/hh-jobs", (req, res) => {
       params.push(`%${q.toLowerCase()}%`, `%${q.toLowerCase()}%`);
     }
     if (city) {
-      where.push("lower(city) LIKE ?");
-      params.push(`%${city.toLowerCase()}%`);
+      const cityInputRaw = String(city).trim();
+      const cityInput = cityInputRaw.toLocaleLowerCase("ru-RU");
+
+      // Simple transliteration/alias map so English inputs still match Cyrillic DB values
+      const cityAliases = {
+        almaty: ["алматы"],
+        almaata: ["алматы"], // common typo
+        astana: ["астана", "нур-султан"],
+        nursultan: ["нур-султан"],
+        shymkent: ["шымкент"],
+        karaganda: ["караганда"],
+        karagandy: ["караганда"],
+        kostanay: ["костанай"],
+        kostanai: ["костанай"],
+        aktobe: ["актобе"],
+        aktobe: ["актобе"],
+        kyzylorda: ["кызылорда"],
+        turkestan: ["туркестан"],
+        turkistan: ["туркестан"],
+        ekibastuz: ["экибастуз"],
+        ekibastus: ["экибастуз"],
+        kokshetau: ["кокшетау"],
+        kokshetav: ["кокшетау"],
+        pavlodar: ["павлодар"],
+        petropavlovsk: ["петропавловск"],
+        aktau: ["актау"],
+        semey: ["семей"],
+        semei: ["семей"],
+        zhezkazgan: ["жезказган"],
+        zhezqazgan: ["жезказган"]
+      };
+
+      const variants = new Set([cityInput]);
+      cityAliases[cityInput]?.forEach((v) => variants.add(v));
+      // Also try capitalized variants because SQLite lower() is ASCII-only (fails for Cyrillic)
+      const capitalize = (s) =>
+        s ? s.charAt(0).toLocaleUpperCase("ru-RU") + s.slice(1) : s;
+      Array.from([...variants]).forEach((v) => variants.add(capitalize(v)));
+      variants.add(cityInputRaw);
+
+      const cityWhere = Array.from(variants)
+        .map(() => "city LIKE ?")
+        .join(" OR ");
+
+      where.push(`(${cityWhere})`);
+      Array.from(variants).forEach((v) => params.push(`%${v}%`));
     }
 
     const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
