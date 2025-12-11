@@ -138,6 +138,9 @@ npm run prisma:generate
 # Run database migrations
 npm run prisma:migrate
 
+# Download the better-sqlite3
+npm install better-sqlite3
+
 # Start the development server
 npm run dev
 ```
