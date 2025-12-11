@@ -1,0 +1,13 @@
+Data Analyst
+Data Scientist
+Designer
+Developer
+HR Manager
+QA Engineer
+Software Engineer
+DevOps Engineer
+Product Manager
+Backend Developer
+Frontend Developer
+ML Engineer
+Recruiter

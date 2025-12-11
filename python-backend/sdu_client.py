@@ -1,0 +1,385 @@
+# backend/sdu_client.py
+import requests
+import re
+import time
+import json
+from bs4 import BeautifulSoup
+from requests.exceptions import RequestException
+
+BASE_URL = "https://my.sdu.edu.kz"
+LOGIN_URL = f"{BASE_URL}/loginAuth.php"
+TRANSCRIPT_URL = f"{BASE_URL}/index.php?mod=transkript"
+TRANSCRIPT_PRINT_URL = f"{BASE_URL}/index.php?mod=transkript&ajx=1&action=PrintTranskript"
+
+
+class SDUClient:
+    def __init__(self):
+        self.session = requests.Session()
+
+    def login(self, username: str, password: str) -> bool:
+        payload = {
+            "username": username,
+            "password": password,
+            "modstring": "",
+            "LogIn": "Log in",
+        }
+
+        headers = {
+            "User-Agent": "Mozilla/5.0 (SDUProjectBot)",
+            "Referer": BASE_URL + "/",
+        }
+
+        resp = self.session.post(LOGIN_URL, data=payload, headers=headers)
+        resp.raise_for_status()
+
+        soup = BeautifulSoup(resp.text, "html.parser")
+        user_input = soup.find("input", {"name": "username"})
+        pass_input = soup.find("input", {"name": "password"})
+
+        if user_input and pass_input:
+            print("Login failed: still on login page")
+            return False
+
+        print("Login successful")
+        return True
+
+
+    def get_print_transcript_html(self, username: str, password: str) -> str | None:
+        """
+        Logs in and returns the HTML of the PRINT version of the transcript:
+        index.php?mod=transkript&ajx=1&action=PrintTranskript
+        """
+        if not self.login(username, password):
+            return None
+
+        resp = self.session.get(TRANSCRIPT_PRINT_URL)
+        resp.raise_for_status()
+        html = resp.text
+
+        return html
+
+
+    def get_profile_data(self, username: str, password: str):
+        """
+        Logs in and parses:
+        - Fullname
+        - Program / Class
+
+        from https://my.sdu.edu.kz/index.php
+        """
+        if not self.login(username, password):
+            return None
+
+        resp = self.session.get(f"{BASE_URL}/index.php")
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        fullname = ""
+        program_class = ""
+
+        # Fullname
+        node = soup.find("td", string=lambda s: s and "Fullname" in s)
+        if node:
+            td = node.find_next("td")
+            if td:
+                fullname = td.get_text(strip=True)
+
+        # Program / Class
+        node = soup.find("td", string=lambda s: s and "Program / Class" in s)
+        if node:
+            td = node.find_next("td")
+            if td:
+                program_class = td.get_text(strip=True) + " course"
+
+        return {
+            "fullname": fullname,
+            "program_class": program_class
+        }
+
+    def get_contact_number(self, username: str, password: str, normalize: bool = False) -> str | None:
+        """
+        Logs in and fetches contact info via AJAX:
+        POST https://my.sdu.edu.kz/index.php
+        Payload:
+            ajx=1
+            mod=profile
+            action=ContactInfo
+
+        Returns the first found contact number as a string, or None if not found.
+
+        If normalize=True, returns digits-only phone (keeps leading '+' if present).
+        """
+        import time
+
+        if not self.login(username, password):
+            return None
+
+        url = f"{BASE_URL}/index.php"
+        payload = {
+            "ajx": "1",
+            "mod": "profile",
+            "action": "ContactInfo",
+            # harmless cache-buster seen in the browser requests:
+            str(int(time.time() * 1000)): ""
+        }
+
+        headers = {
+            "User-Agent": "Mozilla/5.0 (SDUProjectBot)",
+            "Referer": f"{BASE_URL}/index.php?mod=profile",
+            "X-Requested-With": "XMLHttpRequest",
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+        }
+
+        resp = self.session.post(url, data=payload, headers=headers, timeout=15)
+        resp.raise_for_status()
+        html = resp.text.strip()
+
+        soup = BeautifulSoup(html, "html.parser")
+
+        # 1) Direct approach: find "Mobile phone" label and read next <td>
+        mobile_td = soup.find("td", string=lambda s: s and "Mobile phone" in s)
+        if mobile_td:
+            num_td = mobile_td.find_next_sibling("td")
+            if num_td:
+                phone = num_td.get_text(" ", strip=True)
+                if phone:
+                    return _normalize_phone(phone) if normalize else phone
+
+        # 2) General table rows scan (label in first <td>, value in second <td>)
+        table = soup.find("table")
+        if table:
+            for row in table.find_all("tr"):
+                tds = row.find_all("td")
+                if len(tds) >= 2:
+                    label = tds[0].get_text(" ", strip=True).lower()
+                    value = tds[1].get_text(" ", strip=True)
+                    if not value:
+                        continue
+                    # common labels that might indicate phone
+                    if any(k in label for k in ("mobile", "mobile phone", "phone", "telephone", "tel")):
+                        return _normalize_phone(value) if normalize else value
+
+        # 3) Final fallback: run permissive phone regex on the whole returned text
+        whole_text = soup.get_text(" ", strip=True)
+        phone_match = re.search(r'(\+?\d[\d\-\s()]{6,}\d)', whole_text)
+        if phone_match:
+            phone = phone_match.group(0).strip()
+            return _normalize_phone(phone) if normalize else phone
+
+        # nothing found
+        return None
+
+
+    def get_grand_gpa(self, username: str, password: str):
+        """
+        Logs in and extracts Grand GPA from transcript page.
+        Example cell:
+        <td colspan="2" align="center">Grand GPA : 3.73</td>
+        """
+        if not self.login(username, password):
+            return None
+
+        resp = self.session.get(f"{BASE_URL}/index.php?mod=transkript")
+        resp.raise_for_status()
+
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        gpa_node = soup.find(string=lambda s: s and "Grand GPA" in s)
+        if not gpa_node:
+            return None
+
+        td = gpa_node.find_parent("td")
+        if not td:
+            return None
+
+        text = td.get_text(" ", strip=True)
+        # "Grand GPA : 3.73" → "3.73"
+        gpa = text.split(":")[-1].strip()
+
+        return gpa
+
+    def get_schedule_json(self, username: str, password: str, year="2025", term="1"):
+        """
+        Logs in and fetches the real schedule via AJAX POST:
+        POST https://my.sdu.edu.kz/index.php
+        Payload:
+            mod=schedule
+            ajx=1
+            action=showSchedule
+            year=2025
+            term=1
+            type=I
+            details=0
+
+        Returns HTML fragment from the server.
+        """
+        if not self.login(username, password):
+            return None
+
+        url = f"{BASE_URL}/index.php"
+
+        payload = {
+            "mod": "schedule",
+            "ajx": "1",
+            "action": "showSchedule",
+            "year": year,
+            "term": term,
+            "type": "I",
+            "details": "0",
+        }
+
+        headers = {
+            "User-Agent": "Mozilla/5.0 (SDUProjectBot)",
+            "Referer": f"{BASE_URL}/index.php?mod=schedule",
+            "X-Requested-With": "XMLHttpRequest"
+        }
+
+        resp = self.session.post(url, data=payload, headers=headers)
+        resp.raise_for_status()
+
+        html = resp.text.strip()
+
+        # Usually this returns exactly the <div id="div_results"> container
+        # or at least the table HTML.
+
+        soup = BeautifulSoup(html, "html.parser")
+
+        table = soup.find("table", class_="clTbl")
+        rows = table.find_all("tr")
+
+        # --- 1) Get day names ---
+        header_tds = rows[0].find_all("td")[1:]  # skip first column
+        days = []
+        for td in header_tds:
+            span = td.find("span")
+            if span and span.has_attr("title"):
+                days.append(span["title"])  # e.g. Monday, Tuesday
+            else:
+                days.append(td.get_text(strip=True))
+
+        schedule = {day: [] for day in days}
+
+        # --- 2) Parse schedule rows ---
+        for row in rows[1:]:
+            tds = row.find_all("td")
+            if not tds:
+                continue
+
+            # Time column
+            time_spans = tds[0].find_all("span")
+            if len(time_spans) < 2:
+                continue
+
+            start_time = time_spans[0].get_text(strip=True)
+            end_time = time_spans[1].get_text(strip=True)
+            time_range = f"{start_time}-{end_time}"
+
+            # Each day column
+            for day_idx, cell in enumerate(tds[1:]):
+                a = cell.find("a")
+                if not a:
+                    continue  # empty cell
+
+                course_code = a.get_text(strip=True)
+
+                # course title
+                details_span = cell.find("span", attrs={"name": "details"})
+                course_title = details_span.get_text(" ", strip=True) if details_span else ""
+
+                # detect type (Lecture / Practice)
+                type_span = cell.find("span", title=re.compile(r"(Theory|Practice)"))
+                lesson_type = ""
+                if type_span:
+                    if type_span["title"] == "Theory":
+                        lesson_type = "Lecture"
+                    elif type_span["title"] == "Practice":
+                        lesson_type = "Practice"
+
+                # detect room to check for VR (online)
+                room = ""
+                for span in cell.find_all("span"):
+                    if span.get("name") == "details":
+                        continue
+                    text = span.get_text(strip=True)
+                    if re.match(r"[A-Z]{1,3}\s?\d{1,3}", text):  # D214, G102, VR 21 ...
+                        room = text
+
+                if room.startswith("VR"):
+                    lesson_type = "Online"
+
+                schedule[days[day_idx]].append({
+                    "time": time_range,
+                    "course_code": course_code,
+                    "course_title": course_title,
+                    "type": lesson_type
+                })
+
+        return schedule
+
+
+    def gather_profile_payload(self, username: str, password: str, normalize_phone: bool = True) -> dict:
+        """
+        Collect all parsed data into a single JSON-serializable dict.
+        """
+        profile = self.get_profile_data(username, password) or {}
+        contact = self.get_contact_number(username, password, normalize=normalize_phone)
+        gpa = self.get_grand_gpa(username, password)
+        transcript_html = self.get_print_transcript_html(username, password)
+        schedule = self.get_schedule_json(username, password) or {}
+
+        payload = {
+            "source": "sdu.my",               # optional metadata
+            "source_user": username,
+            "fullname": profile.get("fullname"),
+            "program_class": profile.get("program_class"),
+            "contact_number": contact,
+            "grand_gpa": gpa,
+            "transcript_print_html": transcript_html,   # if you want raw HTML stored
+            "schedule": schedule,
+            "fetched_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        }
+        return payload
+
+    def send_to_java(self, payload: dict, java_url: str, bearer_token: str | None = None,
+                     max_retries: int = 3, backoff_factor: float = 1.0, timeout: int = 15) -> dict | None:
+        """
+        POST payload (JSON) to the Java backend. Returns parsed JSON response or None on final failure.
+        """
+        headers = {"Content-Type": "application/json", "Accept": "application/json"}
+        if bearer_token:
+            headers["Authorization"] = f"Bearer {bearer_token}"
+
+        body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+
+        for attempt in range(1, max_retries + 1):
+            try:
+                resp = requests.post(java_url, data=body, headers=headers, timeout=timeout)
+                resp.raise_for_status()
+                # assume java returns JSON
+                return resp.json()
+            except RequestException as exc:
+                # transient? retry with exponential backoff
+                if attempt == max_retries:
+                    # Final failure — bubble up or log
+                    print(f"[send_to_java] final failure after {attempt} attempts: {exc}")
+                    return None
+                wait = backoff_factor * (2 ** (attempt - 1))
+                print(f"[send_to_java] attempt {attempt} failed: {exc}. retrying in {wait}s...")
+                time.sleep(wait)
+
+
+# helper: normalize function (placed outside the class in the same module)
+def _normalize_phone(raw: str) -> str:
+    """
+    Return digits-only phone, preserving leading '+' if present.
+    Example: '+7 701 123 45 67' -> '+77011234567'
+             '8 (701) 123-45-67' -> '87011234567'
+    """
+    raw = raw.strip()
+    leading_plus = raw.startswith("+")
+    # remove all non-digit characters
+    digits = re.sub(r'\D', '', raw)
+    if leading_plus:
+        return f"+{digits}"
+    return digits
+
