@@ -1,263 +1,326 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>UniTalent – Student Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<head>
-  <meta charset="UTF-8" />
-  <title>UniTalent – Student Profile</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-          }
-        }
-      }
-    }
-  </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-
-<body class="font-sans bg-slate-950 text-slate-100" data-guard="EMPLOYER">
-  <!-- Background blobs -->
-  <div class="pointer-events-none fixed inset-0 -z-10">
-    <div class="absolute -top-40 -left-32 h-72 w-72 rounded-full bg-indigo-500/40 blur-3xl"></div>
-    <div class="absolute top-40 -right-20 h-80 w-80 rounded-full bg-emerald-500/30 blur-3xl"></div>
-  </div>
-
-  <!-- NAVBAR -->
-  <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
-    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
-      <a href="index.html" class="flex items-center gap-2">
-        <div
-          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
-          <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
-        </div>
-        <div class="leading-tight">
-          <p class="text-base font-semibold tracking-tight">UniTalent</p>
-          <p class="text-[11px] text-slate-400">Employer Portal</p>
-        </div>
-      </a>
-
-      <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
-        <a href="employer-dashboard.html" class="hover:text-indigo-300">Dashboard</a>
-        <a href="employer-new-job.html" class="hover:text-indigo-300">Post a job</a>
-        <a href="employer-browse-students.html" class="hover:text-indigo-300">Browse students</a>
-      </div>
-
-      <div class="hidden items-center gap-3 md:flex">
-        <button id="logoutBtn"
-          class="rounded-full border border-slate-700 bg-slate-950/60 px-4 py-2 text-xs font-semibold text-slate-200 hover:border-rose-400 hover:text-rose-200">
-          Log out
-        </button>
-      </div>
-    </nav>
-  </header>
-
-  <main class="mx-auto max-w-6xl px-4 pb-16 pt-8 md:pt-10">
-    <!-- Breadcrumb -->
-    <div class="mb-4 text-xs text-slate-400">
-      <a href="index.html" class="hover:text-indigo-300">Home</a>
-      <span class="mx-1 text-slate-500">/</span>
-      <a href="employer-dashboard.html" class="hover:text-indigo-300">Employer</a>
-      <span class="mx-1 text-slate-500">/</span>
-      <span class="text-slate-300">Student Profile</span>
+  <body class="font-sans bg-slate-950 text-slate-100" data-guard="EMPLOYER">
+    <!-- Background blobs -->
+    <div class="pointer-events-none fixed inset-0 -z-10">
+      <div
+        class="absolute -top-40 -left-32 h-72 w-72 rounded-full bg-indigo-500/40 blur-3xl"
+      ></div>
+      <div
+        class="absolute top-40 -right-20 h-80 w-80 rounded-full bg-emerald-500/30 blur-3xl"
+      ></div>
     </div>
 
-    <section class="space-y-4">
-      <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div class="flex items-center gap-3">
-          <a href="employer-dashboard.html"
-            class="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1.5 text-[11px] font-semibold text-slate-200 hover:border-indigo-400 hover:text-indigo-200">
-            ← Back to Dashboard
+    <!-- NAVBAR -->
+    <header
+      class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur"
+    >
+      <nav
+        class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4"
+      >
+        <a href="index.html" class="flex items-center gap-2">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40"
+          >
+            <img
+              src="assets/logo.png"
+              alt="UniTalent logo"
+              class="h-8 w-8 object-contain"
+            />
+          </div>
+          <div class="leading-tight">
+            <p class="text-base font-semibold tracking-tight">UniTalent</p>
+            <p class="text-[11px] text-slate-400">Employer Portal</p>
+          </div>
+        </a>
+
+        <div
+          class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex"
+        >
+          <a href="employer-dashboard.html" class="hover:text-indigo-300"
+            >Dashboard</a
+          >
+          <a href="employer-new-job.html" class="hover:text-indigo-300"
+            >Post a job</a
+          >
+          <a href="employer-browse-students.html" class="hover:text-indigo-300"
+            >Browse students</a
+          >
+        </div>
+
+        <div class="hidden items-center gap-3 md:flex">
+          <button
+            id="logoutBtn"
+            class="rounded-full border border-slate-700 bg-slate-950/60 px-4 py-2 text-xs font-semibold text-slate-200 hover:border-rose-400 hover:text-rose-200"
+          >
+            Log out
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 pb-16 pt-8 md:pt-10">
+      <!-- Breadcrumb -->
+      <div class="mb-4 text-xs text-slate-400">
+        <a href="index.html" class="hover:text-indigo-300">Home</a>
+        <span class="mx-1 text-slate-500">/</span>
+        <a href="employer-dashboard.html" class="hover:text-indigo-300"
+          >Employer</a
+        >
+        <span class="mx-1 text-slate-500">/</span>
+        <span class="text-slate-300">Student Profile</span>
+      </div>
+
+      <section class="space-y-4">
+        <div
+          class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+        >
+          <div class="flex items-center gap-3">
+            <a
+              href="employer-dashboard.html"
+              class="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1.5 text-[11px] font-semibold text-slate-200 hover:border-indigo-400 hover:text-indigo-200"
+            >
+              ← Back to Dashboard
+            </a>
+            <div>
+              <h1
+                class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl"
+              >
+                Student Profile
+              </h1>
+              <p id="status" class="mt-1 text-sm text-slate-400">
+                Loading profile...
+              </p>
+            </div>
+          </div>
+          <a
+            href="employer-browse-students.html"
+            class="rounded-full border border-slate-700 bg-slate-950/60 px-4 py-2 text-xs font-semibold text-slate-200 hover:border-indigo-400 hover:text-indigo-200"
+          >
+            Browse more students
           </a>
-          <div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
-              Student Profile
-            </h1>
-            <p id="status" class="mt-1 text-sm text-slate-400">
-              Loading profile...
-            </p>
+        </div>
+
+        <div
+          id="profileContent"
+          class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl shadow-slate-900/70"
+        >
+          <div class="text-center text-slate-400">
+            Loading student profile...
           </div>
         </div>
-        <a href="employer-browse-students.html"
-          class="rounded-full border border-slate-700 bg-slate-950/60 px-4 py-2 text-xs font-semibold text-slate-200 hover:border-indigo-400 hover:text-indigo-200">
-          Browse more students
-        </a>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-800 bg-slate-950/90">
+      <div
+        class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between"
+      >
+        <p>© 2025 UniTalent. All rights reserved.</p>
+        <div class="flex flex-wrap gap-4">
+          <a href="index.html#about" class="hover:text-indigo-300">About</a>
+          <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
+          <span>Terms · Privacy</span>
+        </div>
       </div>
+    </footer>
 
-      <div id="profileContent" class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl shadow-slate-900/70">
-        <div class="text-center text-slate-400">Loading student profile...</div>
-      </div>
-    </section>
-  </main>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        const API = "http://localhost:3000";
 
-  <footer class="border-t border-slate-800 bg-slate-950/90">
-    <div
-      class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
-      <p>© 2025 UniTalent. All rights reserved.</p>
-      <div class="flex flex-wrap gap-4">
-        <a href="index.html#about" class="hover:text-indigo-300">About</a>
-        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
-        <span>Terms · Privacy</span>
-      </div>
-    </div>
-  </footer>
+        const statusEl = document.getElementById("status");
+        const profileContent = document.getElementById("profileContent");
+        const logoutBtn = document.getElementById("logoutBtn");
 
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      const API = 'http://localhost:3000';
+        // -------------------------
+        // Auth helpers
+        // -------------------------
+        function readUniTalentAuth() {
+          const token =
+            localStorage.getItem("unitalent_token") ||
+            sessionStorage.getItem("unitalent_token");
+          const userRaw =
+            localStorage.getItem("unitalent_user") ||
+            sessionStorage.getItem("unitalent_user");
 
-      const statusEl = document.getElementById('status');
-      const profileContent = document.getElementById('profileContent');
-      const logoutBtn = document.getElementById('logoutBtn');
+          if (!token || !userRaw) return { token: null, user: null };
 
-      // -------------------------
-      // Auth helpers
-      // -------------------------
-      function readUniTalentAuth() {
-        const token = localStorage.getItem('unitalent_token') || sessionStorage.getItem('unitalent_token');
-        const userRaw = localStorage.getItem('unitalent_user') || sessionStorage.getItem('unitalent_user');
-
-        if (!token || !userRaw) return { token: null, user: null };
-
-        try {
-          return { token, user: JSON.parse(userRaw) };
-        } catch {
-          localStorage.removeItem('unitalent_token');
-          localStorage.removeItem('unitalent_user');
-          sessionStorage.removeItem('unitalent_token');
-          sessionStorage.removeItem('unitalent_user');
-          return { token: null, user: null };
-        }
-      }
-
-      function requireEmployerPage() {
-        const { token, user } = readUniTalentAuth();
-
-        if (!token || !user) {
-          window.location.href = 'employer-login.html';
-          return null;
+          try {
+            return { token, user: JSON.parse(userRaw) };
+          } catch {
+            localStorage.removeItem("unitalent_token");
+            localStorage.removeItem("unitalent_user");
+            sessionStorage.removeItem("unitalent_token");
+            sessionStorage.removeItem("unitalent_user");
+            return { token: null, user: null };
+          }
         }
 
-        if (user.role !== 'EMPLOYER') {
-          window.location.href = user.role === 'STUDENT' ? 'student-login.html' : 'employer-login.html';
-          return null;
+        function requireEmployerPage() {
+          const { token, user } = readUniTalentAuth();
+
+          if (!token || !user) {
+            window.location.href = "employer-login.html";
+            return null;
+          }
+
+          if (user.role !== "EMPLOYER") {
+            window.location.href =
+              user.role === "STUDENT"
+                ? "student-login.html"
+                : "employer-login.html";
+            return null;
+          }
+
+          return { token, user };
         }
 
-        return { token, user };
-      }
+        // -------------------------
+        // UI helpers
+        // -------------------------
+        function setStatus(text, isError = false) {
+          if (!statusEl) return;
+          statusEl.textContent = text;
+          statusEl.className = `mt-1 text-sm ${
+            isError ? "text-rose-400" : "text-slate-400"
+          }`;
+        }
 
-      // -------------------------
-      // UI helpers
-      // -------------------------
-      function setStatus(text, isError = false) {
-        if (!statusEl) return;
-        statusEl.textContent = text;
-        statusEl.className = `mt-1 text-sm ${isError ? 'text-rose-400' : 'text-slate-400'}`;
-      }
+        function escapeHtml(str = "") {
+          return String(str)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+        }
 
-      function escapeHtml(str = '') {
-        return String(str)
-          .replaceAll('&', '&amp;')
-          .replaceAll('<', '&lt;')
-          .replaceAll('>', '&gt;')
-          .replaceAll('"', '&quot;')
-          .replaceAll("'", '&#039;');
-      }
+        // -------------------------
+        // Auth guard
+        // -------------------------
+        const auth = requireEmployerPage();
+        if (!auth) return;
+        const { token } = auth;
 
-      // -------------------------
-      // Auth guard
-      // -------------------------
-      const auth = requireEmployerPage();
-      if (!auth) return;
-      const { token } = auth;
+        // -------------------------
+        // Logout
+        // -------------------------
+        if (logoutBtn) {
+          logoutBtn.addEventListener("click", () => {
+            localStorage.removeItem("unitalent_token");
+            localStorage.removeItem("unitalent_user");
+            sessionStorage.removeItem("unitalent_token");
+            sessionStorage.removeItem("unitalent_user");
+            window.location.href = "employer-login.html";
+          });
+        }
 
-      // -------------------------
-      // Logout
-      // -------------------------
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-          localStorage.removeItem('unitalent_token');
-          localStorage.removeItem('unitalent_user');
-          sessionStorage.removeItem('unitalent_token');
-          sessionStorage.removeItem('unitalent_user');
-          window.location.href = 'employer-login.html';
-        });
-      }
+        // -------------------------
+        // Load student profile
+        // -------------------------
+        const params = new URLSearchParams(window.location.search);
+        const studentId = Number(params.get("studentId"));
 
-      // -------------------------
-      // Load student profile
-      // -------------------------
-      const params = new URLSearchParams(window.location.search);
-      const studentId = Number(params.get('studentId'));
-
-      if (!studentId) {
-        setStatus('Missing studentId in URL', true);
-        if (profileContent) {
-          profileContent.innerHTML = `
+        if (!studentId) {
+          setStatus("Missing studentId in URL", true);
+          if (profileContent) {
+            profileContent.innerHTML = `
             <div class="text-center text-rose-300">
               Missing student ID. Please open this page with a valid studentId query parameter.
             </div>
           `;
-        }
-        return;
-      }
-
-      try {
-        setStatus('Loading student profile...');
-
-        const res = await fetch(`${API}/api/students/${studentId}`, {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-
-        if (res.status === 401) {
-          localStorage.removeItem('unitalent_token');
-          localStorage.removeItem('unitalent_user');
-          sessionStorage.removeItem('unitalent_token');
-          sessionStorage.removeItem('unitalent_user');
-          window.location.href = 'employer-login.html';
+          }
           return;
         }
 
-        const data = await res.json().catch(() => ({}));
+        try {
+          setStatus("Loading student profile...");
 
-        if (!res.ok) {
-          throw new Error(data?.message || 'Failed to load student profile');
-        }
+          const res = await fetch(`${API}/api/students/${studentId}`, {
+            headers: { Authorization: "Bearer " + token },
+          });
 
-        const student = data;
+          if (res.status === 401) {
+            localStorage.removeItem("unitalent_token");
+            localStorage.removeItem("unitalent_user");
+            sessionStorage.removeItem("unitalent_token");
+            sessionStorage.removeItem("unitalent_user");
+            window.location.href = "employer-login.html";
+            return;
+          }
 
-        // Render profile
-        const name = [student.firstName, student.lastName].filter(Boolean).join(' ') || student.username || student.email || 'Student';
-        const displayName = escapeHtml(name);
-        const email = escapeHtml(student.email || '');
-        const username = escapeHtml(student.username || '');
-        const university = escapeHtml(student.university || 'Not specified');
-        const major = escapeHtml(student.major || 'Not specified');
-        const studyYear = escapeHtml(student.studyYear || 'Not specified');
-        const city = escapeHtml(student.city || 'Not specified');
-        const skills = escapeHtml(student.skills || 'Not specified');
-        const bio = escapeHtml(student.bio || 'No bio provided');
-        const phone = escapeHtml(student.phone || 'Not provided');
-        const github = student.github ? escapeHtml(student.github) : null;
-        const linkedin = student.linkedin ? escapeHtml(student.linkedin) : null;
-        const portfolio = student.portfolio ? escapeHtml(student.portfolio) : null;
+          const data = await res.json().catch(() => ({}));
 
-        if (profileContent) {
-          profileContent.innerHTML = `
+          if (!res.ok) {
+            throw new Error(data?.message || "Failed to load student profile");
+          }
+
+          const student = data;
+
+          // Render profile
+          const name =
+            [student.firstName, student.lastName].filter(Boolean).join(" ") ||
+            student.username ||
+            student.email ||
+            "Student";
+          const displayName = escapeHtml(name);
+          const email = escapeHtml(student.email || "");
+          const username = escapeHtml(student.username || "");
+          const university = escapeHtml(student.university || "Not specified");
+          const major = escapeHtml(student.major || "Not specified");
+          const studyYear = escapeHtml(student.studyYear || "Not specified");
+          const gpa = escapeHtml(student.gpa || "Not specified");
+          const city = escapeHtml(student.city || "Not specified");
+          const skills = escapeHtml(student.skills || "Not specified");
+          const bio = escapeHtml(student.bio || "No bio provided");
+          const phone = escapeHtml(student.phone || "Not provided");
+          const github = student.github ? escapeHtml(student.github) : null;
+          const linkedin = student.linkedin
+            ? escapeHtml(student.linkedin)
+            : null;
+          const portfolio = student.portfolio
+            ? escapeHtml(student.portfolio)
+            : null;
+
+          if (profileContent) {
+            profileContent.innerHTML = `
             <div class="space-y-6">
               <!-- Header -->
               <div class="border-b border-slate-800 pb-4">
                 <h2 class="text-xl font-bold text-slate-50">${displayName}</h2>
                 <p class="mt-1 text-sm text-slate-400">${email}</p>
-                ${username ? `<p class="text-xs text-slate-500">@${username}</p>` : ''}
+                ${
+                  username
+                    ? `<p class="text-xs text-slate-500">@${username}</p>`
+                    : ""
+                }
               </div>
 
               <!-- Education -->
@@ -275,6 +338,12 @@
                   <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
                     <p class="text-xs text-slate-400">Study Year</p>
                     <p class="mt-1 text-slate-100">${studyYear}</p>
+                  </div>
+                  <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
+                    <p class="text-xs text-slate-400">GPA</p>
+                    <p class="mt-1 text-slate-100 ${
+                      student.gpa ? "font-semibold text-emerald-300" : ""
+                    }">${gpa}</p>
                   </div>
                   <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
                     <p class="text-xs text-slate-400">City</p>
@@ -307,54 +376,63 @@
                     <p class="text-xs text-slate-400">Phone</p>
                     <p class="mt-1 text-sm text-slate-100">${phone}</p>
                   </div>
-                  ${github ? `
+                  ${
+                    github
+                      ? `
                   <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
                     <p class="text-xs text-slate-400">GitHub</p>
                     <a href="${github}" target="_blank" rel="noopener noreferrer" class="mt-1 text-sm text-indigo-300 hover:text-indigo-200 block truncate">
                       ${github}
                     </a>
                   </div>
-                  ` : ''}
-                  ${linkedin ? `
+                  `
+                      : ""
+                  }
+                  ${
+                    linkedin
+                      ? `
                   <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
                     <p class="text-xs text-slate-400">LinkedIn</p>
                     <a href="${linkedin}" target="_blank" rel="noopener noreferrer" class="mt-1 text-sm text-indigo-300 hover:text-indigo-200 block truncate">
                       ${linkedin}
                     </a>
                   </div>
-                  ` : ''}
-                  ${portfolio ? `
+                  `
+                      : ""
+                  }
+                  ${
+                    portfolio
+                      ? `
                   <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
                     <p class="text-xs text-slate-400">Portfolio</p>
                     <a href="${portfolio}" target="_blank" rel="noopener noreferrer" class="mt-1 text-sm text-indigo-300 hover:text-indigo-200 block truncate">
                       ${portfolio}
                     </a>
                   </div>
-                  ` : ''}
+                  `
+                      : ""
+                  }
                 </div>
               </div>
             </div>
           `;
-        }
+          }
 
-        setStatus('Profile loaded successfully');
-      } catch (err) {
-        console.error(err);
-        setStatus(err.message || 'Failed to load profile', true);
-        if (profileContent) {
-          profileContent.innerHTML = `
+          setStatus("Profile loaded successfully");
+        } catch (err) {
+          console.error(err);
+          setStatus(err.message || "Failed to load profile", true);
+          if (profileContent) {
+            profileContent.innerHTML = `
             <div class="text-center text-rose-300">
-              ${escapeHtml(err.message || 'Failed to load student profile')}
+              ${escapeHtml(err.message || "Failed to load student profile")}
             </div>
           `;
+          }
         }
-      }
-    });
-  </script>
+      });
+    </script>
 
-  <script type="module" src="js/auth.js"></script>
-
-</body>
-
+    <script type="module" src="js/auth.js"></script>
+  </body>
 </html>
-

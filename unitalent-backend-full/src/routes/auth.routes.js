@@ -449,4 +449,162 @@ router.post("/reset-password/:token", async (req, res) => {
   }
 });
 
+// -----------------------------
+// SDU PORTAL LOGIN
+// POST /api/auth/sdu-login
+// Public endpoint - logs in via SDU portal and creates/updates user
+// -----------------------------
+router.post("/sdu-login", async (req, res) => {
+  try {
+    const { studentId, password } = req.body;
+
+    if (!studentId || !password) {
+      return res.status(400).json({ message: "Student ID and password are required" });
+    }
+
+    // Call Python scraper to get user data from SDU portal
+    const SDU_SCRAPER_URL = process.env.SDU_SCRAPER_URL || "http://localhost:5000";
+    
+    let sduData;
+    try {
+      const formData = new URLSearchParams();
+      formData.append("student_id", studentId);
+      formData.append("password", password);
+
+      const scraperResponse = await fetch(`${SDU_SCRAPER_URL}/get-user-data`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+      });
+
+      if (!scraperResponse.ok) {
+        if (scraperResponse.status === 401 || scraperResponse.status === 502) {
+          return res.status(401).json({ message: "Invalid SDU credentials or portal unavailable" });
+        }
+        throw new Error(`SDU scraper returned ${scraperResponse.status}`);
+      }
+
+      sduData = await scraperResponse.json();
+    } catch (e) {
+      console.error("Error calling SDU scraper:", e);
+      return res.status(502).json({ 
+        message: "Failed to connect to SDU portal. Please try again later." 
+      });
+    }
+
+    // Check if we got valid data (login was successful)
+    // If login failed, the scraper might return data with null/empty values
+    if (!sduData || (!sduData.fullname && !sduData.program_class)) {
+      return res.status(401).json({ 
+        message: "Invalid SDU credentials. Please check your student ID and password." 
+      });
+    }
+
+    // Parse SDU data
+    const fullname = sduData?.fullname || "";
+    const programClass = sduData?.program_class || "";
+    const contactNumber = sduData?.contact_number || null;
+    // Extract grand_gpa from SDU data (can be string, number, or null/undefined)
+    const grandGpa = sduData?.grand_gpa !== undefined && sduData?.grand_gpa !== null 
+      ? String(sduData.grand_gpa) 
+      : null;
+
+    // Parse fullname into firstName and lastName
+    const nameParts = fullname.trim().split(/\s+/);
+    const firstName = nameParts[0] || null;
+    const lastName = nameParts.slice(1).join(" ") || null;
+
+    // Extract course/year from program_class (e.g., "Computer Science 3 course" -> "3")
+    let studyYear = null;
+    if (programClass) {
+      const yearMatch = programClass.match(/(\d+)\s*course/i);
+      if (yearMatch) {
+        studyYear = yearMatch[1];
+      }
+    }
+
+    // Extract major/program (everything before the year)
+    let major = null;
+    if (programClass) {
+      // Clean extraction: <major> - <digit> course
+      const regex = /^(.+?)\s*-\s*\d+\s*course/i;
+      const match = programClass.match(regex);
+    
+      if (match) {
+        major = match[1].trim();
+      } else {
+        // fallback: remove "<digit> course" if present
+        const fallback = programClass.replace(/\d+\s*course/i, "").trim();
+        major = fallback.replace(/-\s*$/, "").trim();
+      }
+    }
+    
+
+    // Generate email from student ID (assuming format like student_id@sdu.edu.kz)
+    // If student ID doesn't look like email, construct it
+    let email = studentId.includes("@") ? studentId : `${studentId}@sdu.edu.kz`;
+
+    // Check if user already exists
+    let user = await prisma.user.findUnique({ where: { email } });
+
+    // Generate a random password for new users (they'll need to reset it later)
+    // For existing users, keep their current password
+    let passwordHash;
+    if (!user) {
+      // Generate a secure random password
+      const randomPassword = crypto.randomBytes(16).toString("hex");
+      passwordHash = await bcrypt.hash(randomPassword, 10);
+    } else {
+      // Keep existing password
+      passwordHash = user.password;
+    }
+
+    // Prepare user data
+    const userData = {
+      email,
+      password: passwordHash,
+      role: "STUDENT",
+      firstName,
+      lastName,
+      phone: contactNumber,
+      university: "SDU",
+      major,
+      studyYear,
+      gpa: grandGpa, // Save grand_gpa from SDU portal
+    };
+
+    // Create or update user
+    if (user) {
+      // Update existing user with latest SDU data
+      // Always update GPA from SDU portal (grand_gpa) when logging in via SDU
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          firstName: firstName || user.firstName,
+          lastName: lastName || user.lastName,
+          phone: contactNumber || user.phone,
+          university: "SDU",
+          major: major || user.major,
+          studyYear: studyYear || user.studyYear,
+          gpa: grandGpa, // Always update GPA from SDU portal grand_gpa
+        }
+      });
+    } else {
+      // Create new user
+      user = await prisma.user.create({ data: userData });
+    }
+
+    // Return auth response
+    return res.json(buildAuthResponse(user));
+  } catch (e) {
+    console.error("SDU login error:", e);
+    return res.status(500).json({ 
+      message: "SDU login failed", 
+      error: e.message 
+    });
+  }
+});
+
 export default router;

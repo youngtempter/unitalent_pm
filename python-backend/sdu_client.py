@@ -186,6 +186,9 @@ class SDUClient:
 
         gpa_node = soup.find(string=lambda s: s and "Grand GPA" in s)
         if not gpa_node:
+            gpa_node = soup.find(string=lambda s: s and "Жалпы орталама балл" in s)
+
+        if not gpa_node:
             return None
 
         td = gpa_node.find_parent("td")
