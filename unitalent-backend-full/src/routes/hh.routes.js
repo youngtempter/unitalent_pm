@@ -75,7 +75,8 @@ router.get("/hh-jobs", (req, res) => {
         semey: ["семей"],
         semei: ["семей"],
         zhezkazgan: ["жезказган"],
-        zhezqazgan: ["жезказган"]
+        zhezqazgan: ["жезказган"],
+        taraz: ["тараз"]
       };
 
       const variants = new Set([cityInput]);
