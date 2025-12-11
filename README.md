@@ -141,6 +141,9 @@ npm run prisma:migrate
 # Download the better-sqlite3
 npm install better-sqlite3
 
+# Install all required packages at once for scraping SDU Portal
+pip install flask requests beautifulsoup4 lxml
+
 # Start the development server
 npm run dev
 ```
