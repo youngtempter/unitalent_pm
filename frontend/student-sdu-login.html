@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>UniTalent – Student Login</title>
+    <title>UniTalent – SDU Portal Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- Tailwind CDN -->
@@ -184,11 +184,11 @@
       <div class="mb-6 w-full max-w-md text-xs text-slate-400">
         <a href="index.html" class="hover:text-indigo-300">Home</a>
         <span class="mx-1 text-slate-500">/</span>
-        <span class="text-slate-300">Student login</span>
-        <span class="mx-1 text-slate-500">/</span>
-        <a href="student-sdu-login.html" class="hover:text-indigo-300"
-          >SDU Portal</a
+        <a href="student-login.html" class="hover:text-indigo-300"
+          >Student login</a
         >
+        <span class="mx-1 text-slate-500">/</span>
+        <span class="text-slate-300">SDU Portal</span>
       </div>
 
       <!-- Card -->
@@ -200,31 +200,32 @@
           class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-slate-900/80"
         >
           <p
-            class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-indigo-300"
+            class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-emerald-300"
           >
-            Student access
+            SDU Portal Access
           </p>
           <h1
             class="text-xl font-bold tracking-tight text-slate-50 sm:text-2xl"
           >
-            Log in to your account
+            Log in with SDU credentials
           </h1>
           <p class="mt-2 text-xs text-slate-400 sm:text-sm">
-            Continue where you left off: applications, saved jobs, and profile.
+            Use your SDU student portal credentials to automatically sync your
+            profile data.
           </p>
 
           <!-- Login form -->
-          <form id="studentLoginForm" class="mt-5 space-y-4 text-xs sm:text-sm">
+          <form id="sduLoginForm" class="mt-5 space-y-4 text-xs sm:text-sm">
             <div>
-              <label for="email" class="mb-1 block text-slate-200"
-                >University email</label
+              <label for="studentId" class="mb-1 block text-slate-200"
+                >Student ID</label
               >
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="studentId"
+                name="studentId"
+                type="text"
                 required
-                placeholder="you@university.kz"
+                placeholder="e.g. 12345678"
                 class="w-full rounded-2xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none sm:text-sm"
               />
             </div>
@@ -232,12 +233,6 @@
             <div>
               <div class="mb-1 flex items-center justify-between">
                 <label for="password" class="text-slate-200">Password</label>
-                <a
-                  href="forgot-password.html?type=student"
-                  class="text-[11px] text-slate-400 hover:text-indigo-300"
-                >
-                  Forgot password?
-                </a>
               </div>
               <div class="relative">
                 <input
@@ -280,22 +275,20 @@
             <div
               class="flex items-center justify-between text-[11px] text-slate-400 sm:text-xs"
             >
-              <label class="inline-flex items-center gap-2">
-                <input
-                  id="rememberMe"
-                  type="checkbox"
-                  class="h-3 w-3 rounded border-slate-600 bg-slate-900 text-indigo-500 focus:ring-indigo-500"
-                />
-                <span>Keep me signed in</span>
-              </label>
-              <span>Student access only</span>
+              <span>SDU students only</span>
+              <a
+                href="student-login.html"
+                class="text-indigo-300 hover:text-indigo-200"
+              >
+                Regular login →
+              </a>
             </div>
 
             <button
               type="submit"
-              class="mt-2 w-full rounded-full bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 sm:text-sm"
+              class="mt-2 w-full rounded-full bg-emerald-500 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-emerald-500/40 hover:bg-emerald-400 sm:text-sm"
             >
-              Log in
+              Log in with SDU Portal
             </button>
           </form>
 
@@ -304,43 +297,17 @@
             class="mt-2 text-[11px] sm:text-xs text-slate-400"
           ></p>
 
-          <!-- SDU Portal Login Option -->
-          <div class="mt-4 flex items-center gap-3 text-xs text-slate-400">
-            <div class="flex-1 border-t border-slate-800"></div>
-            <span>or</span>
-            <div class="flex-1 border-t border-slate-800"></div>
-          </div>
-          <a
-            href="student-sdu-login.html"
-            class="mt-4 flex w-full items-center justify-center gap-2 rounded-full border border-emerald-500/50 bg-emerald-500/10 px-4 py-2.5 text-xs font-semibold text-emerald-300 shadow-md shadow-emerald-500/20 hover:bg-emerald-500/20 sm:text-sm"
-          >
-            <svg
-              class="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
-            </svg>
-            Log in using SDU Portal
-          </a>
-
           <!-- Sign-up link -->
           <div
             class="mt-4 border-t border-slate-800 pt-4 text-[11px] text-slate-400 sm:text-xs"
           >
             <p>
-              Don’t have a student account yet?
+              Don't have SDU credentials?
               <a
                 href="student-signup.html"
                 class="text-indigo-300 hover:text-indigo-200"
               >
-                Sign up
+                Sign up manually
               </a>
             </p>
           </div>
@@ -349,24 +316,24 @@
         <!-- Right: info / illustration -->
         <div class="hidden flex-col gap-4 md:flex">
           <div
-            class="rounded-3xl border border-slate-800 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-950 p-5 shadow-xl shadow-indigo-500/30"
+            class="rounded-3xl border border-slate-800 bg-gradient-to-br from-emerald-500/20 via-slate-900 to-slate-950 p-5 shadow-xl shadow-emerald-500/30"
           >
             <p
               class="text-[11px] font-semibold uppercase tracking-wide text-emerald-300"
             >
-              Why log in?
+              Why use SDU Portal?
             </p>
             <h2 class="mt-2 text-sm font-semibold text-slate-50">
-              Keep all your job search in one place.
+              Automatically sync your academic data.
             </h2>
             <p class="mt-2 text-xs text-slate-200">
-              Save roles, track applications and update your profile whenever
-              you learn something new.
+              Your profile will be automatically populated with your name,
+              major, GPA, and course information from the SDU portal.
             </p>
             <ul class="mt-3 space-y-1.5 text-xs text-slate-200">
-              <li>• One dashboard for all applications.</li>
-              <li>• Better recommendations over time.</li>
-              <li>• Fast access to saved jobs.</li>
+              <li>• Instant profile creation</li>
+              <li>• Automatic GPA sync</li>
+              <li>• Course and major information</li>
             </ul>
           </div>
 
@@ -380,16 +347,16 @@
             />
             <div class="p-4 text-xs">
               <p
-                class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300"
+                class="text-[11px] font-semibold uppercase tracking-wide text-emerald-300"
               >
                 UniTalent tip
               </p>
               <p class="mt-1 text-slate-200">
-                Spend a few minutes keeping your profile and CV updated.
+                Your SDU credentials are only used to verify your identity and
+                sync your data.
               </p>
               <p class="mt-1 text-slate-400">
-                This small habit increases your chances of getting interview
-                invites.
+                We never store your SDU password.
               </p>
             </div>
           </div>
@@ -411,7 +378,7 @@
       </div>
     </footer>
 
-    <!-- ✅ JS: navbar auth state + student login -->
+    <!-- ✅ JS: navbar auth state + SDU login -->
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         // Password visibility toggle
@@ -530,9 +497,9 @@
         });
 
         // =========================
-        // Login logic
+        // SDU Login logic
         // =========================
-        const form = document.getElementById("studentLoginForm");
+        const form = document.getElementById("sduLoginForm");
         const messageEl = document.getElementById("loginMessage");
         const rememberMe = document.getElementById("rememberMe");
 
@@ -542,32 +509,32 @@
           e.preventDefault();
 
           if (messageEl) {
-            messageEl.textContent = "Logging in...";
+            messageEl.textContent = "Connecting to SDU portal...";
             messageEl.className = "mt-2 text-[11px] sm:text-xs text-slate-300";
           }
 
-          const email = document.getElementById("email")?.value.trim();
+          const studentId = document.getElementById("studentId")?.value.trim();
           const password = document.getElementById("password")?.value;
 
-          if (!email || !password) {
+          if (!studentId || !password) {
             if (messageEl) {
-              messageEl.textContent = "Please enter email and password.";
+              messageEl.textContent = "Please enter student ID and password.";
               messageEl.className = "mt-2 text-[11px] sm:text-xs text-red-400";
             }
             return;
           }
 
           try {
-            const res = await fetch(`${API}/api/auth/login`, {
+            const res = await fetch(`${API}/api/auth/sdu-login`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email, password }),
+              body: JSON.stringify({ studentId, password }),
             });
 
             const data = await res.json().catch(() => ({}));
 
             if (!res.ok) {
-              const errMsg = data?.message || data?.error || "Login failed";
+              const errMsg = data?.message || data?.error || "SDU login failed";
               if (messageEl) {
                 messageEl.textContent = "Error: " + errMsg;
                 messageEl.className =
@@ -588,28 +555,31 @@
               return;
             }
 
-            // Choose storage based on remember me
-            const storage = rememberMe?.checked ? localStorage : sessionStorage;
-
-            // Clean old auth first
+            // Use sessionStorage for SDU login (more secure)
             clearAuth();
 
-            if (data?.token) storage.setItem("unitalent_token", data.token);
+            if (data?.token)
+              sessionStorage.setItem("unitalent_token", data.token);
             if (data?.user)
-              storage.setItem("unitalent_user", JSON.stringify(data.user));
+              sessionStorage.setItem(
+                "unitalent_user",
+                JSON.stringify(data.user)
+              );
 
             if (messageEl) {
-              messageEl.textContent = "Login successful!";
+              messageEl.textContent = "Login successful! Redirecting...";
               messageEl.className =
                 "mt-2 text-[11px] sm:text-xs text-emerald-400";
             }
 
-            window.location.href = "student-dashboard.html";
+            setTimeout(() => {
+              window.location.href = "student-dashboard.html";
+            }, 500);
           } catch (err) {
             console.error(err);
             if (messageEl) {
               messageEl.textContent =
-                "Network error. Check if backend is running.";
+                "Network error. Check if backend and SDU scraper are running.";
               messageEl.className = "mt-2 text-[11px] sm:text-xs text-red-400";
             }
           }

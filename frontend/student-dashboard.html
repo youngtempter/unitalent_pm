@@ -1,863 +1,1084 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>UniTalent – Student Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<head>
-  <meta charset="UTF-8" />
-  <title>UniTalent – Student Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-          }
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        position: relative;
+        overflow-x: hidden;
+        background: #020617;
+      }
+
+      .animated-bg {
+        position: fixed;
+        inset: 0;
+        z-index: -10;
+        pointer-events: none;
+        background: radial-gradient(
+          circle at top,
+          #020617 0,
+          #020617 40%,
+          #000 100%
+        );
+        overflow: hidden;
+      }
+
+      .animated-bg::before {
+        content: "";
+        position: absolute;
+        left: -50%;
+        bottom: -40%;
+        width: 200%;
+        height: 200%;
+        background-image: radial-gradient(#64748b 1px, transparent 1px);
+        background-size: 26px 26px;
+        opacity: 0.6;
+        transform-origin: center;
+        transform: perspective(900px) rotateX(72deg) translateY(0);
+        animation: moveGrid 18s linear infinite;
+      }
+
+      @keyframes moveGrid {
+        0% {
+          transform: perspective(900px) rotateX(72deg) translateY(0);
+        }
+
+        100% {
+          transform: perspective(900px) rotateX(72deg) translateY(140px);
         }
       }
-    }
-  </script>
+    </style>
+  </head>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <body class="font-sans text-slate-100" data-guard="STUDENT">
+    <div class="animated-bg"></div>
 
-  <style>
-    body {
-      position: relative;
-      overflow-x: hidden;
-      background: #020617;
-    }
-
-    .animated-bg {
-      position: fixed;
-      inset: 0;
-      z-index: -10;
-      pointer-events: none;
-      background: radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
-      overflow: hidden;
-    }
-
-    .animated-bg::before {
-      content: "";
-      position: absolute;
-      left: -50%;
-      bottom: -40%;
-      width: 200%;
-      height: 200%;
-      background-image: radial-gradient(#64748b 1px, transparent 1px);
-      background-size: 26px 26px;
-      opacity: 0.6;
-      transform-origin: center;
-      transform: perspective(900px) rotateX(72deg) translateY(0);
-      animation: moveGrid 18s linear infinite;
-    }
-
-    @keyframes moveGrid {
-      0% {
-        transform: perspective(900px) rotateX(72deg) translateY(0);
-      }
-
-      100% {
-        transform: perspective(900px) rotateX(72deg) translateY(140px);
-      }
-    }
-  </style>
-</head>
-
-<body class="font-sans text-slate-100" data-guard="STUDENT">
-  <div class="animated-bg"></div>
-
-  <header class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur">
-    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
-      <a href="index.html" class="flex items-center gap-2">
-        <div
-          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40">
-          <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
-        </div>
-        <div class="leading-tight">
-          <p class="text-base font-semibold tracking-tight">UniTalent</p>
-          <p class="text-[11px] text-slate-400">Student Career Platform</p>
-        </div>
-      </a>
-
-      <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
-        <a href="index.html#how" class="hover:text-indigo-300">How it works</a>
-        <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
-        <a href="saved-jobs.html" class="hover:text-indigo-300">Saved</a>
-
-
-        <!-- ✅ FIX: dashboard link instead of login -->
-        <a href="student-dashboard.html" class="text-indigo-300">For students</a>
-
-        <a href="employer-login.html" class="hover:text-indigo-300">For employers</a>
-        <a href="index.html#about" class="hover:text-indigo-300">About</a>
-      </div>
-
-      <div class="hidden items-center gap-3 md:flex">
-        <span class="text-xs text-slate-400">Logged in as</span>
-
-        <span id="nav-user-pill" class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100">
-          Student
-        </span>
-
-        <button id="logout-btn"
-          class="rounded-full bg-slate-900/80 px-3 py-1 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:ring-rose-400">
-          Logout
-        </button>
-      </div>
-
-      <button
-        class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
-        <span class="sr-only">Open menu</span>
-        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
-    </nav>
-  </header>
-
-  <main class="mx-auto max-w-6xl px-4 pb-16 pt-6 md:pt-8">
-    <div class="mb-4 text-xs text-slate-400">
-      <a href="index.html" class="hover:text-indigo-300">Home</a>
-      <span class="mx-1 text-slate-500">/</span>
-      <a href="student-login.html" class="hover:text-indigo-300">Student login</a>
-      <span class="mx-1 text-slate-500">/</span>
-      <span class="text-slate-300">Dashboard</span>
-    </div>
-
-    <section class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div class="space-y-1">
-        <p class="text-xs text-slate-400">Student dashboard</p>
-        <h1 id="dashboard-title" class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
-          Welcome back 👋
-        </h1>
-        <p class="text-sm text-slate-400">
-          Quick view of your applications and suggested roles.
-        </p>
-      </div>
-
-      <div class="flex flex-wrap items-center gap-3 text-xs">
-        <div class="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2">
-          <div id="profile-avatar-initials"
-            class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold">
-            ST
+    <header
+      class="sticky top-0 z-20 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur"
+    >
+      <nav
+        class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4"
+      >
+        <a href="index.html" class="flex items-center gap-2">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/60 shadow-lg shadow-indigo-500/40"
+          >
+            <img
+              src="assets/logo.png"
+              alt="UniTalent logo"
+              class="h-8 w-8 object-contain"
+            />
           </div>
           <div class="leading-tight">
-            <p id="profile-line-1" class="font-semibold text-slate-100">
-              Student
-            </p>
-            <p id="profile-line-2" class="text-[11px] text-slate-400">
-              Major not specified
-            </p>
+            <p class="text-base font-semibold tracking-tight">UniTalent</p>
+            <p class="text-[11px] text-slate-400">Student Career Platform</p>
           </div>
-        </div>
-
-        <a href="student-profile.html"
-          class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400">
-          Edit profile
         </a>
 
-        <a href="saved-jobs.html"
-          class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-rose-300">
-          Saved jobs
-        </a>
+        <div
+          class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex"
+        >
+          <a href="index.html#how" class="hover:text-indigo-300"
+            >How it works</a
+          >
+          <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
+          <a href="saved-jobs.html" class="hover:text-indigo-300">Saved</a>
 
+          <!-- ✅ FIX: dashboard link instead of login -->
+          <a href="student-dashboard.html" class="text-indigo-300"
+            >For students</a
+          >
 
-      </div>
-    </section>
-
-    <!-- KPI cards -->
-    <section class="mt-6 grid gap-4 text-xs md:grid-cols-3">
-      <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
-        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-          Applications sent
-        </p>
-        <p id="kpi-apps" class="mt-2 text-2xl font-bold text-slate-50">0</p>
-        <p id="kpi-apps-sub" class="mt-1 text-[11px] text-slate-400">
-          Loading...
-        </p>
-      </div>
-
-      <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
-        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-          Upcoming Interviews
-        </p>
-        <p id="kpi-interviews" class="mt-2 text-2xl font-bold text-slate-50">0</p>
-        <p class="mt-1 text-[11px] text-slate-400">
-          Scheduled interviews
-        </p>
-        <a href="student-interviews.html" class="mt-2 inline-block text-[11px] text-indigo-300 hover:text-indigo-200">
-          View interviews →
-        </a>
-      </div>
-
-
-
-      <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70">
-        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-          Saved jobs
-        </p>
-        <p id="kpi-saved" class="mt-2 text-2xl font-bold text-slate-50">0</p>
-        <p class="mt-1 text-[11px] text-slate-400">
-          From your bookmarks
-        </p>
-      </div>
-    </section>
-
-    <section class="mt-8 grid gap-6 md:grid-cols-[minmax(0,1.6fr),minmax(0,1fr)]">
-      <!-- My applications column -->
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
-          <h2 class="text-sm font-semibold text-slate-50">
-            My applications
-          </h2>
-          <div class="flex items-center gap-2">
-            <a href="jobs.html" class="text-xs text-indigo-300 hover:text-indigo-200">
-              Browse more jobs →
-            </a>
-          </div>
+          <a href="employer-login.html" class="hover:text-indigo-300"
+            >For employers</a
+          >
+          <a href="index.html#about" class="hover:text-indigo-300">About</a>
         </div>
 
-        <p id="apps-status" class="text-[11px] text-slate-400">Loading your applications...</p>
+        <div class="hidden items-center gap-3 md:flex">
+          <span class="text-xs text-slate-400">Logged in as</span>
 
-        <div id="apps-list"
-          class="space-y-3 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
-          <!-- dynamic -->
-        </div>
-      </div>
+          <span
+            id="nav-user-pill"
+            class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100"
+          >
+            Student
+          </span>
 
-      <!-- Sidebar -->
-      <aside class="space-y-4">
-        <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
-          <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-            Profile completeness
-          </p>
-
-          <div class="mt-3 flex items-center justify-between">
-            <p id="profile-progress-text" class="text-sm font-semibold text-slate-50">0% complete</p>
-            <span class="rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-200">
-              Finish to get better matches
-            </span>
-          </div>
-
-          <div class="mt-3 h-1.5 rounded-full bg-slate-800">
-            <div id="profile-progress-bar" class="h-1.5 w-0 rounded-full bg-indigo-500"></div>
-          </div>
-
-          <button id="improve-profile-btn"
-            class="mt-4 w-full rounded-full bg-slate-950/70 px-4 py-2 text-[11px] font-semibold text-slate-50 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400">
-            Improve profile
+          <button
+            id="logout-btn"
+            class="rounded-full bg-slate-900/80 px-3 py-1 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:ring-rose-400"
+          >
+            Logout
           </button>
         </div>
 
-        <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs">
-          <div class="flex items-center justify-between">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-              Recommended for you
-            </p>
-            <a href="jobs.html" class="text-[11px] text-indigo-300 hover:text-indigo-200">
-              View all
-            </a>
-          </div>
+        <button
+          class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden"
+        >
+          <span class="sr-only">Open menu</span>
+          <svg
+            class="h-5 w-5"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+      </nav>
+    </header>
 
-          <div id="recommended-list" class="mt-3 space-y-3">
-            <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3 text-[11px] text-slate-300">
-              Recommendations will improve after you complete your profile.
+    <main class="mx-auto max-w-6xl px-4 pb-16 pt-6 md:pt-8">
+      <div class="mb-4 text-xs text-slate-400">
+        <a href="index.html" class="hover:text-indigo-300">Home</a>
+        <span class="mx-1 text-slate-500">/</span>
+        <a href="student-login.html" class="hover:text-indigo-300"
+          >Student login</a
+        >
+        <span class="mx-1 text-slate-500">/</span>
+        <span class="text-slate-300">Dashboard</span>
+      </div>
+
+      <section
+        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+      >
+        <div class="space-y-1">
+          <p class="text-xs text-slate-400">Student dashboard</p>
+          <h1
+            id="dashboard-title"
+            class="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl"
+          >
+            Welcome back 👋
+          </h1>
+          <p class="text-sm text-slate-400">
+            Quick view of your applications and suggested roles.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 text-xs">
+          <div
+            class="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2"
+          >
+            <div
+              id="profile-avatar-initials"
+              class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold"
+            >
+              ST
+            </div>
+            <div class="leading-tight">
+              <p id="profile-line-1" class="font-semibold text-slate-100">
+                Student
+              </p>
+              <p id="profile-line-2" class="text-[11px] text-slate-400">
+                Major not specified
+              </p>
+              <p id="profile-line-3" class="text-[10px] text-slate-500 mt-0.5">
+                <!-- GPA will be shown here if available -->
+              </p>
             </div>
           </div>
+
+          <a
+            href="student-profile.html"
+            class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400"
+          >
+            Edit profile
+          </a>
+
+          <a
+            href="saved-jobs.html"
+            class="rounded-full bg-slate-900/80 px-3 py-2 text-[11px] font-semibold text-slate-200 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-rose-300"
+          >
+            Saved jobs
+          </a>
+        </div>
+      </section>
+
+      <!-- KPI cards -->
+      <section class="mt-6 grid gap-4 text-xs md:grid-cols-3">
+        <div
+          class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70"
+        >
+          <p
+            class="text-[11px] font-semibold uppercase tracking-wide text-slate-400"
+          >
+            Applications sent
+          </p>
+          <p id="kpi-apps" class="mt-2 text-2xl font-bold text-slate-50">0</p>
+          <p id="kpi-apps-sub" class="mt-1 text-[11px] text-slate-400">
+            Loading...
+          </p>
         </div>
 
         <div
-          class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 text-xs text-slate-300 shadow-xl shadow-slate-900/70">
-          <p class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">
-            Tip for this week
+          class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70"
+        >
+          <p
+            class="text-[11px] font-semibold uppercase tracking-wide text-slate-400"
+          >
+            Upcoming Interviews
           </p>
-          <p class="mt-1">
-            Pick 1–2 roles you really like and adjust your CV + profile to match the requirements.
+          <p id="kpi-interviews" class="mt-2 text-2xl font-bold text-slate-50">
+            0
           </p>
+          <p class="mt-1 text-[11px] text-slate-400">Scheduled interviews</p>
+          <a
+            href="student-interviews.html"
+            class="mt-2 inline-block text-[11px] text-indigo-300 hover:text-indigo-200"
+          >
+            View interviews →
+          </a>
         </div>
-      </aside>
-    </section>
 
+        <div
+          class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-slate-900/70"
+        >
+          <p
+            class="text-[11px] font-semibold uppercase tracking-wide text-slate-400"
+          >
+            Saved jobs
+          </p>
+          <p id="kpi-saved" class="mt-2 text-2xl font-bold text-slate-50">0</p>
+          <p class="mt-1 text-[11px] text-slate-400">From your bookmarks</p>
+        </div>
+      </section>
 
-  </main>
+      <section
+        class="mt-8 grid gap-6 md:grid-cols-[minmax(0,1.6fr),minmax(0,1fr)]"
+      >
+        <!-- My applications column -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-slate-50">My applications</h2>
+            <div class="flex items-center gap-2">
+              <a
+                href="jobs.html"
+                class="text-xs text-indigo-300 hover:text-indigo-200"
+              >
+                Browse more jobs →
+              </a>
+            </div>
+          </div>
 
-  <footer class="border-t border-slate-800 bg-slate-950/90">
-    <div
-      class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
-      <p>© 2025 UniTalent. All rights reserved.</p>
-      <div class="flex flex-wrap gap-4">
-        <a href="index.html#about" class="hover:text-indigo-300">About</a>
-        <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
-        <span>Terms · Privacy</span>
+          <p id="apps-status" class="text-[11px] text-slate-400">
+            Loading your applications...
+          </p>
+
+          <div
+            id="apps-list"
+            class="space-y-3 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs"
+          >
+            <!-- dynamic -->
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="space-y-4">
+          <div
+            class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs"
+          >
+            <p
+              class="text-[11px] font-semibold uppercase tracking-wide text-slate-400"
+            >
+              Profile completeness
+            </p>
+
+            <div class="mt-3 flex items-center justify-between">
+              <p
+                id="profile-progress-text"
+                class="text-sm font-semibold text-slate-50"
+              >
+                0% complete
+              </p>
+              <span
+                class="rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-200"
+              >
+                Finish to get better matches
+              </span>
+            </div>
+
+            <div class="mt-3 h-1.5 rounded-full bg-slate-800">
+              <div
+                id="profile-progress-bar"
+                class="h-1.5 w-0 rounded-full bg-indigo-500"
+              ></div>
+            </div>
+
+            <button
+              id="improve-profile-btn"
+              class="mt-4 w-full rounded-full bg-slate-950/70 px-4 py-2 text-[11px] font-semibold text-slate-50 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400"
+            >
+              Improve profile
+            </button>
+          </div>
+
+          <div
+            class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl shadow-slate-900/70 text-xs"
+          >
+            <div class="flex items-center justify-between">
+              <p
+                class="text-[11px] font-semibold uppercase tracking-wide text-slate-400"
+              >
+                Recommended for you
+              </p>
+              <a
+                href="jobs.html"
+                class="text-[11px] text-indigo-300 hover:text-indigo-200"
+              >
+                View all
+              </a>
+            </div>
+
+            <div id="recommended-list" class="mt-3 space-y-3">
+              <div
+                class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3 text-[11px] text-slate-300"
+              >
+                Recommendations will improve after you complete your profile.
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 text-xs text-slate-300 shadow-xl shadow-slate-900/70"
+          >
+            <p
+              class="text-[11px] font-semibold uppercase tracking-wide text-indigo-300"
+            >
+              Tip for this week
+            </p>
+            <p class="mt-1">
+              Pick 1–2 roles you really like and adjust your CV + profile to
+              match the requirements.
+            </p>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-800 bg-slate-950/90">
+      <div
+        class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-500 md:flex-row md:items-center md:justify-between"
+      >
+        <p>© 2025 UniTalent. All rights reserved.</p>
+        <div class="flex flex-wrap gap-4">
+          <a href="index.html#about" class="hover:text-indigo-300">About</a>
+          <a href="index.html#contact" class="hover:text-indigo-300">Contact</a>
+          <span>Terms · Privacy</span>
+        </div>
       </div>
-    </div>
-  </footer>
+    </footer>
 
-  <!-- ✅ CLEAN + FIXED SCRIPT -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const API = 'http://localhost:3000';
+    <!-- ✅ CLEAN + FIXED SCRIPT -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const API = "http://localhost:3000";
 
-      // =========================
-      // ✅ Unified storage helpers
-      // =========================
-      const storeGet = (key) =>
-        localStorage.getItem(key) ?? sessionStorage.getItem(key);
+        // =========================
+        // ✅ Unified storage helpers
+        // =========================
+        const storeGet = (key) =>
+          localStorage.getItem(key) ?? sessionStorage.getItem(key);
 
-      const storeRemove = (key) => {
-        localStorage.removeItem(key);
-        sessionStorage.removeItem(key);
-      };
-
-      function readUniTalentAuth() {
-        const token = storeGet('unitalent_token');
-        const userRaw = storeGet('unitalent_user');
-
-        if (!token || !userRaw) return { token: null, user: null };
-
-        try {
-          return { token, user: JSON.parse(userRaw) };
-        } catch {
-          storeRemove('unitalent_token');
-          storeRemove('unitalent_user');
-          return { token: null, user: null };
-        }
-      }
-
-      function clearAllAuth() {
-        storeRemove('unitalent_token');
-        storeRemove('unitalent_user');
-
-        [
-          'unitalent_student_name',
-          'unitalent_student_email',
-          'unitalent_student_username',
-          'unitalent_employer_name',
-          'unitalent_employer_bin',
-          'unitalent_employer_city',
-          'unitalent_employer_size'
-        ].forEach(storeRemove);
-      }
-
-      // =========================
-      // ✅ Student auth guard
-      // =========================
-      const { token, user } = readUniTalentAuth();
-
-      if (!token || !user) {
-        clearAllAuth();
-        window.location.href = 'student-login.html';
-        return;
-      }
-
-      if (user.role !== 'STUDENT') {
-        window.location.href =
-          user.role === 'EMPLOYER'
-            ? 'employer-dashboard.html'
-            : 'student-login.html';
-        return;
-      }
-
-      // =========================
-      // Local profile (optional UI-only)
-      // =========================
-      function getLocalProfile() {
-        try {
-          return JSON.parse(localStorage.getItem('unitalent_student_profile') || 'null');
-        } catch {
-          return null;
-        }
-      }
-
-      function escapeHtml(str = '') {
-        return String(str)
-          .replaceAll('&', '&amp;')
-          .replaceAll('<', '&lt;')
-          .replaceAll('>', '&gt;')
-          .replaceAll('"', '&quot;')
-          .replaceAll("'", '&#039;');
-      }
-
-      function formatDate(iso) {
-        try {
-          const d = new Date(iso);
-          if (Number.isNaN(d.getTime())) return null;
-          return d.toLocaleDateString();
-        } catch {
-          return null;
-        }
-      }
-
-      function formatInterviewDate(iso) {
-        try {
-          const d = new Date(iso);
-          if (Number.isNaN(d.getTime())) return null;
-          return d.toLocaleString();
-        } catch {
-          return null;
-        }
-      }
-
-      function formatStatusLabel(status) {
-        const statusUpper = (status || 'APPLIED').toUpperCase();
-        const statusMap = {
-          'APPLIED': 'Applied',
-          'IN_REVIEW': 'In Review',
-          'INTERVIEW': 'Interview',
-          'OFFERED': 'Offer Received',
-          'ACCEPTED': 'Accepted',
-          'REJECTED': 'Rejected'
-        };
-        return statusMap[statusUpper] || status;
-      }
-
-      function getStatusBadgeClass(status) {
-        const statusUpper = (status || 'APPLIED').toUpperCase();
-        if (statusUpper === 'OFFERED') {
-          return 'bg-emerald-500/20 text-emerald-200';
-        } else if (statusUpper === 'ACCEPTED') {
-          return 'bg-emerald-500/20 text-emerald-200';
-        } else if (statusUpper === 'REJECTED') {
-          return 'bg-rose-500/15 text-rose-300';
-        } else if (statusUpper === 'IN_REVIEW' || statusUpper === 'INTERVIEW') {
-          return 'bg-blue-500/15 text-blue-300';
-        }
-        return 'bg-slate-800 text-slate-200';
-      }
-
-      // =========================
-      // UI elements
-      // =========================
-      const dashboardTitle = document.getElementById('dashboard-title');
-      const navUserPill = document.getElementById('nav-user-pill');
-      const avatarInitials = document.getElementById('profile-avatar-initials');
-      const profileLine1 = document.getElementById('profile-line-1');
-      const profileLine2 = document.getElementById('profile-line-2');
-      const logoutBtn = document.getElementById('logout-btn');
-
-      const kpiApps = document.getElementById('kpi-apps');
-      const kpiAppsSub = document.getElementById('kpi-apps-sub');
-      const kpiInterviews = document.getElementById('kpi-interviews');
-      const kpiSaved = document.getElementById('kpi-saved');
-
-      const appsList = document.getElementById('apps-list');
-      const appsStatus = document.getElementById('apps-status');
-
-      const progressText = document.getElementById('profile-progress-text');
-      const progressBar = document.getElementById('profile-progress-bar');
-      const improveProfileBtn = document.getElementById('improve-profile-btn');
-
-      const recommendedList = document.getElementById('recommended-list');
-
-      // =========================
-      // Name + major
-      // =========================
-      const localProfile = getLocalProfile() || {};
-
-      const fullName =
-        [localProfile.firstName, localProfile.lastName].filter(Boolean).join(' ') ||
-        [user.firstName, user.lastName].filter(Boolean).join(' ') ||
-        user.email ||
-        'Student';
-
-      const major = localProfile.major || 'Major not specified';
-
-      if (dashboardTitle) dashboardTitle.textContent = `Welcome back, ${fullName} 👋`;
-      if (navUserPill) navUserPill.textContent = fullName;
-      if (profileLine1) profileLine1.textContent = fullName;
-      if (profileLine2) profileLine2.textContent = major;
-
-      if (avatarInitials) {
-        const initials = fullName
-          .split(' ')
-          .filter(Boolean)
-          .map(s => s[0])
-          .join('')
-          .slice(0, 2)
-          .toUpperCase();
-        avatarInitials.textContent = initials || 'ST';
-      }
-
-      // =========================
-      // ✅ Profile completeness
-      // =========================
-      function calcProgress(p) {
-        const fields = [
-          p.firstName,
-          p.lastName,
-          p.university,
-          p.major,
-          p.studyYear,
-          p.skills,
-          p.bio
-        ];
-        const filled = fields.filter(v => String(v || '').trim().length > 0).length;
-        return Math.round((filled / fields.length) * 100);
-      }
-
-      function renderProfileProgress() {
-        const p = {
-          firstName: localProfile.firstName || user.firstName || '',
-          lastName: localProfile.lastName || user.lastName || '',
-          university: localProfile.university || '',
-          major: localProfile.major || '',
-          studyYear: localProfile.studyYear || '',
-          skills: localProfile.skills || '',
-          bio: localProfile.bio || ''
+        const storeRemove = (key) => {
+          localStorage.removeItem(key);
+          sessionStorage.removeItem(key);
         };
 
-        const pct = calcProgress(p);
-        if (progressText) progressText.textContent = `${pct}% complete`;
-        if (progressBar) progressBar.style.width = `${pct}%`;
-      }
+        function readUniTalentAuth() {
+          const token = storeGet("unitalent_token");
+          const userRaw = storeGet("unitalent_user");
 
-      renderProfileProgress();
+          if (!token || !userRaw) return { token: null, user: null };
 
-      improveProfileBtn?.addEventListener('click', () => {
-        window.location.href = 'student-profile.html';
-      });
-
-      // =========================
-      // ✅ Logout
-      // =========================
-      logoutBtn?.addEventListener('click', () => {
-        clearAllAuth();
-        window.location.href = 'index.html';
-      });
-
-      async function cancelInterview(appId, buttonEl) {
-        if (!confirm('Cancel this interview?')) return;
-        if (buttonEl) {
-          buttonEl.disabled = true;
-          buttonEl.textContent = 'Cancelling...';
+          try {
+            return { token, user: JSON.parse(userRaw) };
+          } catch {
+            storeRemove("unitalent_token");
+            storeRemove("unitalent_user");
+            return { token: null, user: null };
+          }
         }
-        try {
-          const res = await fetch(`${API}/api/applications/${appId}/interview/cancel`, {
-            method: 'PATCH',
-            headers: {
-              'Authorization': 'Bearer ' + token,
-              'Content-Type': 'application/json'
-            }
-          });
-          const data = await res.json().catch(() => ({}));
-          if (!res.ok) {
-            alert(data?.message || 'Failed to cancel interview');
+
+        function clearAllAuth() {
+          storeRemove("unitalent_token");
+          storeRemove("unitalent_user");
+
+          [
+            "unitalent_student_name",
+            "unitalent_student_email",
+            "unitalent_student_username",
+            "unitalent_employer_name",
+            "unitalent_employer_bin",
+            "unitalent_employer_city",
+            "unitalent_employer_size",
+          ].forEach(storeRemove);
+        }
+
+        // =========================
+        // ✅ Student auth guard
+        // =========================
+        const { token, user } = readUniTalentAuth();
+
+        if (!token || !user) {
+          clearAllAuth();
+          window.location.href = "student-login.html";
+          return;
+        }
+
+        if (user.role !== "STUDENT") {
+          window.location.href =
+            user.role === "EMPLOYER"
+              ? "employer-dashboard.html"
+              : "student-login.html";
+          return;
+        }
+
+        // =========================
+        // Local profile (optional UI-only)
+        // =========================
+        function getLocalProfile() {
+          try {
+            return JSON.parse(
+              localStorage.getItem("unitalent_student_profile") || "null"
+            );
+          } catch {
+            return null;
+          }
+        }
+
+        function escapeHtml(str = "") {
+          return String(str)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+        }
+
+        function formatDate(iso) {
+          try {
+            const d = new Date(iso);
+            if (Number.isNaN(d.getTime())) return null;
+            return d.toLocaleDateString();
+          } catch {
+            return null;
+          }
+        }
+
+        function formatInterviewDate(iso) {
+          try {
+            const d = new Date(iso);
+            if (Number.isNaN(d.getTime())) return null;
+            return d.toLocaleString();
+          } catch {
+            return null;
+          }
+        }
+
+        function formatStatusLabel(status) {
+          const statusUpper = (status || "APPLIED").toUpperCase();
+          const statusMap = {
+            APPLIED: "Applied",
+            IN_REVIEW: "In Review",
+            INTERVIEW: "Interview",
+            OFFERED: "Offer Received",
+            ACCEPTED: "Accepted",
+            REJECTED: "Rejected",
+          };
+          return statusMap[statusUpper] || status;
+        }
+
+        function getStatusBadgeClass(status) {
+          const statusUpper = (status || "APPLIED").toUpperCase();
+          if (statusUpper === "OFFERED") {
+            return "bg-emerald-500/20 text-emerald-200";
+          } else if (statusUpper === "ACCEPTED") {
+            return "bg-emerald-500/20 text-emerald-200";
+          } else if (statusUpper === "REJECTED") {
+            return "bg-rose-500/15 text-rose-300";
+          } else if (
+            statusUpper === "IN_REVIEW" ||
+            statusUpper === "INTERVIEW"
+          ) {
+            return "bg-blue-500/15 text-blue-300";
+          }
+          return "bg-slate-800 text-slate-200";
+        }
+
+        // =========================
+        // UI elements
+        // =========================
+        const dashboardTitle = document.getElementById("dashboard-title");
+        const navUserPill = document.getElementById("nav-user-pill");
+        const avatarInitials = document.getElementById(
+          "profile-avatar-initials"
+        );
+        const profileLine1 = document.getElementById("profile-line-1");
+        const profileLine2 = document.getElementById("profile-line-2");
+        const profileLine3 = document.getElementById("profile-line-3");
+        const logoutBtn = document.getElementById("logout-btn");
+
+        const kpiApps = document.getElementById("kpi-apps");
+        const kpiAppsSub = document.getElementById("kpi-apps-sub");
+        const kpiInterviews = document.getElementById("kpi-interviews");
+        const kpiSaved = document.getElementById("kpi-saved");
+
+        const appsList = document.getElementById("apps-list");
+        const appsStatus = document.getElementById("apps-status");
+
+        const progressText = document.getElementById("profile-progress-text");
+        const progressBar = document.getElementById("profile-progress-bar");
+        const improveProfileBtn = document.getElementById(
+          "improve-profile-btn"
+        );
+
+        const recommendedList = document.getElementById("recommended-list");
+
+        // =========================
+        // Name + major
+        // =========================
+        const localProfile = getLocalProfile() || {};
+
+        const fullName =
+          [localProfile.firstName, localProfile.lastName]
+            .filter(Boolean)
+            .join(" ") ||
+          [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+          user.email ||
+          "Student";
+
+        const major = localProfile.major || "Major not specified";
+        const gpa = localProfile.gpa || null;
+
+        if (dashboardTitle)
+          dashboardTitle.textContent = `Welcome back, ${fullName} 👋`;
+        if (navUserPill) navUserPill.textContent = fullName;
+        if (profileLine1) profileLine1.textContent = fullName;
+        if (profileLine2) profileLine2.textContent = major;
+        if (profileLine3) {
+          if (gpa) {
+            profileLine3.textContent = `GPA: ${gpa}`;
+            profileLine3.classList.remove("hidden");
           } else {
-            await loadMyApplications();
-          }
-        } catch (err) {
-          alert('Network error. Try again.');
-        } finally {
-          if (buttonEl) {
-            buttonEl.disabled = false;
-            buttonEl.textContent = 'Cancel interview';
+            profileLine3.textContent = "";
+            profileLine3.classList.add("hidden");
           }
         }
-      }
 
-      // =========================
-      // ✅ Applications UI
-      // =========================
-      function renderApps(apps = []) {
-        if (!appsList) return;
+        if (avatarInitials) {
+          const initials = fullName
+            .split(" ")
+            .filter(Boolean)
+            .map((s) => s[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase();
+          avatarInitials.textContent = initials || "ST";
+        }
 
-        if (!apps.length) {
-          appsList.innerHTML = `
+        // =========================
+        // ✅ Profile completeness
+        // =========================
+        function calcProgress(p) {
+          const fields = [
+            p.firstName,
+            p.lastName,
+            p.university,
+            p.major,
+            p.studyYear,
+            p.skills,
+            p.bio,
+          ];
+          const filled = fields.filter(
+            (v) => String(v || "").trim().length > 0
+          ).length;
+          return Math.round((filled / fields.length) * 100);
+        }
+
+        function renderProfileProgress() {
+          const p = {
+            firstName: localProfile.firstName || user.firstName || "",
+            lastName: localProfile.lastName || user.lastName || "",
+            university: localProfile.university || "",
+            major: localProfile.major || "",
+            studyYear: localProfile.studyYear || "",
+            skills: localProfile.skills || "",
+            bio: localProfile.bio || "",
+          };
+
+          const pct = calcProgress(p);
+          if (progressText) progressText.textContent = `${pct}% complete`;
+          if (progressBar) progressBar.style.width = `${pct}%`;
+        }
+
+        // =========================
+        // Load profile from backend (to get latest GPA)
+        // =========================
+        async function refreshProfile() {
+          try {
+            const res = await fetch(`${API}/api/students/me`, {
+              headers: { Authorization: "Bearer " + token },
+            });
+
+            if (res.status === 401) {
+              clearAllAuth();
+              window.location.href = "student-login.html";
+              return;
+            }
+
+            const data = await res.json().catch(() => null);
+            if (res.ok && data) {
+              // Update localStorage with latest profile (including GPA)
+              localStorage.setItem(
+                "unitalent_student_profile",
+                JSON.stringify(data)
+              );
+
+              // Update display if GPA is available
+              if (profileLine3 && data.gpa) {
+                profileLine3.textContent = `GPA: ${data.gpa}`;
+                profileLine3.classList.remove("hidden");
+              }
+            }
+          } catch (e) {
+            console.warn("Failed to refresh profile:", e);
+          }
+        }
+
+        // Refresh profile on page load to get latest GPA
+        refreshProfile();
+
+        renderProfileProgress();
+
+        improveProfileBtn?.addEventListener("click", () => {
+          window.location.href = "student-profile.html";
+        });
+
+        // =========================
+        // ✅ Logout
+        // =========================
+        logoutBtn?.addEventListener("click", () => {
+          clearAllAuth();
+          window.location.href = "index.html";
+        });
+
+        async function cancelInterview(appId, buttonEl) {
+          if (!confirm("Cancel this interview?")) return;
+          if (buttonEl) {
+            buttonEl.disabled = true;
+            buttonEl.textContent = "Cancelling...";
+          }
+          try {
+            const res = await fetch(
+              `${API}/api/applications/${appId}/interview/cancel`,
+              {
+                method: "PATCH",
+                headers: {
+                  Authorization: "Bearer " + token,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+              alert(data?.message || "Failed to cancel interview");
+            } else {
+              await loadMyApplications();
+            }
+          } catch (err) {
+            alert("Network error. Try again.");
+          } finally {
+            if (buttonEl) {
+              buttonEl.disabled = false;
+              buttonEl.textContent = "Cancel interview";
+            }
+          }
+        }
+
+        // =========================
+        // ✅ Applications UI
+        // =========================
+        function renderApps(apps = []) {
+          if (!appsList) return;
+
+          if (!apps.length) {
+            appsList.innerHTML = `
           <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-5 text-sm text-slate-300">
             You haven’t applied yet.
             <a href="jobs.html" class="text-indigo-300 hover:text-indigo-200">Browse jobs</a>
           </div>
         `;
-          return;
-        }
+            return;
+          }
 
-        appsList.innerHTML = apps.map(app => {
-          const job = app.job || {};
-          const title = escapeHtml(job.title || 'Untitled role');
-          const location = escapeHtml(job.location || 'Location not specified');
-          const salary = escapeHtml(job.salary || 'Salary not specified');
+          appsList.innerHTML = apps
+            .map((app) => {
+              const job = app.job || {};
+              const title = escapeHtml(job.title || "Untitled role");
+              const location = escapeHtml(
+                job.location || "Location not specified"
+              );
+              const salary = escapeHtml(job.salary || "Salary not specified");
 
-          const statusRaw = (app.status || 'APPLIED').toString();
-          const statusLabel = formatStatusLabel(statusRaw);
-          const statusBadgeClass = getStatusBadgeClass(statusRaw);
+              const statusRaw = (app.status || "APPLIED").toString();
+              const statusLabel = formatStatusLabel(statusRaw);
+              const statusBadgeClass = getStatusBadgeClass(statusRaw);
 
-          const created = formatDate(app.createdAt);
-          const createdText = created ? `Sent on ${created}` : 'Sent recently';
+              const created = formatDate(app.createdAt);
+              const createdText = created
+                ? `Sent on ${created}`
+                : "Sent recently";
 
-          const interviewDate = app.interviewDate ? formatInterviewDate(app.interviewDate) : null;
-          const statusUpper = statusRaw.toUpperCase();
-          const isOffered = statusUpper === 'OFFERED';
+              const interviewDate = app.interviewDate
+                ? formatInterviewDate(app.interviewDate)
+                : null;
+              const statusUpper = statusRaw.toUpperCase();
+              const isOffered = statusUpper === "OFFERED";
 
-          return `
+              return `
           <article class="flex flex-col gap-3 border-b border-slate-800 pb-3 last:border-b-0 last:pb-0 md:flex-row md:items-center md:justify-between">
             <div>
-              <p class="text-[11px] uppercase tracking-wide ${isOffered ? 'text-emerald-400' : 'text-emerald-400'}">${isOffered ? 'Offer Received' : 'Applied'}</p>
+              <p class="text-[11px] uppercase tracking-wide ${
+                isOffered ? "text-emerald-400" : "text-emerald-400"
+              }">${isOffered ? "Offer Received" : "Applied"}</p>
               <h3 class="mt-1 text-sm font-semibold text-slate-50">${title}</h3>
               <p class="text-[11px] text-slate-400">${location}</p>
               <p class="mt-1 text-[11px] text-slate-300">${createdText}</p>
               <p class="mt-1 text-[11px] text-slate-500">${salary}</p>
-              ${isOffered ? `
+              ${
+                isOffered
+                  ? `
               <p class="mt-2 text-xs font-semibold text-emerald-300">
                 🎉 You received an offer for this position!
               </p>
-              ` : ''}
+              `
+                  : ""
+              }
               <p class="mt-1 text-[11px] text-slate-300">
-                ${interviewDate
-              ? `Interview scheduled: <span class="text-indigo-200">${escapeHtml(interviewDate)}</span>`
-              : statusUpper === 'INTERVIEW' ? 'Interview scheduled' : 'No interview scheduled'}
+                ${
+                  interviewDate
+                    ? `Interview scheduled: <span class="text-indigo-200">${escapeHtml(
+                        interviewDate
+                      )}</span>`
+                    : statusUpper === "INTERVIEW"
+                    ? "Interview scheduled"
+                    : "No interview scheduled"
+                }
               </p>
             </div>
             <div class="flex flex-col items-end gap-1">
               <span class="rounded-full ${statusBadgeClass} px-2 py-1 text-[10px] font-medium">
                 ${escapeHtml(statusLabel)}
               </span>
-              ${interviewDate ? `
+              ${
+                interviewDate
+                  ? `
               <button data-cancel="${app.id}"
                 class="rounded-full bg-rose-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-rose-500 disabled:opacity-70">
                 Cancel interview
               </button>
-              ` : (statusUpper === 'APPLIED' || statusUpper === 'IN_REVIEW') ? `
+              `
+                  : statusUpper === "APPLIED" || statusUpper === "IN_REVIEW"
+                  ? `
               <div class="flex flex-col gap-1 items-end">
                 <button data-withdraw="${app.id}"
                   class="rounded-full bg-slate-700 px-3 py-1.5 text-[11px] font-semibold text-slate-200 hover:bg-slate-600 disabled:opacity-70">
                   Withdraw
                 </button>
-                <a href="job-details.html?jobId=${app.job?.id || ''}" class="text-[11px] text-indigo-300 hover:text-indigo-200">
+                <a href="job-details.html?jobId=${
+                  app.job?.id || ""
+                }" class="text-[11px] text-indigo-300 hover:text-indigo-200">
                   View Details →
                 </a>
               </div>
-              ` : `
-              <a href="job-details.html?jobId=${app.job?.id || ''}" class="text-[11px] text-indigo-300 hover:text-indigo-200">
+              `
+                  : `
+              <a href="job-details.html?jobId=${
+                app.job?.id || ""
+              }" class="text-[11px] text-indigo-300 hover:text-indigo-200">
                 View Details →
               </a>
-              `}
+              `
+              }
             </div>
           </article>
         `;
-        }).join('');
+            })
+            .join("");
 
-        document.querySelectorAll('button[data-cancel]')?.forEach(btn => {
-          btn.addEventListener('click', () => {
-            const appId = btn.getAttribute('data-cancel');
-            cancelInterview(appId, btn);
+          document.querySelectorAll("button[data-cancel]")?.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const appId = btn.getAttribute("data-cancel");
+              cancelInterview(appId, btn);
+            });
           });
-        });
 
-        document.querySelectorAll('button[data-withdraw]')?.forEach(btn => {
-          btn.addEventListener('click', () => {
-            const appId = btn.getAttribute('data-withdraw');
-            withdrawApplication(appId, btn);
+          document.querySelectorAll("button[data-withdraw]")?.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const appId = btn.getAttribute("data-withdraw");
+              withdrawApplication(appId, btn);
+            });
           });
-        });
-      }
-
-      // =========================
-      // ✅ Withdraw application
-      // =========================
-      async function withdrawApplication(appId, buttonEl) {
-        if (!confirm('Are you sure you want to withdraw this application? This action cannot be undone.')) return;
-        
-        if (buttonEl) {
-          buttonEl.disabled = true;
-          buttonEl.textContent = 'Withdrawing...';
         }
 
-        try {
-          const res = await fetch(`${API}/api/applications/${appId}`, {
-            method: 'DELETE',
-            headers: {
-              'Authorization': 'Bearer ' + token,
-              'Content-Type': 'application/json'
-            }
-          });
-
-          const data = await res.json().catch(() => ({}));
-
-          if (res.status === 401) {
-            clearAllAuth();
-            window.location.href = 'student-login.html';
+        // =========================
+        // ✅ Withdraw application
+        // =========================
+        async function withdrawApplication(appId, buttonEl) {
+          if (
+            !confirm(
+              "Are you sure you want to withdraw this application? This action cannot be undone."
+            )
+          )
             return;
+
+          if (buttonEl) {
+            buttonEl.disabled = true;
+            buttonEl.textContent = "Withdrawing...";
           }
 
-          if (!res.ok) {
-            const errorMsg = data?.message || 'Failed to withdraw application';
-            if (typeof toast !== 'undefined') {
+          try {
+            const res = await fetch(`${API}/api/applications/${appId}`, {
+              method: "DELETE",
+              headers: {
+                Authorization: "Bearer " + token,
+                "Content-Type": "application/json",
+              },
+            });
+
+            const data = await res.json().catch(() => ({}));
+
+            if (res.status === 401) {
+              clearAllAuth();
+              window.location.href = "student-login.html";
+              return;
+            }
+
+            if (!res.ok) {
+              const errorMsg =
+                data?.message || "Failed to withdraw application";
+              if (typeof toast !== "undefined") {
+                toast.error(errorMsg);
+              } else {
+                alert(errorMsg);
+              }
+              return;
+            }
+
+            if (typeof toast !== "undefined") {
+              toast.success("Application withdrawn successfully");
+            } else {
+              alert("Application withdrawn successfully");
+            }
+
+            await loadMyApplications();
+          } catch (err) {
+            console.error(err);
+            const errorMsg = "Network error. Please try again.";
+            if (typeof toast !== "undefined") {
               toast.error(errorMsg);
             } else {
               alert(errorMsg);
             }
-            return;
-          }
-
-          if (typeof toast !== 'undefined') {
-            toast.success('Application withdrawn successfully');
-          } else {
-            alert('Application withdrawn successfully');
-          }
-
-          await loadMyApplications();
-        } catch (err) {
-          console.error(err);
-          const errorMsg = 'Network error. Please try again.';
-          if (typeof toast !== 'undefined') {
-            toast.error(errorMsg);
-          } else {
-            alert(errorMsg);
-          }
-        } finally {
-          if (buttonEl) {
-            buttonEl.disabled = false;
-            buttonEl.textContent = 'Withdraw';
+          } finally {
+            if (buttonEl) {
+              buttonEl.disabled = false;
+              buttonEl.textContent = "Withdraw";
+            }
           }
         }
-      }
 
-      // =========================
-      // ✅ Load applications
-      // =========================
-      async function loadMyApplications() {
-        try {
-          if (appsStatus) appsStatus.textContent = 'Loading your applications...';
-          if (kpiAppsSub) kpiAppsSub.textContent = 'Loading...';
+        // =========================
+        // ✅ Load applications
+        // =========================
+        async function loadMyApplications() {
+          try {
+            if (appsStatus)
+              appsStatus.textContent = "Loading your applications...";
+            if (kpiAppsSub) kpiAppsSub.textContent = "Loading...";
 
-          const res = await fetch(`${API}/api/applications/my`, {
-            headers: { 'Authorization': 'Bearer ' + token }
-          });
+            const res = await fetch(`${API}/api/applications/my`, {
+              headers: { Authorization: "Bearer " + token },
+            });
 
-          if (res.status === 401) {
-            clearAllAuth();
-            window.location.href = 'student-login.html';
-            return;
+            if (res.status === 401) {
+              clearAllAuth();
+              window.location.href = "student-login.html";
+              return;
+            }
+
+            const data = await res.json().catch(() => []);
+
+            if (!res.ok) {
+              throw new Error(data?.message || "Failed to load applications");
+            }
+
+            const apps = Array.isArray(data) ? data : [];
+
+            if (kpiApps) kpiApps.textContent = String(apps.length);
+            if (kpiAppsSub) {
+              kpiAppsSub.textContent = apps.length
+                ? "Updated from backend"
+                : "No applications yet";
+            }
+
+            // Upcoming interviews count is loaded separately
+
+            renderApps(apps);
+            if (appsStatus) appsStatus.textContent = "";
+
+            loadRecommendations();
+          } catch (err) {
+            console.error(err);
+            if (appsStatus) appsStatus.textContent = err.message;
+            renderApps([]);
+            if (kpiApps) kpiApps.textContent = "0";
+            if (kpiAppsSub) kpiAppsSub.textContent = "Backend error";
+            if (kpiInterviews) kpiInterviews.textContent = "0";
           }
-
-          const data = await res.json().catch(() => ([]));
-
-          if (!res.ok) {
-            throw new Error(data?.message || 'Failed to load applications');
-          }
-
-          const apps = Array.isArray(data) ? data : [];
-
-          if (kpiApps) kpiApps.textContent = String(apps.length);
-          if (kpiAppsSub) {
-            kpiAppsSub.textContent =
-              apps.length ? 'Updated from backend' : 'No applications yet';
-          }
-
-          // Upcoming interviews count is loaded separately
-
-          renderApps(apps);
-          if (appsStatus) appsStatus.textContent = '';
-
-          loadRecommendations();
-        } catch (err) {
-          console.error(err);
-          if (appsStatus) appsStatus.textContent = err.message;
-          renderApps([]);
-          if (kpiApps) kpiApps.textContent = '0';
-          if (kpiAppsSub) kpiAppsSub.textContent = 'Backend error';
-          if (kpiInterviews) kpiInterviews.textContent = '0';
         }
-      }
 
-      // =========================
-      // ✅ Load saved jobs KPI (BACKEND)
-      // =========================
-      async function loadSavedKPI() {
-        try {
-          if (kpiSaved) kpiSaved.textContent = '0';
+        // =========================
+        // ✅ Load saved jobs KPI (BACKEND)
+        // =========================
+        async function loadSavedKPI() {
+          try {
+            if (kpiSaved) kpiSaved.textContent = "0";
 
-          const res = await fetch(`${API}/api/saved-jobs/my`, {
-            headers: { Authorization: 'Bearer ' + token }
-          });
+            const res = await fetch(`${API}/api/saved-jobs/my`, {
+              headers: { Authorization: "Bearer " + token },
+            });
 
-          if (res.status === 401) {
-            clearAllAuth();
-            window.location.href = 'student-login.html';
-            return;
+            if (res.status === 401) {
+              clearAllAuth();
+              window.location.href = "student-login.html";
+              return;
+            }
+
+            const data = await res.json().catch(() => []);
+            const saved = Array.isArray(data) ? data : [];
+
+            if (kpiSaved) kpiSaved.textContent = String(saved.length);
+          } catch (err) {
+            console.error(err);
+            if (kpiSaved) kpiSaved.textContent = "0";
           }
-
-          const data = await res.json().catch(() => ([]));
-          const saved = Array.isArray(data) ? data : [];
-
-          if (kpiSaved) kpiSaved.textContent = String(saved.length);
-        } catch (err) {
-          console.error(err);
-          if (kpiSaved) kpiSaved.textContent = '0';
         }
-      }
 
-      // =========================
-      // ✅ Load upcoming interviews count
-      // =========================
-      async function loadUpcomingInterviewsCount() {
-        try {
-          if (kpiInterviews) kpiInterviews.textContent = '0';
+        // =========================
+        // ✅ Load upcoming interviews count
+        // =========================
+        async function loadUpcomingInterviewsCount() {
+          try {
+            if (kpiInterviews) kpiInterviews.textContent = "0";
 
-          const res = await fetch(`${API}/api/applications/my/interviews/upcoming/count`, {
-            headers: { Authorization: 'Bearer ' + token }
-          });
+            const res = await fetch(
+              `${API}/api/applications/my/interviews/upcoming/count`,
+              {
+                headers: { Authorization: "Bearer " + token },
+              }
+            );
 
-          if (res.status === 401) {
-            clearAllAuth();
-            window.location.href = 'student-login.html';
-            return;
+            if (res.status === 401) {
+              clearAllAuth();
+              window.location.href = "student-login.html";
+              return;
+            }
+
+            const data = await res.json().catch(() => ({ count: 0 }));
+            const count = typeof data.count === "number" ? data.count : 0;
+
+            if (kpiInterviews) kpiInterviews.textContent = String(count);
+          } catch (err) {
+            console.error(err);
+            if (kpiInterviews) kpiInterviews.textContent = "0";
           }
-
-          const data = await res.json().catch(() => ({ count: 0 }));
-          const count = typeof data.count === 'number' ? data.count : 0;
-
-          if (kpiInterviews) kpiInterviews.textContent = String(count);
-        } catch (err) {
-          console.error(err);
-          if (kpiInterviews) kpiInterviews.textContent = '0';
         }
-      }
 
-      // =========================
-      // ✅ Simple recommendations
-      // =========================
-      async function loadRecommendations() {
-        if (!recommendedList) return;
+        // =========================
+        // ✅ Simple recommendations
+        // =========================
+        async function loadRecommendations() {
+          if (!recommendedList) return;
 
-        try {
-          const res = await fetch(`${API}/api/jobs`);
-          const jobs = await res.json().catch(() => ([]));
-          if (!res.ok) return;
+          try {
+            const res = await fetch(`${API}/api/jobs`);
+            const jobs = await res.json().catch(() => []);
+            if (!res.ok) return;
 
-          const all = Array.isArray(jobs) ? jobs : [];
-          const skillsText = (localProfile.skills || '').toLowerCase();
+            const all = Array.isArray(jobs) ? jobs : [];
+            const skillsText = (localProfile.skills || "").toLowerCase();
 
-          let rec = all.slice(0, 2);
+            let rec = all.slice(0, 2);
 
-          if (skillsText) {
-            const skillWords = skillsText.split(',').map(s => s.trim()).filter(Boolean);
-            const scored = all.map(j => {
-              const hay = `${j.title || ''} ${j.description || ''}`.toLowerCase();
-              const score = skillWords.reduce((acc, w) => acc + (hay.includes(w) ? 1 : 0), 0);
-              return { j, score };
-            }).sort((a, b) => b.score - a.score);
+            if (skillsText) {
+              const skillWords = skillsText
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean);
+              const scored = all
+                .map((j) => {
+                  const hay = `${j.title || ""} ${
+                    j.description || ""
+                  }`.toLowerCase();
+                  const score = skillWords.reduce(
+                    (acc, w) => acc + (hay.includes(w) ? 1 : 0),
+                    0
+                  );
+                  return { j, score };
+                })
+                .sort((a, b) => b.score - a.score);
 
-            rec = scored.slice(0, 2).map(x => x.j);
-          }
+              rec = scored.slice(0, 2).map((x) => x.j);
+            }
 
-          if (!rec.length) {
-            recommendedList.innerHTML = `
+            if (!rec.length) {
+              recommendedList.innerHTML = `
             <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3 text-[11px] text-slate-300">
               No recommendations yet.
             </div>
           `;
-            return;
-          }
+              return;
+            }
 
-          recommendedList.innerHTML = rec.map(job => {
-            const title = escapeHtml(job.title || 'Untitled role');
-            const location = escapeHtml(job.location || 'Location not specified');
+            recommendedList.innerHTML = rec
+              .map((job) => {
+                const title = escapeHtml(job.title || "Untitled role");
+                const location = escapeHtml(
+                  job.location || "Location not specified"
+                );
 
-            return `
+                return `
             <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
               <p class="text-[11px] uppercase tracking-wide text-emerald-400">
                 Recommended
@@ -870,24 +1091,23 @@
               </a>
             </article>
           `;
-          }).join('');
-        } catch {
-          // silent
+              })
+              .join("");
+          } catch {
+            // silent
+          }
         }
-      }
 
-      // =========================
-      // Run
-      // =========================
-      loadMyApplications();
-      loadSavedKPI();
-      loadUpcomingInterviewsCount();
-    });
-  </script>
+        // =========================
+        // Run
+        // =========================
+        loadMyApplications();
+        loadSavedKPI();
+        loadUpcomingInterviewsCount();
+      });
+    </script>
 
-  <script src="js/toast.js"></script>
-  <script type="module" src="js/auth.js"></script>
-
-</body>
-
+    <script src="js/toast.js"></script>
+    <script type="module" src="js/auth.js"></script>
+  </body>
 </html>

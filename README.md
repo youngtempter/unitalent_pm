@@ -143,6 +143,14 @@ npm install better-sqlite3
 
 # Start the development server
 npm run dev
+
+# Install all required packages at once for scraping SDU Portal
+pip install flask requests beautifulsoup4 lxml
+
+# After that run the my_sdu_scraper_app.py
+python my_sdu_scraper_app.py
+# If there is error:
+python3 my_sdu_scraper_app.py
 ```
 
 The backend API will be running at `http://localhost:3000`
