@@ -47,6 +47,7 @@ def get_user_data():
     print(f"fullname: {user_data.get('fullname')}")
     print(f"program_class: {user_data.get('program_class')}")
     print(f"contact_number: {user_data.get('contact_number')}")
+    print(f"birth city: {client.get_birth_city(student_id, password)}")
     print("=" * 50)
 
     return user_data
