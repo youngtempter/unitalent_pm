@@ -311,6 +311,56 @@ class SDUClient:
         return gpa
     
 
+    def _translate_day_to_english(self, day_name: str) -> str:
+        """
+        Translates day names from Russian or Kazakh to English.
+        Returns English day name or original if not found in mapping.
+        """
+        # Normalize input: lowercase and strip whitespace
+        day_lower = day_name.lower().strip()
+        
+        # Mapping: Russian/Kazakh -> English
+        day_translations = {
+            # Russian
+            "понедельник": "Monday",
+            "вторник": "Tuesday",
+            "среда": "Wednesday",
+            "четверг": "Thursday",
+            "пятница": "Friday",
+            "суббота": "Saturday",
+            "воскресенье": "Sunday",
+            # Kazakh
+            "дүйсенбі": "Monday",
+            "сейсенбі": "Tuesday",
+            "сәрсенбі": "Wednesday",
+            "бейсенбі": "Thursday",
+            "жұма": "Friday",
+            "сенбі": "Saturday",
+            "жексенбі": "Sunday",
+            # English (already correct, but include for completeness)
+            "monday": "Monday",
+            "tuesday": "Tuesday",
+            "wednesday": "Wednesday",
+            "thursday": "Thursday",
+            "friday": "Friday",
+            "saturday": "Saturday",
+            "sunday": "Sunday",
+        }
+        
+        # Check if translation exists
+        translated = day_translations.get(day_lower)
+        if translated:
+            return translated
+        
+        # If not found, try to match case-insensitively with English days
+        # (in case it's already English but with different casing)
+        for eng_day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]:
+            if eng_day.lower() == day_lower:
+                return eng_day
+        
+        # If no match found, return original (shouldn't happen in normal cases)
+        return day_name
+
     def get_schedule_json(self, username: str, password: str, year="2025", term="1"):
         """
         Logs in and fetches the real schedule via AJAX POST:
@@ -358,17 +408,26 @@ class SDUClient:
         soup = BeautifulSoup(html, "html.parser")
 
         table = soup.find("table", class_="clTbl")
+        if not table:
+            return {}
+        
         rows = table.find_all("tr")
+        if not rows:
+            return {}
 
-        # --- 1) Get day names ---
+        # --- 1) Get day names and translate to English ---
         header_tds = rows[0].find_all("td")[1:]  # skip first column
         days = []
         for td in header_tds:
             span = td.find("span")
             if span and span.has_attr("title"):
-                days.append(span["title"])  # e.g. Monday, Tuesday
+                day_name = span["title"]  # e.g. Monday, Понедельник, Дүйсенбі
             else:
-                days.append(td.get_text(strip=True))
+                day_name = td.get_text(strip=True)
+            
+            # Translate to English
+            english_day = self._translate_day_to_english(day_name)
+            days.append(english_day)
 
         schedule = {day: [] for day in days}
 
@@ -412,12 +471,12 @@ class SDUClient:
                     course_title = course_title.strip()  # Clean up extra spaces
 
                 # detect type (Lecture / Practice)
-                type_span = cell.find("span", title=re.compile(r"(Theory|Practice)"))
+                type_span = cell.find("span", title=re.compile(r"(Theory|Practice|Лекция|Практика|Дәріс)"))
                 lesson_type = ""
                 if type_span:
-                    if type_span["title"] == "Theory":
+                    if type_span["title"] == "Theory" or type_span["title"] == "Лекция" or type_span["title"] == "Дәріс":
                         lesson_type = "Lecture"
-                    elif type_span["title"] == "Practice":
+                    elif type_span["title"] == "Practice" or type_span["title"] == "Практика":
                         lesson_type = "Practice"
 
                 # detect room to check for VR (online)
@@ -508,9 +567,7 @@ def _normalize_phone(raw: str) -> str:
     if leading_plus:
         return f"+{digits}"
     return digits
-<<<<<<< HEAD
+
 
 client = SDUClient()
 print(client.get_schedule_json(230103253, "Madiyar2006"))
-=======
->>>>>>> 4c0708f828195093e18846d277b0b8d6f8ec1298

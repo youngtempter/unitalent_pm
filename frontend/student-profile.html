@@ -642,111 +642,6 @@
 
     <!-- Script -->
     <script>
-      /* Replace this schedule with your actual JSON or fetch from backend */
-      const schedule = {
-        Monday: [
-          {
-            time: "08:30-09:20",
-            course_code: "MDE 162",
-            course_title: "Law",
-            credit: "[3cr / 5ECTS]",
-            type: "Lecture",
-          },
-          {
-            time: "09:30-10:20",
-            course_code: "MDE 162",
-            course_title: "Law",
-            credit: "[3cr / 5ECTS]",
-            type: "Lecture",
-          },
-          {
-            time: "11:30-12:20",
-            course_code: "INF 317",
-            course_title: "Python for data analysis",
-            credit: "[3cr / 5ECTS]",
-            type: "Lecture",
-          },
-          {
-            time: "12:30-13:20",
-            course_code: "INF 317",
-            course_title: "Python for data analysis",
-            credit: "[3cr / 5ECTS]",
-            type: "Lecture",
-          },
-          {
-            time: "17:30-18:20",
-            course_code: "CSS 280",
-            course_title: "Industrial practice 1",
-            credit: "[1cr / 2ECTS]",
-            type: "Online",
-          },
-        ],
-        Tuesday: [
-          {
-            time: "12:30-13:20",
-            course_code: "MDE 162",
-            course_title: "Law",
-            credit: "[3cr / 5ECTS]",
-            type: "Practice",
-          },
-        ],
-        Wednesday: [],
-        Thursday: [
-          {
-            time: "08:30-09:20",
-            course_code: "INF 316",
-            course_title: "Web front",
-            credit: "[3cr / 5ECTS]",
-            type: "Lecture",
-          },
-          {
-            time: "09:30-10:20",
-            course_code: "INF 316",
-            course_title: "Web front",
-            credit: "[3cr / 5ECTS]",
-            type: "Lecture",
-          },
-          {
-            time: "11:30-12:20",
-            course_code: "INF 317",
-            course_title: "Python for data analysis",
-            credit: "[3cr / 5ECTS]",
-            type: "Practice",
-          },
-        ],
-        Friday: [
-          {
-            time: "08:30-09:20",
-            course_code: "INF 451",
-            course_title: "Project management information system",
-            credit: "[3cr / 5ECTS]",
-            type: "Lecture",
-          },
-          {
-            time: "09:30-10:20",
-            course_code: "INF 316",
-            course_title: "Web front",
-            credit: "[3cr / 5ECTS]",
-            type: "Practice",
-          },
-          {
-            time: "13:30-14:20",
-            course_code: "INF 451",
-            course_title: "Project management information system",
-            credit: "[3cr / 5ECTS]",
-            type: "Practice",
-          },
-          {
-            time: "14:30-15:20",
-            course_code: "INF 451",
-            course_title: "Project management information system",
-            credit: "[3cr / 5ECTS]",
-            type: "Practice",
-          },
-        ],
-        Saturday: [],
-      };
-
       /* define the time slots that should appear in the left column (match your image) */
       const timeSlots = [
         "08:30-09:20",
@@ -787,73 +682,90 @@
         return "bg-slate-800 text-slate-200";
       }
 
-      /* build quick lookup: scheduleLookup[day][time] -> event */
-      const scheduleLookup = {};
-      for (const d of days) {
-        scheduleLookup[d] = {};
-        (schedule[d] || []).forEach((ev) => {
-          scheduleLookup[d][ev.time] = ev;
-        });
-      }
-
-      /* render table */
-      const tbody = document.getElementById("timetable-body");
-      timeSlots.forEach((slot) => {
-        const tr = document.createElement("tr");
-        // left column: time label
-        const th = document.createElement("th");
-        th.className =
-          "py-3 pr-2 align-middle text-center text-slate-300 font-normal";
-        th.style.width = "8rem";
-        th.textContent = slot;
-        tr.appendChild(th);
-
-        // days columns
-        for (const d of days) {
-          const td = document.createElement("td");
-          td.className =
-            "border-b border-slate-800/60 px-2 py-3 align-middle text-center";
-          // check if we have an event for this day+slot
-          const ev = scheduleLookup[d] && scheduleLookup[d][slot];
-          if (ev) {
-            // build small card
-            const card = document.createElement("div");
-            card.className =
-              "rounded-2xl p-2 text-[12px] " + typeColorClass(ev.type);
-            // top line: code + small badge
-            const top = document.createElement("div");
-            top.className = "flex items-center justify-between gap-2";
-            const code = document.createElement("div");
-            code.className = "font-semibold text-[12px]";
-            code.textContent = ev.course_code;
-            const badge = document.createElement("div");
-            badge.className = "text-[11px] px-2 py-0.5 rounded-full";
-            badge.textContent = ev.type;
-            top.appendChild(code);
-            top.appendChild(badge);
-            card.appendChild(top);
-            // title
-            const title = document.createElement("div");
-            title.className = "mt-1 text-[11px] text-slate-200 text-center";
-            title.textContent = ev.course_title;
-            card.appendChild(title);
-            // credit
-            if (ev.credit) {
-              const credit = document.createElement("div");
-              credit.className =
-                "mt-0.5 text-[10px] text-slate-300/80 text-center";
-              credit.textContent = ev.credit;
-              card.appendChild(credit);
-            }
-            td.appendChild(card);
-          } else {
-            td.innerHTML = '<div class="h-8"></div>';
+      /* render schedule table */
+      function renderSchedule(schedule) {
+        if (!schedule || typeof schedule !== "object") {
+          // Empty schedule - render empty table
+          const tbody = document.getElementById("timetable-body");
+          if (tbody) {
+            tbody.innerHTML =
+              '<tr><td colspan="7" class="text-center text-slate-400 py-8">No schedule available. Sync from SDU portal to view your schedule.</td></tr>';
           }
-          tr.appendChild(td);
+          return;
         }
 
-        tbody.appendChild(tr);
-      });
+        /* build quick lookup: scheduleLookup[day][time] -> event */
+        const scheduleLookup = {};
+        for (const d of days) {
+          scheduleLookup[d] = {};
+          (schedule[d] || []).forEach((ev) => {
+            scheduleLookup[d][ev.time] = ev;
+          });
+        }
+
+        /* render table */
+        const tbody = document.getElementById("timetable-body");
+        if (!tbody) return;
+
+        tbody.innerHTML = ""; // Clear existing content
+
+        timeSlots.forEach((slot) => {
+          const tr = document.createElement("tr");
+          // left column: time label
+          const th = document.createElement("th");
+          th.className =
+            "py-3 pr-2 align-middle text-center text-slate-300 font-normal";
+          th.style.width = "8rem";
+          th.textContent = slot;
+          tr.appendChild(th);
+
+          // days columns
+          for (const d of days) {
+            const td = document.createElement("td");
+            td.className =
+              "border-b border-slate-800/60 px-2 py-3 align-middle text-center";
+            // check if we have an event for this day+slot
+            const ev = scheduleLookup[d] && scheduleLookup[d][slot];
+            if (ev) {
+              // build small card
+              const card = document.createElement("div");
+              card.className =
+                "rounded-2xl p-2 text-[12px] " + typeColorClass(ev.type);
+              // top line: code + small badge
+              const top = document.createElement("div");
+              top.className = "flex items-center justify-between gap-2";
+              const code = document.createElement("div");
+              code.className = "font-semibold text-[12px]";
+              code.textContent = ev.course_code;
+              const badge = document.createElement("div");
+              badge.className = "text-[11px] px-2 py-0.5 rounded-full";
+              badge.textContent = ev.type;
+              top.appendChild(code);
+              top.appendChild(badge);
+              card.appendChild(top);
+              // title
+              const title = document.createElement("div");
+              title.className = "mt-1 text-[11px] text-slate-200 text-center";
+              title.textContent = ev.course_title;
+              card.appendChild(title);
+              // credit
+              if (ev.credit) {
+                const credit = document.createElement("div");
+                credit.className =
+                  "mt-0.5 text-[10px] text-slate-300/80 text-center";
+                credit.textContent = ev.credit;
+                card.appendChild(credit);
+              }
+              td.appendChild(card);
+            } else {
+              td.innerHTML = '<div class="h-8"></div>';
+            }
+            tr.appendChild(td);
+          }
+
+          tbody.appendChild(tr);
+        });
+      }
 
       document.addEventListener("DOMContentLoaded", () => {
         const API = "http://localhost:3000";
@@ -1092,12 +1004,26 @@
             setLocalProfile(merged);
             fillForm(merged);
 
+            // Render schedule if available
+            if (data.scheduleJson) {
+              renderSchedule(data.scheduleJson);
+            } else {
+              renderSchedule(null);
+            }
+
             if (statusEl) statusEl.textContent = "Profile loaded.";
           } catch (e) {
             console.warn(e);
             if (statusEl)
               statusEl.textContent =
                 "Using local profile (backend not available).";
+            // Try to render schedule from local profile
+            const local = getLocalProfile() || {};
+            if (local.scheduleJson) {
+              renderSchedule(local.scheduleJson);
+            } else {
+              renderSchedule(null);
+            }
           }
         }
 
@@ -1329,6 +1255,9 @@
         // Init
         setNavName(getLocalProfile());
         loadProfile();
+
+        // Initial render with empty schedule (will be updated when profile loads)
+        renderSchedule(null);
       });
     </script>
 

@@ -223,6 +223,142 @@
         }
 
         // -------------------------
+        // Schedule rendering
+        // -------------------------
+        const timeSlots = [
+          "08:30-09:20",
+          "09:30-10:20",
+          "10:30-11:20",
+          "11:30-12:20",
+          "12:30-13:20",
+          "13:30-14:20",
+          "14:30-15:20",
+          "15:30-16:20",
+          "16:30-17:20",
+          "17:30-18:20",
+          "18:30-19:20",
+          "19:30-20:20",
+          "20:30-21:20",
+          "21:30-22:20",
+        ];
+
+        const days = [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+
+        function typeColorClass(type) {
+          if (!type) return "bg-slate-800 text-slate-200";
+          type = type.toLowerCase();
+          if (type.includes("lecture"))
+            return "bg-indigo-600/20 ring-1 ring-indigo-400 text-indigo-200";
+          if (type.includes("practice"))
+            return "bg-emerald-600/20 ring-1 ring-emerald-400 text-emerald-200";
+          if (type.includes("online"))
+            return "bg-violet-600/20 ring-1 ring-violet-400 text-violet-200";
+          return "bg-slate-800 text-slate-200";
+        }
+
+        function renderSchedule(schedule, container) {
+          if (!container) return;
+
+          if (!schedule || typeof schedule !== "object") {
+            container.innerHTML = `
+              <div class="text-center text-slate-400 py-4">
+                No schedule available.
+              </div>
+            `;
+            return;
+          }
+
+          // Build lookup table
+          const scheduleLookup = {};
+          for (const d of days) {
+            scheduleLookup[d] = {};
+            (schedule[d] || []).forEach((ev) => {
+              scheduleLookup[d][ev.time] = ev;
+            });
+          }
+
+          // Create table
+          let tableHTML = `
+            <div class="overflow-auto">
+              <table class="w-full table-fixed text-xs">
+                <thead>
+                  <tr>
+                    <th class="w-32 pr-2 text-center text-slate-300">Day / Time</th>
+                    <th class="px-2 py-1 text-center align-middle text-slate-300">Mon</th>
+                    <th class="px-2 py-1 text-center align-middle text-slate-300">Tue</th>
+                    <th class="px-2 py-1 text-center align-middle text-slate-300">Wed</th>
+                    <th class="px-2 py-1 text-center align-middle text-slate-300">Thu</th>
+                    <th class="px-2 py-1 text-center align-middle text-slate-300">Fri</th>
+                    <th class="px-2 py-1 text-center align-middle text-slate-300">Sat</th>
+                  </tr>
+                </thead>
+                <tbody class="align-top">
+          `;
+
+          timeSlots.forEach((slot) => {
+            tableHTML += "<tr>";
+            // Time column
+            tableHTML += `<th class="py-3 pr-2 align-middle text-center text-slate-300 font-normal" style="width: 8rem;">${escapeHtml(
+              slot
+            )}</th>`;
+
+            // Day columns
+            for (const d of days) {
+              const ev = scheduleLookup[d] && scheduleLookup[d][slot];
+              tableHTML +=
+                '<td class="border-b border-slate-800/60 px-2 py-3 align-middle text-center">';
+
+              if (ev) {
+                const colorClass = typeColorClass(ev.type);
+                tableHTML += `
+                  <div class="rounded-2xl p-2 text-[12px] ${colorClass}">
+                    <div class="flex items-center justify-between gap-2">
+                      <div class="font-semibold text-[12px]">${escapeHtml(
+                        ev.course_code
+                      )}</div>
+                      <div class="text-[11px] px-2 py-0.5 rounded-full">${escapeHtml(
+                        ev.type
+                      )}</div>
+                    </div>
+                    <div class="mt-1 text-[11px] text-slate-200 text-center">${escapeHtml(
+                      ev.course_title
+                    )}</div>
+                    ${
+                      ev.credit
+                        ? `<div class="mt-0.5 text-[10px] text-slate-300/80 text-center">${escapeHtml(
+                            ev.credit
+                          )}</div>`
+                        : ""
+                    }
+                  </div>
+                `;
+              } else {
+                tableHTML += '<div class="h-8"></div>';
+              }
+
+              tableHTML += "</td>";
+            }
+
+            tableHTML += "</tr>";
+          });
+
+          tableHTML += `
+                </tbody>
+              </table>
+            </div>
+          `;
+
+          container.innerHTML = tableHTML;
+        }
+
+        // -------------------------
         // Auth guard
         // -------------------------
         const auth = requireEmployerPage();
@@ -263,9 +399,37 @@
         try {
           setStatus("Loading student profile...");
 
-          const res = await fetch(`${API}/api/students/${studentId}`, {
-            headers: { Authorization: "Bearer " + token },
-          });
+          console.log("Fetching student profile for ID:", studentId);
+          console.log("API URL:", `${API}/api/students/${studentId}`);
+          console.log("Token present:", !!token);
+
+          // Add timeout to fetch
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+          let res;
+          try {
+            res = await fetch(`${API}/api/students/${studentId}`, {
+              headers: { Authorization: "Bearer " + token },
+              signal: controller.signal,
+            });
+            clearTimeout(timeoutId);
+          } catch (fetchError) {
+            clearTimeout(timeoutId);
+            if (fetchError.name === "AbortError") {
+              console.error("Fetch timeout - request took too long");
+              throw new Error(
+                "Request timed out. The backend server might be slow or unresponsive."
+              );
+            }
+            console.error("Fetch error:", fetchError);
+            throw new Error(
+              `Network error: ${fetchError.message}. Make sure the backend server is running at ${API}.`
+            );
+          }
+
+          console.log("Response status:", res.status);
+          console.log("Response ok:", res.ok);
 
           if (res.status === 401) {
             localStorage.removeItem("unitalent_token");
@@ -276,11 +440,25 @@
             return;
           }
 
-          const data = await res.json().catch(() => ({}));
+          let data;
+          try {
+            const text = await res.text();
+            console.log("Response text:", text.substring(0, 200));
+            data = text ? JSON.parse(text) : {};
+          } catch (parseError) {
+            console.error("JSON parse error:", parseError);
+            throw new Error(
+              "Invalid response from server. Please check the backend logs."
+            );
+          }
 
           if (!res.ok) {
-            throw new Error(data?.message || "Failed to load student profile");
+            throw new Error(
+              data?.message || `Server error: ${res.status} ${res.statusText}`
+            );
           }
+
+          console.log("Student data received:", data);
 
           const student = data;
 
@@ -414,18 +592,53 @@
                   }
                 </div>
               </div>
+
+              <!-- Weekly Schedule -->
+              <div>
+                <h3 class="text-sm font-semibold text-slate-200 mb-3">Weekly Schedule</h3>
+                <div id="schedule-container" class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                  <div class="text-center text-slate-400 py-4">
+                    Loading schedule...
+                  </div>
+                </div>
+              </div>
             </div>
           `;
           }
 
+          // Render schedule if available
+          if (student.scheduleJson) {
+            renderSchedule(
+              student.scheduleJson,
+              document.getElementById("schedule-container")
+            );
+          } else {
+            const scheduleContainer =
+              document.getElementById("schedule-container");
+            if (scheduleContainer) {
+              scheduleContainer.innerHTML = `
+                <div class="text-center text-slate-400 py-4">
+                  No schedule available. Student hasn't synced their schedule from SDU portal.
+                </div>
+              `;
+            }
+          }
+
           setStatus("Profile loaded successfully");
         } catch (err) {
-          console.error(err);
+          console.error("Error loading student profile:", err);
+          console.error("Error stack:", err.stack);
           setStatus(err.message || "Failed to load profile", true);
           if (profileContent) {
             profileContent.innerHTML = `
-            <div class="text-center text-rose-300">
-              ${escapeHtml(err.message || "Failed to load student profile")}
+            <div class="space-y-4">
+              <div class="text-center text-rose-300">
+                <p class="font-semibold">Failed to load student profile</p>
+                <p class="mt-2 text-sm">${escapeHtml(
+                  err.message || "Unknown error occurred"
+                )}</p>
+                <p class="mt-4 text-xs text-slate-500">Check the browser console for more details.</p>
+              </div>
             </div>
           `;
           }

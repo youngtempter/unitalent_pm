@@ -39,6 +39,7 @@ router.get("/me", auth, requireRole("STUDENT"), async (req, res) => {
         github: true,
         linkedin: true,
         portfolio: true,
+        scheduleJson: true,
 
         createdAt: true,
       },
@@ -114,6 +115,7 @@ router.put("/me", auth, requireRole("STUDENT"), async (req, res) => {
         github: true,
         linkedin: true,
         portfolio: true,
+        scheduleJson: true,
 
         createdAt: true,
       },
@@ -160,6 +162,7 @@ router.get("/:id", auth, requireRole("EMPLOYER", "ADMIN"), async (req, res) => {
         github: true,
         linkedin: true,
         portfolio: true,
+        scheduleJson: true,
         createdAt: true,
       },
     });
@@ -240,6 +243,7 @@ router.get("/", auth, requireRole("EMPLOYER", "ADMIN"), async (req, res) => {
         github: true,
         linkedin: true,
         portfolio: true,
+        scheduleJson: true,
         createdAt: true,
       },
       orderBy: { createdAt: "desc" },
@@ -249,6 +253,81 @@ router.get("/", auth, requireRole("EMPLOYER", "ADMIN"), async (req, res) => {
     res.json(students);
   } catch (e) {
     res.status(500).json({ message: "Failed to search students", error: e.message });
+  }
+});
+
+/**
+ * POST /api/students/me/sync-schedule
+ * Sync schedule from SDU portal (requires SDU credentials)
+ */
+router.post("/me/sync-schedule", auth, requireRole("STUDENT"), async (req, res) => {
+  try {
+    const { studentId, password } = req.body;
+
+    if (!studentId || !password) {
+      return res.status(400).json({ message: "Student ID and password are required" });
+    }
+
+    // Call Python scraper to get schedule from SDU portal
+    const SDU_SCRAPER_URL = process.env.SDU_SCRAPER_URL || "http://localhost:5000";
+    
+    let sduData;
+    try {
+      const formData = new URLSearchParams();
+      formData.append("student_id", studentId);
+      formData.append("password", password);
+
+      const scraperResponse = await fetch(`${SDU_SCRAPER_URL}/get-user-data`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+      });
+
+      if (!scraperResponse.ok) {
+        if (scraperResponse.status === 401 || scraperResponse.status === 502) {
+          return res.status(401).json({ message: "Invalid SDU credentials or portal unavailable" });
+        }
+        throw new Error(`SDU scraper returned ${scraperResponse.status}`);
+      }
+
+      sduData = await scraperResponse.json();
+    } catch (e) {
+      console.error("Error calling SDU scraper:", e);
+      return res.status(502).json({ 
+        message: "Failed to connect to SDU portal. Please try again later." 
+      });
+    }
+
+    // Extract schedule JSON from SDU data
+    const scheduleJson = sduData?.schedule || null;
+
+    if (!scheduleJson) {
+      return res.status(404).json({ message: "No schedule data found in SDU portal" });
+    }
+
+    // Update user's schedule
+    const updated = await prisma.user.update({
+      where: { id: req.user.id },
+      data: {
+        scheduleJson: scheduleJson,
+      },
+      select: {
+        scheduleJson: true,
+      },
+    });
+
+    res.json({ 
+      message: "Schedule synced successfully",
+      scheduleJson: updated.scheduleJson 
+    });
+  } catch (e) {
+    console.error("Schedule sync error:", e);
+    res.status(500).json({ 
+      message: "Failed to sync schedule", 
+      error: e.message 
+    });
   }
 });
 

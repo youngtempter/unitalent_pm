@@ -44,6 +44,9 @@ model User {
   // Profile picture
   avatarUrl   String?
 
+  // Schedule JSON from SDU portal
+  scheduleJson Json?
+
   employerJobs        Job[]         @relation("EmployerJobs")
   applications        Application[] @relation("StudentApplications")
   invitationsSent     Invitation[]  @relation("InvitesSent")
