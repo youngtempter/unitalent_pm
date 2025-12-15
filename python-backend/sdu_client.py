@@ -288,6 +288,18 @@ class SDUClient:
                 # course title
                 details_span = cell.find("span", attrs={"name": "details"})
                 course_title = details_span.get_text(" ", strip=True) if details_span else ""
+                
+                # Extract credit information: [3cr / 5ECTS] pattern
+                credit = ""
+                if course_title:
+                    credit_match = re.search(r'\[([^\]]+)\]', course_title)
+                    if credit_match:
+                        credit = credit_match.group(0)  # Keep the brackets: [3cr / 5ECTS]
+                    
+                    # Remove credit information: (1+2+0) and [3cr / 5ECTS] patterns
+                    course_title = re.sub(r'\([^)]+\)', '', course_title)  # Remove parentheses content
+                    course_title = re.sub(r'\[[^\]]+\]', '', course_title)  # Remove brackets content
+                    course_title = course_title.strip()  # Clean up extra spaces
 
                 # detect type (Lecture / Practice)
                 type_span = cell.find("span", title=re.compile(r"(Theory|Practice)"))
@@ -314,6 +326,7 @@ class SDUClient:
                     "time": time_range,
                     "course_code": course_code,
                     "course_title": course_title,
+                    "credit": credit,
                     "type": lesson_type
                 })
 
@@ -386,3 +399,5 @@ def _normalize_phone(raw: str) -> str:
         return f"+{digits}"
     return digits
 
+client = SDUClient()
+print(client.get_schedule_json(230103253, "Madiyar2006"))

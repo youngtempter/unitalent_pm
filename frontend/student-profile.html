@@ -416,6 +416,54 @@
         </form>
       </section>
 
+      <!-- Schedule card (paste under the profile form card) -->
+      <section
+        class="mt-4 rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl shadow-slate-900/70"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-semibold text-slate-50">Weekly schedule</h2>
+            <p class="mt-1 text-[11px] text-slate-400">
+              Shows your lessons for the current term.
+            </p>
+          </div>
+          <div class="text-xs text-slate-400">
+            Format: time · code · title · type
+          </div>
+        </div>
+
+        <div class="mt-4 overflow-auto">
+          <table id="timetable" class="w-full table-fixed text-xs">
+            <thead>
+              <tr>
+                <th class="w-32 pr-2 text-center text-slate-300">Day / Time</th>
+                <th class="px-2 py-1 text-center align-middle text-slate-300">
+                  Mon
+                </th>
+                <th class="px-2 py-1 text-center align-middle text-slate-300">
+                  Tue
+                </th>
+                <th class="px-2 py-1 text-center align-middle text-slate-300">
+                  Wed
+                </th>
+                <th class="px-2 py-1 text-center align-middle text-slate-300">
+                  Thu
+                </th>
+                <th class="px-2 py-1 text-center align-middle text-slate-300">
+                  Fri
+                </th>
+                <th class="px-2 py-1 text-center align-middle text-slate-300">
+                  Sat
+                </th>
+              </tr>
+            </thead>
+            <tbody id="timetable-body" class="align-top">
+              <!-- JS will populate rows -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <!-- Change Credentials Section (Separate from profile form) -->
       <section
         class="mt-6 rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl shadow-slate-900/70"
@@ -594,6 +642,219 @@
 
     <!-- Script -->
     <script>
+      /* Replace this schedule with your actual JSON or fetch from backend */
+      const schedule = {
+        Monday: [
+          {
+            time: "08:30-09:20",
+            course_code: "MDE 162",
+            course_title: "Law",
+            credit: "[3cr / 5ECTS]",
+            type: "Lecture",
+          },
+          {
+            time: "09:30-10:20",
+            course_code: "MDE 162",
+            course_title: "Law",
+            credit: "[3cr / 5ECTS]",
+            type: "Lecture",
+          },
+          {
+            time: "11:30-12:20",
+            course_code: "INF 317",
+            course_title: "Python for data analysis",
+            credit: "[3cr / 5ECTS]",
+            type: "Lecture",
+          },
+          {
+            time: "12:30-13:20",
+            course_code: "INF 317",
+            course_title: "Python for data analysis",
+            credit: "[3cr / 5ECTS]",
+            type: "Lecture",
+          },
+          {
+            time: "17:30-18:20",
+            course_code: "CSS 280",
+            course_title: "Industrial practice 1",
+            credit: "[1cr / 2ECTS]",
+            type: "Online",
+          },
+        ],
+        Tuesday: [
+          {
+            time: "12:30-13:20",
+            course_code: "MDE 162",
+            course_title: "Law",
+            credit: "[3cr / 5ECTS]",
+            type: "Practice",
+          },
+        ],
+        Wednesday: [],
+        Thursday: [
+          {
+            time: "08:30-09:20",
+            course_code: "INF 316",
+            course_title: "Web front",
+            credit: "[3cr / 5ECTS]",
+            type: "Lecture",
+          },
+          {
+            time: "09:30-10:20",
+            course_code: "INF 316",
+            course_title: "Web front",
+            credit: "[3cr / 5ECTS]",
+            type: "Lecture",
+          },
+          {
+            time: "11:30-12:20",
+            course_code: "INF 317",
+            course_title: "Python for data analysis",
+            credit: "[3cr / 5ECTS]",
+            type: "Practice",
+          },
+        ],
+        Friday: [
+          {
+            time: "08:30-09:20",
+            course_code: "INF 451",
+            course_title: "Project management information system",
+            credit: "[3cr / 5ECTS]",
+            type: "Lecture",
+          },
+          {
+            time: "09:30-10:20",
+            course_code: "INF 316",
+            course_title: "Web front",
+            credit: "[3cr / 5ECTS]",
+            type: "Practice",
+          },
+          {
+            time: "13:30-14:20",
+            course_code: "INF 451",
+            course_title: "Project management information system",
+            credit: "[3cr / 5ECTS]",
+            type: "Practice",
+          },
+          {
+            time: "14:30-15:20",
+            course_code: "INF 451",
+            course_title: "Project management information system",
+            credit: "[3cr / 5ECTS]",
+            type: "Practice",
+          },
+        ],
+        Saturday: [],
+      };
+
+      /* define the time slots that should appear in the left column (match your image) */
+      const timeSlots = [
+        "08:30-09:20",
+        "09:30-10:20",
+        "10:30-11:20",
+        "11:30-12:20",
+        "12:30-13:20",
+        "13:30-14:20",
+        "14:30-15:20",
+        "15:30-16:20",
+        "16:30-17:20",
+        "17:30-18:20",
+        "18:30-19:20",
+        "19:30-20:20",
+        "20:30-21:20",
+        "21:30-22:20",
+      ];
+
+      const days = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+
+      function typeColorClass(type) {
+        // map lesson type -> small color accent
+        if (!type) return "bg-slate-800 text-slate-200";
+        type = type.toLowerCase();
+        if (type.includes("lecture"))
+          return "bg-indigo-600/20 ring-1 ring-indigo-400 text-indigo-200";
+        if (type.includes("practice"))
+          return "bg-emerald-600/20 ring-1 ring-emerald-400 text-emerald-200";
+        if (type.includes("online"))
+          return "bg-violet-600/20 ring-1 ring-violet-400 text-violet-200";
+        return "bg-slate-800 text-slate-200";
+      }
+
+      /* build quick lookup: scheduleLookup[day][time] -> event */
+      const scheduleLookup = {};
+      for (const d of days) {
+        scheduleLookup[d] = {};
+        (schedule[d] || []).forEach((ev) => {
+          scheduleLookup[d][ev.time] = ev;
+        });
+      }
+
+      /* render table */
+      const tbody = document.getElementById("timetable-body");
+      timeSlots.forEach((slot) => {
+        const tr = document.createElement("tr");
+        // left column: time label
+        const th = document.createElement("th");
+        th.className =
+          "py-3 pr-2 align-middle text-center text-slate-300 font-normal";
+        th.style.width = "8rem";
+        th.textContent = slot;
+        tr.appendChild(th);
+
+        // days columns
+        for (const d of days) {
+          const td = document.createElement("td");
+          td.className =
+            "border-b border-slate-800/60 px-2 py-3 align-middle text-center";
+          // check if we have an event for this day+slot
+          const ev = scheduleLookup[d] && scheduleLookup[d][slot];
+          if (ev) {
+            // build small card
+            const card = document.createElement("div");
+            card.className =
+              "rounded-2xl p-2 text-[12px] " + typeColorClass(ev.type);
+            // top line: code + small badge
+            const top = document.createElement("div");
+            top.className = "flex items-center justify-between gap-2";
+            const code = document.createElement("div");
+            code.className = "font-semibold text-[12px]";
+            code.textContent = ev.course_code;
+            const badge = document.createElement("div");
+            badge.className = "text-[11px] px-2 py-0.5 rounded-full";
+            badge.textContent = ev.type;
+            top.appendChild(code);
+            top.appendChild(badge);
+            card.appendChild(top);
+            // title
+            const title = document.createElement("div");
+            title.className = "mt-1 text-[11px] text-slate-200 text-center";
+            title.textContent = ev.course_title;
+            card.appendChild(title);
+            // credit
+            if (ev.credit) {
+              const credit = document.createElement("div");
+              credit.className =
+                "mt-0.5 text-[10px] text-slate-300/80 text-center";
+              credit.textContent = ev.credit;
+              card.appendChild(credit);
+            }
+            td.appendChild(card);
+          } else {
+            td.innerHTML = '<div class="h-8"></div>';
+          }
+          tr.appendChild(td);
+        }
+
+        tbody.appendChild(tr);
+      });
+
       document.addEventListener("DOMContentLoaded", () => {
         const API = "http://localhost:3000";
 
