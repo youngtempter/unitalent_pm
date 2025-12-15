@@ -168,6 +168,115 @@ class SDUClient:
 
         # nothing found
         return None
+    
+    def _debug_addresses_response(resp):
+        text = resp.text or ""
+        print("STATUS:", resp.status_code)
+        print("FINAL URL:", resp.url)
+        print("HAS 'Place of Birth':", "Place of Birth" in text)
+        print("HAS addr_type=4:", 'name="addr_type" value="4"' in text or "addr_type\" value=\"4" in text)
+        print("FIRST 300 CHARS:\n", text[:300])
+
+    
+    def get_birth_city(self, username: str, password: str, debug: bool = False) -> str | None:
+        """
+        Fetches AJAX Addresses and returns Place of Birth:
+        - City if present
+        - otherwise Province
+        """
+        import time, json
+        from bs4 import BeautifulSoup
+
+        if not self.login(username, password):
+            return None
+
+        url = f"{BASE_URL}/index.php"
+        payload = {
+            "ajx": "1",
+            "mod": "profile",
+            "action": "Addresses",
+            str(int(time.time() * 1000)): ""
+        }
+
+        headers = {
+            "User-Agent": "Mozilla/5.0 (SDUProjectBot)",
+            "Referer": f"{BASE_URL}/index.php?mod=profile",
+            "X-Requested-With": "XMLHttpRequest",
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "Accept": "application/json, text/plain, */*",
+            "Origin": BASE_URL,
+        }
+
+        resp = self.session.post(url, data=payload, headers=headers, timeout=15)
+        resp.raise_for_status()
+
+        raw = (resp.text or "").strip()
+
+        # ✅ IMPORTANT: extract HTML from JSON response
+        html = raw
+        if raw.startswith("{") and '"DATA"' in raw:
+            try:
+                obj = json.loads(raw)
+                html = obj.get("DATA", "") or ""
+            except Exception:
+                pass
+
+        if debug:
+            print("STATUS:", resp.status_code)
+            print("FINAL URL:", resp.url)
+            print("RAW starts with:", raw[:20])
+            print("HTML has Place of Birth:", "Place of Birth" in html)
+            print("HTML has addr_type=4:", 'name="addr_type" value="4"' in html)
+
+            with open("addresses_debug.html", "w", encoding="utf-8") as f:
+                f.write(html)
+            print("Saved parsed HTML to addresses_debug.html")
+
+        soup = BeautifulSoup(html, "html.parser")
+
+        def _t(s: str) -> str:
+            return (s or "").replace("\xa0", " ").strip()
+
+        # Find Place of Birth form by hidden input addr_type=4
+        pob_form = None
+        for form in soup.find_all("form"):
+            inp = form.find("input", attrs={"name": "addr_type"})
+            if inp and _t(inp.get("value", "")) == "4":
+                pob_form = form
+                break
+
+        # fallback: find by heading if needed
+        if not pob_form:
+            heading = soup.find(lambda tag: tag and "Place of Birth" in tag.get_text(" ", strip=True))
+            if heading:
+                pob_form = heading.find_next("form")
+
+        if not pob_form:
+            return None
+
+        pob_table = pob_form.find("table")
+        if not pob_table:
+            return None
+
+        # Parse fields from table: label/value pairs across the row
+        fields: dict[str, str] = {}
+        for row in pob_table.find_all("tr"):
+            tds = row.find_all("td")
+            i = 0
+            while i < len(tds) - 1:
+                label = _t(tds[i].get_text(" ", strip=True)).rstrip(":").lower()
+                value = _t(tds[i + 1].get_text(" ", strip=True))
+                if label:
+                    fields[label] = value
+                i += 2
+
+        city = fields.get("city", "")
+        if city:
+            return city
+
+        province = fields.get("province", "")
+        return province if province else None
+
 
 
     def get_grand_gpa(self, username: str, password: str):
@@ -200,6 +309,7 @@ class SDUClient:
         gpa = text.split(":")[-1].strip()
 
         return gpa
+    
 
     def get_schedule_json(self, username: str, password: str, year="2025", term="1"):
         """
@@ -398,6 +508,9 @@ def _normalize_phone(raw: str) -> str:
     if leading_plus:
         return f"+{digits}"
     return digits
+<<<<<<< HEAD
 
 client = SDUClient()
 print(client.get_schedule_json(230103253, "Madiyar2006"))
+=======
+>>>>>>> 4c0708f828195093e18846d277b0b8d6f8ec1298

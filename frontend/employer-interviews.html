@@ -43,6 +43,7 @@
 
       <div class="hidden items-center gap-6 text-sm font-medium text-slate-200 md:flex">
         <a href="jobs.html" class="hover:text-indigo-300">Jobs</a>
+        <a href="employer-browse-students.html" class="hover:text-indigo-300">Students</a>
         <a href="employer-dashboard.html" class="hover:text-indigo-300">Dashboard</a>
         <a href="employer-interviews.html" class="text-indigo-300">Interviews</a>
       </div>
@@ -206,7 +207,16 @@
         try {
           const d = new Date(iso);
           if (Number.isNaN(d.getTime())) return null;
-          return d.toLocaleString();
+          // Format as: "Dec 15, 2024 at 2:30 PM"
+          const options = { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric', 
+            hour: 'numeric', 
+            minute: '2-digit',
+            hour12: true
+          };
+          return d.toLocaleString('en-US', options);
         } catch {
           return null;
         }
