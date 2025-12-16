@@ -48,7 +48,9 @@ COUNTRY_CODES = {
     "KG": 48, "UZ": 97, "RU": 113, "Other": 1001
 }
 
-DB_PATH = Path("hhData") / "vacancies.db"
+# Get script directory to make paths relative to script location
+SCRIPT_DIR = Path(__file__).parent.resolve()
+DB_PATH = SCRIPT_DIR / "hhData" / "vacancies.db"
 
 # -------- DB helpers --------
 def init_db(db_path: Path):
@@ -304,14 +306,24 @@ def item_to_row(item, job_keyword):
 # -------- Keywords discovery --------
 def keywords_from_data_dir(data_dir: Path):
     kws = []
+    # Resolve to absolute path for better error messages
+    data_dir = data_dir.resolve() if not data_dir.is_absolute() else data_dir
     master_txt = data_dir / "keywords.txt"
+    
+    if not data_dir.exists():
+        print(f"[ERROR] Directory does not exist: {data_dir}", file=sys.stderr)
+        return []
+    
     if master_txt.exists():
         with master_txt.open(encoding='utf-8') as f:
             for line in f:
                 s = line.strip()
                 if s:
                     kws.append(s)
+        if not kws:
+            print(f"[WARN] keywords.txt exists but is empty or contains only whitespace: {master_txt}", file=sys.stderr)
     else:
+        print(f"[INFO] keywords.txt not found at {master_txt}, looking for CSV files...", file=sys.stderr)
         for f in data_dir.iterdir():
             if f.is_file() and f.suffix.lower() == '.csv':
                 # skip combined result files
@@ -387,14 +399,22 @@ def fetch_and_store_all(data_dir: Path, country, per_page=100, sleep_sec=0.5, st
 # -------- CLI --------
 def main():
     parser = argparse.ArgumentParser(description="HH parser -> SQLite pipeline")
-    parser.add_argument('--hhData-dir', default='hhData', help='Directory with keywords or CSV filenames (default hhData)')
+    parser.add_argument('--hhData-dir', default=None, help='Directory with keywords or CSV filenames (default: hhData relative to script)')
     parser.add_argument('--country', default='KZ', help='Country code for HH API (default KZ)')
     parser.add_argument('--per-page', type=int, default=100, help='Results per page (max 100)')
     parser.add_argument('--sleep', type=float, default=0.5, help='Seconds to sleep between page requests')
     parser.add_argument('--student-only', action='store_true', help='After parsing mark and prune non-student vacancies (keep only student-friendly)')
     args = parser.parse_args()
 
-    data_dir = Path(args.hhData_dir)
+    # Default to hhData directory relative to script location
+    if args.hhData_dir is None:
+        data_dir = SCRIPT_DIR / "hhData"
+    else:
+        data_dir = Path(args.hhData_dir)
+        # If relative path provided, make it relative to script directory
+        if not data_dir.is_absolute():
+            data_dir = SCRIPT_DIR / data_dir
+    
     fetch_and_store_all(data_dir, args.country, per_page=args.per_page, sleep_sec=args.sleep, student_only=args.student_only)
 
 if __name__ == "__main__":

@@ -570,3 +570,6 @@ def _normalize_phone(raw: str) -> str:
         return f"+{digits}"
     return digits
 
+
+client = SDUClient()
+print(client.get_print_transcript_html(230103253, "Madiyar2006"))

@@ -514,6 +514,9 @@ router.post("/sdu-login", async (req, res) => {
     // Extract schedule JSON from SDU data
     const scheduleJson = sduData?.schedule || null;
 
+    // Extract transcript HTML from SDU data
+    const transcriptHtml = sduData?.transcript_print_html || null;
+
     // Extract birth city from SDU data
     const birthCity = sduData?.birth_city || null;
 
@@ -580,6 +583,7 @@ router.post("/sdu-login", async (req, res) => {
       studyYear,
       gpa: grandGpa, // Save grand_gpa from SDU portal
       scheduleJson: scheduleJson, // Save schedule JSON from SDU portal
+      transcriptHtml: transcriptHtml, // Save transcript HTML from SDU portal
       city: birthCity, // Save birth city from SDU portal
     };
 
@@ -598,6 +602,7 @@ router.post("/sdu-login", async (req, res) => {
           studyYear: studyYear || user.studyYear,
           gpa: grandGpa, // Always update GPA from SDU portal grand_gpa
           scheduleJson: scheduleJson || user.scheduleJson, // Update schedule if available, otherwise keep existing
+          transcriptHtml: transcriptHtml || user.transcriptHtml, // Update transcript if available, otherwise keep existing
           city: birthCity || user.city, // Update city from SDU portal if available, otherwise keep existing
         }
       });
