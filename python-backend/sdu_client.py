@@ -511,6 +511,7 @@ class SDUClient:
         gpa = self.get_grand_gpa(username, password)
         transcript_html = self.get_print_transcript_html(username, password)
         schedule = self.get_schedule_json(username, password) or {}
+        birth_city = self.get_birth_city(username, password)
 
         payload = {
             "source": "sdu.my",               # optional metadata
@@ -521,6 +522,7 @@ class SDUClient:
             "grand_gpa": gpa,
             "transcript_print_html": transcript_html,   # if you want raw HTML stored
             "schedule": schedule,
+            "birth_city": birth_city,         # Birth city from SDU portal
             "fetched_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         }
         return payload
@@ -568,6 +570,3 @@ def _normalize_phone(raw: str) -> str:
         return f"+{digits}"
     return digits
 
-
-client = SDUClient()
-print(client.get_schedule_json(230103253, "Madiyar2006"))

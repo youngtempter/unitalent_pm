@@ -514,6 +514,9 @@ router.post("/sdu-login", async (req, res) => {
     // Extract schedule JSON from SDU data
     const scheduleJson = sduData?.schedule || null;
 
+    // Extract birth city from SDU data
+    const birthCity = sduData?.birth_city || null;
+
     // Parse fullname into firstName and lastName
     const nameParts = fullname.trim().split(/\s+/);
     const firstName = nameParts[0] || null;
@@ -577,12 +580,13 @@ router.post("/sdu-login", async (req, res) => {
       studyYear,
       gpa: grandGpa, // Save grand_gpa from SDU portal
       scheduleJson: scheduleJson, // Save schedule JSON from SDU portal
+      city: birthCity, // Save birth city from SDU portal
     };
 
     // Create or update user
     if (user) {
       // Update existing user with latest SDU data
-      // Always update GPA and schedule from SDU portal when logging in via SDU
+      // Always update GPA, schedule, and city from SDU portal when logging in via SDU
       user = await prisma.user.update({
         where: { id: user.id },
         data: {
@@ -594,6 +598,7 @@ router.post("/sdu-login", async (req, res) => {
           studyYear: studyYear || user.studyYear,
           gpa: grandGpa, // Always update GPA from SDU portal grand_gpa
           scheduleJson: scheduleJson || user.scheduleJson, // Update schedule if available, otherwise keep existing
+          city: birthCity || user.city, // Update city from SDU portal if available, otherwise keep existing
         }
       });
     } else {
