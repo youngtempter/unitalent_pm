@@ -167,7 +167,38 @@ router.post("/employer/register", async (req, res) => {
 
     return res.status(201).json(buildAuthResponse(user));
   } catch (e) {
-    return res.status(500).json({ message: "Employer register error", error: e.message });
+    console.error("Employer register error:", e);
+    console.error("Error details:", {
+      name: e.name,
+      code: e.code,
+      message: e.message,
+      meta: e.meta
+    });
+    
+    // Handle Prisma-specific errors
+    if (e.code === 'P2002') {
+      const field = e.meta?.target?.[0] || "field";
+      return res.status(409).json({ 
+        message: `${field} already exists`,
+        field: field
+      });
+    }
+    
+    if (e.code === 'P2025') {
+      return res.status(404).json({ message: "Database record not found." });
+    }
+    
+    if (e.message && e.message.includes('Unknown model')) {
+      return res.status(500).json({ 
+        message: "Database configuration error. Please run: npx prisma generate" 
+      });
+    }
+    
+    return res.status(500).json({ 
+      message: "Employer register error", 
+      error: process.env.NODE_ENV === 'development' ? e.message : undefined,
+      code: e.code || undefined
+    });
   }
 });
 
