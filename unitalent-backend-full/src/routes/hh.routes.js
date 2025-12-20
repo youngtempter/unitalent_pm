@@ -7,10 +7,6 @@ import fs from "fs";
 const router = Router();
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
-// Resolve DB path:
-// 1) HH_SQLITE_PATH env
-// 2) ../python-backend/hhData/vacancies.db relative to cwd (when running from unitalent-backend-full)
-// 3) ../../python-backend/hhData/vacancies.db relative to this file (fallback)
 const candidates = [
   process.env.HH_SQLITE_PATH,
   path.resolve(process.cwd(), "../python-backend/hhData/vacancies.db"),
@@ -25,7 +21,6 @@ if (!dbPath) {
   );
 }
 
-// Single shared connection (read-only workload)
 const db = new Database(dbPath, { readonly: true, fileMustExist: true });
 
 router.get("/hh-jobs", (req, res) => {
@@ -38,7 +33,6 @@ router.get("/hh-jobs", (req, res) => {
     const where = [];
     const params = [];
 
-    // Only student-friendly rows
     where.push("student_friendly = 1");
 
     if (q) {
@@ -49,7 +43,6 @@ router.get("/hh-jobs", (req, res) => {
       const cityInputRaw = String(city).trim();
       const cityInput = cityInputRaw.toLocaleLowerCase("ru-RU");
 
-      // Simple transliteration/alias map so English inputs still match Cyrillic DB values
       const cityAliases = {
         almaty: ["алматы"],
         almaata: ["алматы"], // common typo
@@ -81,7 +74,6 @@ router.get("/hh-jobs", (req, res) => {
 
       const variants = new Set([cityInput]);
       cityAliases[cityInput]?.forEach((v) => variants.add(v));
-      // Also try capitalized variants because SQLite lower() is ASCII-only (fails for Cyrillic)
       const capitalize = (s) =>
         s ? s.charAt(0).toLocaleUpperCase("ru-RU") + s.slice(1) : s;
       Array.from([...variants]).forEach((v) => variants.add(capitalize(v)));

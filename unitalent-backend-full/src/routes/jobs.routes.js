@@ -4,11 +4,6 @@ import { auth, requireRole } from "../middleware/auth.js";
 
 const router = Router();
 
-// ----------------------
-// GET /api/jobs
-// Public list of jobs with search/filter support
-// Query params: q, location, type, workMode, minSalary, maxSalary, sortBy
-// ----------------------
 router.get("/", async (req, res) => {
   try {
     const { q, location, type, workMode, minSalary, maxSalary, sortBy } = req.query;
@@ -16,13 +11,11 @@ router.get("/", async (req, res) => {
     const where = {};
     const now = new Date();
 
-    // Exclude expired jobs
     where.OR = [
       { expiresAt: null },
       { expiresAt: { gt: now } }
     ];
 
-    // Keyword search across title and description
     if (q) {
       const searchTerm = q.trim();
       where.AND = where.AND || [];
@@ -48,16 +41,9 @@ router.get("/", async (req, res) => {
 
     if (workMode) {
       where.AND = where.AND || [];
-      where.AND.push({ workMode: workMode.trim() });
+      where.AND.push({ workMode: workMode.trim()       });
     }
 
-    // Salary filtering - basic string contains check
-    if (minSalary || maxSalary) {
-      // Since salary is stored as string, we do contains check
-      // This is a basic implementation - can be enhanced with numeric parsing
-    }
-
-    // Determine sort order
     let orderBy = { createdAt: "desc" };
     if (sortBy === "recent") {
       orderBy = { createdAt: "desc" };
@@ -82,10 +68,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ----------------------
-// POST /api/jobs
-// Create job (EMPLOYER)
-// ----------------------
 router.post("/", auth, requireRole("EMPLOYER"), async (req, res) => {
   const { title, description, location, salary, type, workMode, requirements, expiresAt, applicationDeadline } = req.body;
 
@@ -96,7 +78,6 @@ router.post("/", auth, requireRole("EMPLOYER"), async (req, res) => {
   }
 
   try {
-    // Parse dates if provided
     let expiresAtDate = null;
     if (expiresAt) {
       expiresAtDate = new Date(expiresAt);
@@ -135,10 +116,6 @@ router.post("/", auth, requireRole("EMPLOYER"), async (req, res) => {
   }
 });
 
-// ----------------------
-// GET /api/jobs/my
-// Employer's own jobs
-// ----------------------
 router.get("/my", auth, requireRole("EMPLOYER"), async (req, res) => {
   const jobs = await prisma.job.findMany({
     where: { employerId: req.user.id },
@@ -147,11 +124,6 @@ router.get("/my", auth, requireRole("EMPLOYER"), async (req, res) => {
   res.json(jobs);
 });
 
-// ----------------------
-// GET /api/jobs/:id
-// Load single job (public endpoint, increments view count)
-// For editing, use GET /api/jobs/:id/edit (EMPLOYER only)
-// ----------------------
 router.get("/:id", async (req, res) => {
   const id = Number(req.params.id);
   if (!id) return res.status(400).json({ message: "Invalid job id" });
@@ -168,7 +140,6 @@ router.get("/:id", async (req, res) => {
 
     if (!job) return res.status(404).json({ message: "Job not found" });
 
-    // Increment view count for public views
     await prisma.job.update({
       where: { id },
       data: { views: { increment: 1 } }
@@ -182,10 +153,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// ----------------------
-// GET /api/jobs/:id/edit
-// Load single job for editing (EMPLOYER only)
-// ----------------------
 router.get("/:id/edit", auth, requireRole("EMPLOYER"), async (req, res) => {
   const id = Number(req.params.id);
   if (!id) return res.status(400).json({ message: "Invalid job id" });
@@ -222,10 +189,6 @@ router.get("/:id/edit", auth, requireRole("EMPLOYER"), async (req, res) => {
   }
 });
 
-// ----------------------
-// PATCH /api/jobs/:id
-// Update job (EMPLOYER only)
-// ----------------------
 router.patch("/:id", auth, requireRole("EMPLOYER"), async (req, res) => {
   const id = Number(req.params.id);
   if (!id) return res.status(400).json({ message: "Invalid job id" });
@@ -245,7 +208,6 @@ router.patch("/:id", auth, requireRole("EMPLOYER"), async (req, res) => {
       return res.status(403).json({ message: "You can edit only your own jobs" });
     }
 
-    // Parse dates if provided
     const updateData = {
       title: title?.trim(),
       description: description?.trim(),
@@ -292,10 +254,6 @@ router.patch("/:id", auth, requireRole("EMPLOYER"), async (req, res) => {
   }
 });
 
-// ----------------------
-// 🚀 NEW: DELETE /api/jobs/:id
-// Delete job (EMPLOYER only)
-// ----------------------
 router.delete("/:id", auth, requireRole("EMPLOYER"), async (req, res) => {
   const id = Number(req.params.id);
   if (!id) return res.status(400).json({ message: "Invalid job id" });
@@ -316,7 +274,6 @@ router.delete("/:id", auth, requireRole("EMPLOYER"), async (req, res) => {
       });
     }
 
-    // Cascade deletion of applications if referential actions set in schema
     await prisma.job.delete({ where: { id } });
 
     return res.json({ message: "Job deleted successfully" });
@@ -326,10 +283,6 @@ router.delete("/:id", auth, requireRole("EMPLOYER"), async (req, res) => {
   }
 });
 
-// ----------------------
-// GET /api/jobs/:id/view
-// Increment view count (public endpoint)
-// ----------------------
 router.post("/:id/view", async (req, res) => {
   const id = Number(req.params.id);
   if (!id) return res.status(400).json({ message: "Invalid job id" });

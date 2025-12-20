@@ -4,11 +4,6 @@ import { auth, requireRole } from "../middleware/auth.js";
 
 const router = Router();
 
-/**
- * ✅ STUDENT applies to a job
- * POST /api/applications
- * body: { jobId }
- */
 router.post("/", auth, requireRole("STUDENT"), async (req, res) => {
   try {
     const jobId = Number(req.body.jobId);
@@ -22,7 +17,6 @@ router.post("/", auth, requireRole("STUDENT"), async (req, res) => {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    // Check if application deadline has passed
     if (job.applicationDeadline && new Date(job.applicationDeadline) < new Date()) {
       return res.status(400).json({ message: "Application deadline has passed for this job" });
     }
@@ -44,7 +38,6 @@ router.post("/", auth, requireRole("STUDENT"), async (req, res) => {
       }
     });
 
-    // Log initial status
     await prisma.applicationLog.create({
       data: {
         applicationId: app.id,
@@ -60,10 +53,6 @@ router.post("/", auth, requireRole("STUDENT"), async (req, res) => {
   }
 });
 
-/**
- * ✅ EMPLOYER reads applicants for a specific job
- * GET /api/applications?jobId=123
- */
 router.get("/", auth, requireRole("EMPLOYER"), async (req, res) => {
   try {
     const jobId = Number(req.query.jobId);
@@ -116,10 +105,6 @@ router.get("/", auth, requireRole("EMPLOYER"), async (req, res) => {
   }
 });
 
-/**
- * ✅ STUDENT: my applications
- * GET /api/applications/my
- */
 router.get("/my", auth, requireRole("STUDENT"), async (req, res) => {
   try {
     const apps = await prisma.application.findMany({
@@ -133,10 +118,6 @@ router.get("/my", auth, requireRole("STUDENT"), async (req, res) => {
   }
 });
 
-/**
- * ✅ EMPLOYER: all applications across my jobs
- * GET /api/applications/employer/my
- */
 router.get("/employer/my", auth, requireRole("EMPLOYER"), async (req, res) => {
   try {
     const apps = await prisma.application.findMany({
@@ -169,10 +150,6 @@ router.get("/employer/my", auth, requireRole("EMPLOYER"), async (req, res) => {
   }
 });
 
-/**
- * ✅ STUDENT withdraws application
- * DELETE /api/applications/:id
- */
 router.delete("/:id", auth, requireRole("STUDENT"), async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -194,7 +171,6 @@ router.delete("/:id", auth, requireRole("STUDENT"), async (req, res) => {
       return res.status(403).json({ message: "Forbidden: not your application" });
     }
 
-    // Only allow withdrawal for certain statuses
     const withdrawableStatuses = ["APPLIED", "IN_REVIEW"];
     if (!withdrawableStatuses.includes(app.status)) {
       return res.status(400).json({ 
@@ -202,7 +178,6 @@ router.delete("/:id", auth, requireRole("STUDENT"), async (req, res) => {
       });
     }
 
-    // Delete application (cascade will handle logs)
     await prisma.application.delete({
       where: { id }
     });
@@ -213,11 +188,6 @@ router.delete("/:id", auth, requireRole("STUDENT"), async (req, res) => {
   }
 });
 
-/**
- * ✅ EMPLOYER updates application status
- * PATCH /api/applications/:id
- * body: { status, interviewDate? }
- */
 router.patch("/:id", auth, requireRole("EMPLOYER"), async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -255,7 +225,6 @@ router.patch("/:id", auth, requireRole("EMPLOYER"), async (req, res) => {
       }
     });
 
-    // Log status change if it changed
     if (oldStatus !== newStatus) {
       await prisma.applicationLog.create({
         data: {
@@ -273,11 +242,6 @@ router.patch("/:id", auth, requireRole("EMPLOYER"), async (req, res) => {
   }
 });
 
-/**
- * ✅ EMPLOYER schedules an interview
- * PATCH /api/applications/:id/interview
- * body: { interviewDate }
- */
 router.patch("/:id/interview", auth, requireRole("EMPLOYER"), async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -300,7 +264,6 @@ router.patch("/:id/interview", auth, requireRole("EMPLOYER"), async (req, res) =
       return res.status(403).json({ message: "Forbidden: not your application" });
     }
 
-    // Validate interviewDate format
     const interviewDateObj = new Date(interviewDate);
     if (isNaN(interviewDateObj)) {
       return res.status(400).json({ message: "Invalid interview date" });
@@ -317,7 +280,6 @@ router.patch("/:id/interview", auth, requireRole("EMPLOYER"), async (req, res) =
       }
     });
 
-    // Log status change
     await prisma.applicationLog.create({
       data: {
         applicationId: id,
@@ -333,10 +295,6 @@ router.patch("/:id/interview", auth, requireRole("EMPLOYER"), async (req, res) =
   }
 });
 
-/**
- * ✅ STUDENT cancels interview
- * PATCH /api/applications/:id/interview/cancel
- */
 router.patch("/:id/interview/cancel", auth, requireRole("STUDENT"), async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -368,10 +326,6 @@ router.patch("/:id/interview/cancel", auth, requireRole("STUDENT"), async (req, 
   }
 });
 
-/**
- * ✅ EMPLOYER: Get all scheduled interviews
- * GET /api/applications/employer/interviews
- */
 router.get("/employer/interviews", auth, requireRole("EMPLOYER"), async (req, res) => {
   try {
     const interviews = await prisma.application.findMany({
@@ -412,10 +366,6 @@ router.get("/employer/interviews", auth, requireRole("EMPLOYER"), async (req, re
   }
 });
 
-/**
- * ✅ STUDENT: Get upcoming interviews count
- * GET /api/applications/my/interviews/upcoming/count
- */
 router.get("/my/interviews/upcoming/count", auth, requireRole("STUDENT"), async (req, res) => {
   try {
     const now = new Date();
@@ -432,10 +382,6 @@ router.get("/my/interviews/upcoming/count", auth, requireRole("STUDENT"), async 
   }
 });
 
-/**
- * ✅ EMPLOYER: Get upcoming interviews count
- * GET /api/applications/employer/interviews/upcoming/count
- */
 router.get("/employer/interviews/upcoming/count", auth, requireRole("EMPLOYER"), async (req, res) => {
   try {
     const now = new Date();
@@ -452,20 +398,14 @@ router.get("/employer/interviews/upcoming/count", auth, requireRole("EMPLOYER"),
   }
 });
 
-/**
- * ✅ EMPLOYER: Get hiring funnel stats
- * GET /api/applications/employer/funnel
- */
 router.get("/employer/funnel", auth, requireRole("EMPLOYER"), async (req, res) => {
   try {
     const whereBase = { job: { employerId: req.user.id } };
 
-    // Total applications received (all statuses)
     const applicationsReceived = await prisma.application.count({
       where: whereBase
     });
 
-    // In review: status = APPLIED OR IN_REVIEW
     const inReview = await prisma.application.count({
       where: {
         ...whereBase,
@@ -473,7 +413,6 @@ router.get("/employer/funnel", auth, requireRole("EMPLOYER"), async (req, res) =
       }
     });
 
-    // Interviews: status = INTERVIEW OR interviewDate IS NOT NULL
     const interviews = await prisma.application.count({
       where: {
         ...whereBase,
@@ -484,7 +423,6 @@ router.get("/employer/funnel", auth, requireRole("EMPLOYER"), async (req, res) =
       }
     });
 
-    // Offers made: status = OFFERED
     const offersMade = await prisma.application.count({
       where: {
         ...whereBase,
@@ -503,10 +441,6 @@ router.get("/employer/funnel", auth, requireRole("EMPLOYER"), async (req, res) =
   }
 });
 
-/**
- * ✅ EMPLOYER: Send offer to applicant
- * PATCH /api/applications/:id/offer
- */
 router.patch("/:id/offer", auth, requireRole("EMPLOYER"), async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -538,7 +472,6 @@ router.patch("/:id/offer", auth, requireRole("EMPLOYER"), async (req, res) => {
       }
     });
 
-    // Log status change
     await prisma.applicationLog.create({
       data: {
         applicationId: id,
@@ -554,16 +487,10 @@ router.patch("/:id/offer", auth, requireRole("EMPLOYER"), async (req, res) => {
   }
 });
 
-/**
- * ✅ EMPLOYER: Bulk update applications
- * PATCH /api/applications/bulk
- * body: { applicationIds: [1,2,3], status: "REJECTED" } or { ids: [1,2,3], status: "REJECTED" }
- */
 router.patch("/bulk", auth, requireRole("EMPLOYER"), async (req, res) => {
   try {
     const { applicationIds, ids, status } = req.body;
     
-    // Accept both applicationIds and ids for compatibility
     const idArray = applicationIds || ids;
 
     if (!Array.isArray(idArray) || idArray.length === 0) {
@@ -580,7 +507,6 @@ router.patch("/bulk", auth, requireRole("EMPLOYER"), async (req, res) => {
       return res.status(400).json({ message: "No applications selected" });
     }
 
-    // Verify all applications belong to this employer
     const apps = await prisma.application.findMany({
       where: {
         id: { in: validApplicationIds }
@@ -593,7 +519,6 @@ router.patch("/bulk", auth, requireRole("EMPLOYER"), async (req, res) => {
       return res.status(403).json({ message: "Some applications do not belong to you" });
     }
 
-    // Update all applications
     const updated = await prisma.application.updateMany({
       where: {
         id: { in: validApplicationIds }
@@ -603,7 +528,6 @@ router.patch("/bulk", auth, requireRole("EMPLOYER"), async (req, res) => {
       }
     });
 
-    // Log status changes for each application
     const logPromises = apps.map(app => {
       if (app.status !== status) {
         return prisma.applicationLog.create({
@@ -629,10 +553,6 @@ router.patch("/bulk", auth, requireRole("EMPLOYER"), async (req, res) => {
   }
 });
 
-/**
- * ✅ Get application status history
- * GET /api/applications/:id/logs
- */
 router.get("/:id/logs", auth, async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -650,7 +570,6 @@ router.get("/:id/logs", auth, async (req, res) => {
       return res.status(404).json({ message: "Application not found" });
     }
 
-    // Check permissions: student can see their own, employer can see their job's applications
     const isStudent = req.user.role === "STUDENT" && app.studentId === req.user.id;
     const isEmployer = req.user.role === "EMPLOYER" && app.job.employerId === req.user.id;
 

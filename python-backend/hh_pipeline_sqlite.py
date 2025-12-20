@@ -42,23 +42,19 @@ def get_almaty_tz():
 
 ALMATY_TZ = get_almaty_tz()
 
-# HH area codes mapping for the API (KZ => 40)
 COUNTRY_CODES = {
     "UA": 5, "AZ": 9, "BY": 16, "GE": 28, "KZ": 40,
     "KG": 48, "UZ": 97, "RU": 113, "Other": 1001
 }
 
-# Get script directory to make paths relative to script location
 SCRIPT_DIR = Path(__file__).parent.resolve()
 DB_PATH = SCRIPT_DIR / "hhData" / "vacancies.db"
 
-# -------- DB helpers --------
 def init_db(db_path: Path):
     db_path.parent.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(db_path)
     cur = con.cursor()
 
-    # Create table with UNIQUE constraint on url for dedupe
     cur.execute("""
     CREATE TABLE IF NOT EXISTS vacancies (
         id INTEGER PRIMARY KEY,
@@ -75,11 +71,10 @@ def init_db(db_path: Path):
         inserted_at TEXT
     );
     """)
-    # Indexes for common query fields
     cur.execute("CREATE INDEX IF NOT EXISTS idx_job_keyword ON vacancies(job_keyword);")
     cur.execute("CREATE INDEX IF NOT EXISTS idx_publish_date ON vacancies(publish_date);")
-    cur.execute("PRAGMA journal_mode=WAL;")      # better concurrency
-    cur.execute("PRAGMA synchronous=NORMAL;")   # performance tradeoff
+    cur.execute("PRAGMA journal_mode=WAL;")
+    cur.execute("PRAGMA synchronous=NORMAL;")
     con.commit()
     return con
 
@@ -90,7 +85,6 @@ def upsert_rows(conn: sqlite3.Connection, rows):
     Uses UPSERT (ON CONFLICT DO UPDATE). This requires SQLite >= 3.24.
     """
     cur = conn.cursor()
-    # We'll try UPSERT; if SQLite version is old and raises an OperationalError, fallback to insert-ignore + update
     try:
         cur.executemany("""
         INSERT INTO vacancies (url,title,employer,city,publish_date,salary,requirements,responsibilities,job_keyword,raw_json,inserted_at)
@@ -112,8 +106,6 @@ def upsert_rows(conn: sqlite3.Connection, rows):
             inserted_at=excluded.inserted_at
         """, rows)
     except sqlite3.OperationalError as e:
-        # Fallback path for older SQLite: INSERT OR IGNORE then UPDATE existing rows
-        # We'll do this per-row (slower) but compatible.
         conn.rollback()
         for r in rows:
             try:
@@ -121,7 +113,6 @@ def upsert_rows(conn: sqlite3.Connection, rows):
                     INSERT OR IGNORE INTO vacancies (url,title,employer,city,publish_date,salary,requirements,responsibilities,job_keyword,raw_json,inserted_at)
                     VALUES (?,?,?,?,?,?,?,?,?,?,?)
                 """, r)
-                # Update existing row with new hhData (could be redundant)
                 cur.execute("""
                     UPDATE vacancies SET
                         title = ?,
@@ -144,7 +135,6 @@ def upsert_rows(conn: sqlite3.Connection, rows):
                 print(f"[WARN] fallback upsert failed for {r[0]}: {ex}", file=sys.stderr)
     conn.commit()
 
-# -------- Student-friendly functions (NEW) --------
 def ensure_student_column(conn: sqlite3.Connection):
     """
     Add student_friendly INTEGER column if it doesn't exist (0/1).
@@ -169,33 +159,28 @@ def mark_student_friendly(conn: sqlite3.Connection):
     ensure_student_column(conn)
     cur = conn.cursor()
 
-    # Patterns to keep (case-insensitive)
     keep_phrases = [
         'no experience', 'no experience required', 'no experience needed',
         'for students', 'для студентов', 'intern', 'internship', 'trainee',
         'junior', 'junior developer', 'junior engineer', 'студент', 'стажировка',
-        'стажер', 'без опыта', 'стартап', 'startup', 'startups'
+        'стажер', 'без опыта',         'стартап', 'startup', 'startups'
     ]
 
-    # Phrases to exclude (senior, middle, lead etc.)
     exclude_phrases = [
         'senior', 'sr ', ' sr.', 'middle', 'mid-level', 'lead', 'principal',
-        'manager', 'head of', 'experienced', 'senior-level', 'сеньор', 'мидл'
+        'manager', 'head of', 'experienced', 'senior-level',         'сеньор', 'мидл'
     ]
 
-    # Build SQL conditions
     def build_like_clause(column_name, phrases):
-        # returns a SQL snippet like "(lower(column) LIKE ? OR lower(column) LIKE ? ...)"
         parts = []
         for _ in phrases:
             parts.append(f"lower({column_name}) LIKE ?")
         if not parts:
-            return "1=0", []   # impossible
+            return "1=0", []
         clause = "(" + " OR ".join(parts) + ")"
         params = [f"%{p.lower()}%" for p in phrases]
         return clause, params
 
-    # We'll set student_friendly=1 when ANY keep phrase is present in any of these columns
     keep_clauses = []
     keep_params = []
     for col in ('requirements','title','job_keyword','employer'):
@@ -204,14 +189,11 @@ def mark_student_friendly(conn: sqlite3.Connection):
         keep_params.extend(params)
     keep_sql = "(" + " OR ".join(keep_clauses) + ")"
 
-    # And ensure we don't mark as friendly when exclude phrases are present in title (strong signal)
     exclude_clause, exclude_params = build_like_clause('title', exclude_phrases)
 
-    # First: set all to 0
     cur.execute("UPDATE vacancies SET student_friendly = 0;")
     conn.commit()
 
-    # Now: mark those that match keep_sql AND NOT match exclude_clause
     update_sql = f"""
         UPDATE vacancies
         SET student_friendly = 1
@@ -221,11 +203,9 @@ def mark_student_friendly(conn: sqlite3.Connection):
     cur.execute(update_sql, params)
     conn.commit()
 
-    # For safety: also mark as friendly any rows where title/job_keyword includes 'junior' even if requirements empty
     cur.execute("UPDATE vacancies SET student_friendly = 1 WHERE (lower(title) LIKE ? OR lower(job_keyword) LIKE ?) ;", ('%junior%','%junior%'))
     conn.commit()
 
-    # Print counts for diagnostics
     cur.execute("SELECT COUNT(*) FROM vacancies;")
     total = cur.fetchone()[0]
     cur.execute("SELECT COUNT(*) FROM vacancies WHERE student_friendly = 1;")
@@ -306,7 +286,6 @@ def item_to_row(item, job_keyword):
 # -------- Keywords discovery --------
 def keywords_from_data_dir(data_dir: Path):
     kws = []
-    # Resolve to absolute path for better error messages
     data_dir = data_dir.resolve() if not data_dir.is_absolute() else data_dir
     master_txt = data_dir / "keywords.txt"
     
@@ -326,19 +305,16 @@ def keywords_from_data_dir(data_dir: Path):
         print(f"[INFO] keywords.txt not found at {master_txt}, looking for CSV files...", file=sys.stderr)
         for f in data_dir.iterdir():
             if f.is_file() and f.suffix.lower() == '.csv':
-                # skip combined result files
                 if f.stem.lower().startswith("results_"):
                     continue
                 kws.append(f.stem)
     return sorted(set(kws))
 
-# -------- Main pipeline --------
 def fetch_and_store_all(data_dir: Path, country, per_page=100, sleep_sec=0.5, student_only=False):
     if country not in COUNTRY_CODES:
         raise ValueError(f"Unknown country code {country}")
     country_code = COUNTRY_CODES[country]
 
-    # init DB
     con = init_db(DB_PATH)
 
     keywords = keywords_from_data_dir(data_dir)
@@ -362,12 +338,10 @@ def fetch_and_store_all(data_dir: Path, country, per_page=100, sleep_sec=0.5, st
             for it in items:
                 try:
                     row = item_to_row(it, kw)
-                    # skip if no url
                     if row[0]:
                         all_rows.append(row)
                 except Exception as e:
                     print(f"[WARN] Failed to process item for '{kw}': {e}", file=sys.stderr)
-            # pagination handling
             total_pages = data.get('pages')
             page += 1
             time.sleep(sleep_sec)
@@ -378,17 +352,14 @@ def fetch_and_store_all(data_dir: Path, country, per_page=100, sleep_sec=0.5, st
 
         if all_rows:
             try:
-                # batch insert/upsert in one transaction for speed
                 upsert_rows(con, all_rows)
                 print(f"[OK] Inserted/updated {len(all_rows)} rows for '{kw}'")
             except Exception as e:
                 print(f"[ERROR] DB upsert failed for '{kw}': {e}", file=sys.stderr)
 
-    # After inserting all keywords: mark student-friendly rows
     try:
         mark_student_friendly(con)
         if student_only:
-            # prune (delete) non-student rows
             prune_non_student_vacancies(con)
     except Exception as e:
         print(f"[WARN] Could not mark/prune student-friendly rows: {e}", file=sys.stderr)
@@ -396,7 +367,6 @@ def fetch_and_store_all(data_dir: Path, country, per_page=100, sleep_sec=0.5, st
     con.close()
     print("[DONE] All keywords processed. DB closed.")
 
-# -------- CLI --------
 def main():
     parser = argparse.ArgumentParser(description="HH parser -> SQLite pipeline")
     parser.add_argument('--hhData-dir', default=None, help='Directory with keywords or CSV filenames (default: hhData relative to script)')
@@ -406,12 +376,10 @@ def main():
     parser.add_argument('--student-only', action='store_true', help='After parsing mark and prune non-student vacancies (keep only student-friendly)')
     args = parser.parse_args()
 
-    # Default to hhData directory relative to script location
     if args.hhData_dir is None:
         data_dir = SCRIPT_DIR / "hhData"
     else:
         data_dir = Path(args.hhData_dir)
-        # If relative path provided, make it relative to script directory
         if not data_dir.is_absolute():
             data_dir = SCRIPT_DIR / data_dir
     

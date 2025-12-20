@@ -4,15 +4,6 @@ import { auth, requireRole } from "../middleware/auth.js";
 
 const router = Router();
 
-/**
- * POST /api/saved-jobs
- * body: { jobId }
- *
- * ✅ Idempotent save with upsert
- * ✅ Handles:
- *  - Already saved (no error)
- *  - Job not found (P2003)
- */
 router.post("/", auth, requireRole("STUDENT"), async (req, res) => {
   const jobId = Number(req.body.jobId);
 
@@ -37,7 +28,6 @@ router.post("/", auth, requireRole("STUDENT"), async (req, res) => {
 
     return res.status(201).json(saved);
   } catch (e) {
-    // Foreign key violation -> job doesn't exist
     if (e.code === "P2003") {
       return res.status(404).json({ message: "Job not found" });
     }
@@ -49,13 +39,6 @@ router.post("/", auth, requireRole("STUDENT"), async (req, res) => {
   }
 });
 
-/**
- * DELETE /api/saved-jobs/:jobId
- *
- * ✅ Removes saved job
- * ✅ Handles:
- *  - Not in saved list (P2025)
- */
 router.delete("/:jobId", auth, requireRole("STUDENT"), async (req, res) => {
   const jobId = Number(req.params.jobId);
 
@@ -75,7 +58,6 @@ router.delete("/:jobId", auth, requireRole("STUDENT"), async (req, res) => {
 
     return res.json({ message: "Removed from saved" });
   } catch (e) {
-    // Record not found
     if (e.code === "P2025") {
       return res.status(404).json({ message: "Not in saved list" });
     }
@@ -87,11 +69,6 @@ router.delete("/:jobId", auth, requireRole("STUDENT"), async (req, res) => {
   }
 });
 
-/**
- * GET /api/saved-jobs/my
- *
- * ✅ Returns saved jobs of current student
- */
 router.get("/my", auth, requireRole("STUDENT"), async (req, res) => {
   try {
     const list = await prisma.savedJob.findMany({

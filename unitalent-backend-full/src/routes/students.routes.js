@@ -26,8 +26,6 @@ router.get("/me", auth, requireRole("STUDENT"), async (req, res) => {
         username: true,
         firstName: true,
         lastName: true,
-
-        // ✅ your new fields
         phone: true,
         university: true,
         major: true,
@@ -123,7 +121,6 @@ router.put("/me", auth, requireRole("STUDENT"), async (req, res) => {
 
     res.json(updated);
   } catch (e) {
-    // ✅ handle unique conflict for username
     if (e.code === "P2002") {
       return res.status(409).json({ message: "Username already taken" });
     }
@@ -194,7 +191,6 @@ router.get("/", auth, requireRole("EMPLOYER", "ADMIN"), async (req, res) => {
       role: "STUDENT",
     };
 
-    // Keyword search across name, skills, major, university
     if (q) {
       const searchTerm = q.trim();
       where.OR = [
@@ -268,7 +264,6 @@ router.post("/me/sync-schedule", auth, requireRole("STUDENT"), async (req, res) 
       return res.status(400).json({ message: "Student ID and password are required" });
     }
 
-    // Call Python scraper to get schedule from SDU portal
     const SDU_SCRAPER_URL = process.env.SDU_SCRAPER_URL || "http://localhost:5000";
     
     let sduData;
@@ -300,22 +295,18 @@ router.post("/me/sync-schedule", auth, requireRole("STUDENT"), async (req, res) 
       });
     }
 
-    // Extract schedule JSON from SDU data
     const scheduleJson = sduData?.schedule || null;
-
-    // Extract transcript HTML from SDU data
     const transcriptHtml = sduData?.transcript_print_html || null;
 
     if (!scheduleJson) {
       return res.status(404).json({ message: "No schedule data found in SDU portal" });
     }
 
-    // Update user's schedule and transcript
     const updated = await prisma.user.update({
       where: { id: req.user.id },
       data: {
         scheduleJson: scheduleJson,
-        transcriptHtml: transcriptHtml || undefined, // Update transcript if available
+        transcriptHtml: transcriptHtml || undefined,
       },
       select: {
         scheduleJson: true,
@@ -358,7 +349,7 @@ router.get("/me/transcript", auth, requireRole("STUDENT"), async (req, res) => {
 
     res.json({ 
       transcriptHtml: user.transcriptHtml,
-      transcript_print_html: user.transcriptHtml // Alias for compatibility
+      transcript_print_html: user.transcriptHtml
     });
   } catch (e) {
     console.error("Transcript fetch error:", e);
@@ -380,7 +371,6 @@ router.get("/:id/transcript", auth, requireRole("EMPLOYER", "ADMIN"), async (req
       return res.status(400).json({ message: "Invalid student id" });
     }
 
-    // Get student with transcript
     const student = await prisma.user.findUnique({
       where: { id: studentId },
       select: {
@@ -404,7 +394,7 @@ router.get("/:id/transcript", auth, requireRole("EMPLOYER", "ADMIN"), async (req
 
     res.json({ 
       transcriptHtml: student.transcriptHtml,
-      transcript_print_html: student.transcriptHtml // Alias for compatibility
+      transcript_print_html: student.transcriptHtml
     });
   } catch (e) {
     console.error("Transcript fetch error:", e);

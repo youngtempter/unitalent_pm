@@ -1,10 +1,6 @@
-// js/auth.js
-// UniTalent - universal frontend auth + guards
-
 const AUTH_TOKEN = "unitalent_token";
 const AUTH_USER = "unitalent_user";
 
-// Optional convenience keys you used before
 const OPTIONAL_KEYS = [
   "unitalent_student_name",
   "unitalent_student_email",
@@ -16,9 +12,6 @@ const OPTIONAL_KEYS = [
   "unitalent_student_profile"
 ];
 
-// -------------------------
-// Storage helpers
-// -------------------------
 const storeGet = (key) =>
   localStorage.getItem(key) ?? sessionStorage.getItem(key);
 
@@ -27,9 +20,6 @@ const storeRemove = (key) => {
   sessionStorage.removeItem(key);
 };
 
-// -------------------------
-// Core auth
-// -------------------------
 export function readUniTalentAuth() {
   const token = storeGet(AUTH_TOKEN);
   const userRaw = storeGet(AUTH_USER);
@@ -59,9 +49,6 @@ export function redirectByRole(user) {
   return "index.html";
 }
 
-// -------------------------
-// Guards
-// -------------------------
 export function guardRole(requiredRole) {
   const { token, user, role } = readUniTalentAuth();
 
@@ -94,11 +81,6 @@ export function guardGuest() {
   return true;
 }
 
-// -------------------------
-// Navbar auth UI
-// Requires these IDs (if present):
-// authArea, loginBtn, signupBtn, dashboardBtn, logoutBtn
-// -------------------------
 export function setupNavbarAuthUI() {
   const authArea = document.getElementById("authArea");
   const loginBtn = document.getElementById("loginBtn");
@@ -140,9 +122,6 @@ export function setupNavbarAuthUI() {
   });
 }
 
-// -------------------------
-// Auto init (runs everywhere)
-// -------------------------
 function applyBodyGuard() {
   const guard = document.body?.dataset?.guard;
 

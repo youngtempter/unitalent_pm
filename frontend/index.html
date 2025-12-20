@@ -25,6 +25,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- Custom Animations CSS -->
+  <link rel="stylesheet" href="css/animations.css">
+
   <!-- Abstract background -->
   <style>
     body {
@@ -130,22 +133,53 @@
         </button>
       </div>
 
-      <!-- Mobile menu button (visual) -->
-      <button
-        class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
+      <!-- Mobile menu button -->
+      <button id="mobileMenuBtn" class="mobile-menu-btn inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 transition-all hover:border-indigo-400 hover:text-indigo-300 md:hidden">
         <span class="sr-only">Open menu</span>
-        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="h-5 w-5 transition-transform" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
     </nav>
   </header>
 
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="mobile-menu hidden flex-col gap-6 p-6 md:hidden">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2">
+        <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
+        <span class="text-base font-semibold text-slate-50">UniTalent</span>
+      </div>
+      <button class="mobile-menu-close text-slate-400 hover:text-slate-200 text-2xl">✕</button>
+    </div>
+    <nav class="flex flex-col gap-4">
+      <a href="#how" class="text-lg font-medium text-slate-200 hover:text-indigo-300 transition-colors">How it works</a>
+      <a href="jobs.html" class="text-lg font-medium text-slate-200 hover:text-indigo-300 transition-colors">Jobs</a>
+      <a href="student-login.html" class="text-lg font-medium text-slate-200 hover:text-indigo-300 transition-colors">For students</a>
+      <a href="employer-login.html" class="text-lg font-medium text-slate-200 hover:text-indigo-300 transition-colors">For employers</a>
+      <a href="#about" class="text-lg font-medium text-slate-200 hover:text-indigo-300 transition-colors">About</a>
+    </nav>
+    <div id="mobileAuthArea" class="hidden flex-col gap-4 mt-6 pt-6 border-t border-slate-800">
+      <a id="mobileLoginBtn" href="student-login.html" class="text-center rounded-full border border-slate-700 bg-slate-950/60 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:border-indigo-400 transition-all">
+        Log in
+      </a>
+      <a id="mobileSignupBtn" href="student-signup.html" class="text-center rounded-full bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-400 transition-all">
+        Sign up
+      </a>
+      <a id="mobileDashboardBtn" href="#" class="hidden text-center rounded-full bg-slate-950/70 px-4 py-2.5 text-sm font-semibold text-slate-50 ring-1 ring-slate-700 hover:bg-slate-900 hover:ring-indigo-400 transition-all">
+        Dashboard
+      </a>
+      <button id="mobileLogoutBtn" class="hidden rounded-full border border-slate-700 bg-slate-950/60 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:border-rose-400 hover:text-rose-200 transition-all">
+        Log out
+      </button>
+    </div>
+  </div>
+
   <main class="mx-auto max-w-6xl px-4 pb-16 pt-8 md:pt-12">
     <!-- HERO -->
     <section id="hero" class="grid gap-10 py-6 md:grid-cols-2 md:items-center md:py-12">
       <!-- Left -->
-      <div class="space-y-6">
+      <div class="space-y-6 fade-in-on-scroll">
         <div
           class="inline-flex items-center gap-2 rounded-full border border-indigo-500/40 bg-indigo-500/10 px-3 py-1 text-[11px] font-medium text-indigo-200">
           <span class="inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
@@ -164,12 +198,12 @@
 
         <div class="flex flex-wrap items-center gap-3">
           <a id="heroStudentBtn" href="student-login.html"
-            class="inline-flex items-center justify-center rounded-full bg-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400">
+            class="btn-animated inline-flex items-center justify-center rounded-full bg-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400">
             Get started as student
           </a>
 
           <a id="heroEmployerBtn" href="employer-login.html"
-            class="js-post-job-cta inline-flex items-center justify-center rounded-full border border-slate-600 bg-slate-950/70 px-5 py-2.5 text-sm font-semibold text-slate-100 hover:border-indigo-400 hover:text-indigo-200">
+            class="js-post-job-cta btn-animated inline-flex items-center justify-center rounded-full border border-slate-600 bg-slate-950/70 px-5 py-2.5 text-sm font-semibold text-slate-100 hover:border-indigo-400 hover:text-indigo-200">
             Post a role as employer
           </a>
         </div>
@@ -187,10 +221,10 @@
       </div>
 
       <!-- Right -->
-      <div class="relative">
-        <div class="absolute -top-10 -right-6 h-28 w-28 rounded-full bg-indigo-500/40 blur-3xl"></div>
+      <div class="relative fade-in-on-scroll fade-right">
+        <div class="absolute -top-10 -right-6 h-28 w-28 rounded-full bg-indigo-500/40 blur-3xl animate-pulse-custom"></div>
         <div
-          class="relative rounded-3xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-2xl shadow-slate-950/80 backdrop-blur">
+          class="relative rounded-3xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-2xl shadow-slate-950/80 backdrop-blur card-interactive">
           <div class="overflow-hidden rounded-2xl border border-slate-800/80">
             <img
               src="https://contentful.harrypotter.com/usf1vwtuqyxm/7oUyTOXuYlQzga0NLJmbuA/226f145030850ae961c63a340c5318e7/hp-f4-hermione-great-hall-smiling-book-web-landscape-16-x9.jpg"
@@ -252,7 +286,7 @@
       </div>
 
       <div class="grid gap-6 md:grid-cols-3">
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-950/60">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-950/60 card-interactive fade-in-on-scroll" style="animation-delay: 0.1s">
           <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500/20">
             <span class="text-lg">📄</span>
           </div>
@@ -262,7 +296,7 @@
           </p>
         </div>
 
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-950/60">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-950/60 card-interactive fade-in-on-scroll" style="animation-delay: 0.2s">
           <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/15">
             <span class="text-lg">🔍</span>
           </div>
@@ -272,7 +306,7 @@
           </p>
         </div>
 
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-950/60">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-950/60 card-interactive fade-in-on-scroll" style="animation-delay: 0.3s">
           <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500/20">
             <span class="text-lg">✅</span>
           </div>
@@ -623,10 +657,54 @@
       }
 
       const { token, user } = readUniTalentAuth();
-      if (token && user) setAuthedUI(user);
-      else setGuestUI();
+      if (token && user) {
+        setAuthedUI(user);
+        // Sync mobile menu auth
+        const mobileAuthArea = document.getElementById('mobileAuthArea');
+        const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+        const mobileSignupBtn = document.getElementById('mobileSignupBtn');
+        const mobileDashboardBtn = document.getElementById('mobileDashboardBtn');
+        const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+        
+        if (mobileAuthArea) {
+          mobileAuthArea.classList.remove('hidden');
+          mobileLoginBtn?.classList.add('hidden');
+          mobileSignupBtn?.classList.add('hidden');
+          mobileDashboardBtn?.classList.remove('hidden');
+          mobileLogoutBtn?.classList.remove('hidden');
+          
+          if (mobileDashboardBtn) {
+            mobileDashboardBtn.href = user.role === 'EMPLOYER' 
+              ? 'employer-dashboard.html' 
+              : 'student-dashboard.html';
+          }
+        }
+      } else {
+        setGuestUI();
+        // Sync mobile menu auth
+        const mobileAuthArea = document.getElementById('mobileAuthArea');
+        const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+        const mobileSignupBtn = document.getElementById('mobileSignupBtn');
+        const mobileDashboardBtn = document.getElementById('mobileDashboardBtn');
+        const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+        
+        if (mobileAuthArea) {
+          mobileAuthArea.classList.remove('hidden');
+          mobileLoginBtn?.classList.remove('hidden');
+          mobileSignupBtn?.classList.remove('hidden');
+          mobileDashboardBtn?.classList.add('hidden');
+          mobileLogoutBtn?.classList.add('hidden');
+        }
+      }
 
       logoutBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        clearAllAuth();
+        window.location.href = 'index.html';
+      });
+
+      // Mobile logout button
+      document.getElementById('mobileLogoutBtn')?.addEventListener('click', (e) => {
         e.preventDefault();
         clearAllAuth();
         window.location.href = 'index.html';
@@ -813,7 +891,22 @@
       loadFeaturedJobs();
     });
   </script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  
+  <!-- jQuery Interactions -->
+  <script src="js/interactions.js"></script>
+  
+  <!-- Auth Module -->
   <script type="module" src="js/auth.js"></script>
+
+  <!-- Back to Top Button -->
+  <a href="#" class="back-to-top">
+    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+    </svg>
+  </a>
 
 </body>
 

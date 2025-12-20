@@ -1,4 +1,3 @@
-// src/routes/employers.routes.js
 import { Router } from "express";
 import { prisma } from "../prisma.js";
 import { auth, requireRole } from "../middleware/auth.js";

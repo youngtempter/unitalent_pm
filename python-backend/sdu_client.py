@@ -1,4 +1,3 @@
-# backend/sdu_client.py
 import requests
 import re
 import time
@@ -166,18 +165,8 @@ class SDUClient:
             phone = phone_match.group(0).strip()
             return _normalize_phone(phone) if normalize else phone
 
-        # nothing found
         return None
-    
-    def _debug_addresses_response(resp):
-        text = resp.text or ""
-        print("STATUS:", resp.status_code)
-        print("FINAL URL:", resp.url)
-        print("HAS 'Place of Birth':", "Place of Birth" in text)
-        print("HAS addr_type=4:", 'name="addr_type" value="4"' in text or "addr_type\" value=\"4" in text)
-        print("FIRST 300 CHARS:\n", text[:300])
 
-    
     def get_birth_city(self, username: str, password: str, debug: bool = False) -> str | None:
         """
         Fetches AJAX Addresses and returns Place of Birth:
@@ -212,7 +201,6 @@ class SDUClient:
 
         raw = (resp.text or "").strip()
 
-        # ✅ IMPORTANT: extract HTML from JSON response
         html = raw
         if raw.startswith("{") and '"DATA"' in raw:
             try:
@@ -237,7 +225,6 @@ class SDUClient:
         def _t(s: str) -> str:
             return (s or "").replace("\xa0", " ").strip()
 
-        # Find Place of Birth form by hidden input addr_type=4
         pob_form = None
         for form in soup.find_all("form"):
             inp = form.find("input", attrs={"name": "addr_type"})
@@ -245,7 +232,6 @@ class SDUClient:
                 pob_form = form
                 break
 
-        # fallback: find by heading if needed
         if not pob_form:
             heading = soup.find(lambda tag: tag and "Place of Birth" in tag.get_text(" ", strip=True))
             if heading:
@@ -258,7 +244,6 @@ class SDUClient:
         if not pob_table:
             return None
 
-        # Parse fields from table: label/value pairs across the row
         fields: dict[str, str] = {}
         for row in pob_table.find_all("tr"):
             tds = row.find_all("td")
@@ -305,7 +290,6 @@ class SDUClient:
             return None
 
         text = td.get_text(" ", strip=True)
-        # "Grand GPA : 3.73" → "3.73"
         gpa = text.split(":")[-1].strip()
 
         return gpa
@@ -316,12 +300,9 @@ class SDUClient:
         Translates day names from Russian or Kazakh to English.
         Returns English day name or original if not found in mapping.
         """
-        # Normalize input: lowercase and strip whitespace
         day_lower = day_name.lower().strip()
         
-        # Mapping: Russian/Kazakh -> English
         day_translations = {
-            # Russian
             "понедельник": "Monday",
             "вторник": "Tuesday",
             "среда": "Wednesday",
@@ -329,7 +310,6 @@ class SDUClient:
             "пятница": "Friday",
             "суббота": "Saturday",
             "воскресенье": "Sunday",
-            # Kazakh
             "дүйсенбі": "Monday",
             "сейсенбі": "Tuesday",
             "сәрсенбі": "Wednesday",
@@ -337,7 +317,6 @@ class SDUClient:
             "жұма": "Friday",
             "сенбі": "Saturday",
             "жексенбі": "Sunday",
-            # English (already correct, but include for completeness)
             "monday": "Monday",
             "tuesday": "Tuesday",
             "wednesday": "Wednesday",
@@ -347,18 +326,14 @@ class SDUClient:
             "sunday": "Sunday",
         }
         
-        # Check if translation exists
         translated = day_translations.get(day_lower)
         if translated:
             return translated
         
-        # If not found, try to match case-insensitively with English days
-        # (in case it's already English but with different casing)
         for eng_day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]:
             if eng_day.lower() == day_lower:
                 return eng_day
         
-        # If no match found, return original (shouldn't happen in normal cases)
         return day_name
 
     def get_schedule_json(self, username: str, password: str, year="2025", term="1"):
@@ -401,10 +376,6 @@ class SDUClient:
         resp.raise_for_status()
 
         html = resp.text.strip()
-
-        # Usually this returns exactly the <div id="div_results"> container
-        # or at least the table HTML.
-
         soup = BeautifulSoup(html, "html.parser")
 
         table = soup.find("table", class_="clTbl")
@@ -415,8 +386,7 @@ class SDUClient:
         if not rows:
             return {}
 
-        # --- 1) Get day names and translate to English ---
-        header_tds = rows[0].find_all("td")[1:]  # skip first column
+        header_tds = rows[0].find_all("td")[1:]
         days = []
         for td in header_tds:
             span = td.find("span")
@@ -425,19 +395,16 @@ class SDUClient:
             else:
                 day_name = td.get_text(strip=True)
             
-            # Translate to English
             english_day = self._translate_day_to_english(day_name)
             days.append(english_day)
 
         schedule = {day: [] for day in days}
 
-        # --- 2) Parse schedule rows ---
         for row in rows[1:]:
             tds = row.find_all("td")
             if not tds:
                 continue
 
-            # Time column
             time_spans = tds[0].find_all("span")
             if len(time_spans) < 2:
                 continue
@@ -446,31 +413,26 @@ class SDUClient:
             end_time = time_spans[1].get_text(strip=True)
             time_range = f"{start_time}-{end_time}"
 
-            # Each day column
             for day_idx, cell in enumerate(tds[1:]):
                 a = cell.find("a")
                 if not a:
-                    continue  # empty cell
+                    continue
 
                 course_code = a.get_text(strip=True)
 
-                # course title
                 details_span = cell.find("span", attrs={"name": "details"})
                 course_title = details_span.get_text(" ", strip=True) if details_span else ""
                 
-                # Extract credit information: [3cr / 5ECTS] pattern
                 credit = ""
                 if course_title:
                     credit_match = re.search(r'\[([^\]]+)\]', course_title)
                     if credit_match:
-                        credit = credit_match.group(0)  # Keep the brackets: [3cr / 5ECTS]
+                        credit = credit_match.group(0)
                     
-                    # Remove credit information: (1+2+0) and [3cr / 5ECTS] patterns
-                    course_title = re.sub(r'\([^)]+\)', '', course_title)  # Remove parentheses content
-                    course_title = re.sub(r'\[[^\]]+\]', '', course_title)  # Remove brackets content
-                    course_title = course_title.strip()  # Clean up extra spaces
+                    course_title = re.sub(r'\([^)]+\)', '', course_title)
+                    course_title = re.sub(r'\[[^\]]+\]', '', course_title)
+                    course_title = course_title.strip()
 
-                # detect type (Lecture / Practice)
                 type_span = cell.find("span", title=re.compile(r"(Theory|Practice|Лекция|Практика|Дәріс)"))
                 lesson_type = ""
                 if type_span:
@@ -479,13 +441,12 @@ class SDUClient:
                     elif type_span["title"] == "Practice" or type_span["title"] == "Практика":
                         lesson_type = "Practice"
 
-                # detect room to check for VR (online)
                 room = ""
                 for span in cell.find_all("span"):
                     if span.get("name") == "details":
                         continue
                     text = span.get_text(strip=True)
-                    if re.match(r"[A-Z]{1,3}\s?\d{1,3}", text):  # D214, G102, VR 21 ...
+                    if re.match(r"[A-Z]{1,3}\s?\d{1,3}", text):
                         room = text
 
                 if room.startswith("VR"):
@@ -514,15 +475,15 @@ class SDUClient:
         birth_city = self.get_birth_city(username, password)
 
         payload = {
-            "source": "sdu.my",               # optional metadata
+            "source": "sdu.my",
             "source_user": username,
             "fullname": profile.get("fullname"),
             "program_class": profile.get("program_class"),
             "contact_number": contact,
             "grand_gpa": gpa,
-            "transcript_print_html": transcript_html,   # if you want raw HTML stored
+            "transcript_print_html": transcript_html,
             "schedule": schedule,
-            "birth_city": birth_city,         # Birth city from SDU portal
+            "birth_city": birth_city,
             "fetched_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         }
         return payload
@@ -542,12 +503,9 @@ class SDUClient:
             try:
                 resp = requests.post(java_url, data=body, headers=headers, timeout=timeout)
                 resp.raise_for_status()
-                # assume java returns JSON
                 return resp.json()
             except RequestException as exc:
-                # transient? retry with exponential backoff
                 if attempt == max_retries:
-                    # Final failure — bubble up or log
                     print(f"[send_to_java] final failure after {attempt} attempts: {exc}")
                     return None
                 wait = backoff_factor * (2 ** (attempt - 1))
@@ -555,7 +513,6 @@ class SDUClient:
                 time.sleep(wait)
 
 
-# helper: normalize function (placed outside the class in the same module)
 def _normalize_phone(raw: str) -> str:
     """
     Return digits-only phone, preserving leading '+' if present.
@@ -564,12 +521,8 @@ def _normalize_phone(raw: str) -> str:
     """
     raw = raw.strip()
     leading_plus = raw.startswith("+")
-    # remove all non-digit characters
     digits = re.sub(r'\D', '', raw)
     if leading_plus:
         return f"+{digits}"
     return digits
 
-
-client = SDUClient()
-print(client.get_print_transcript_html(230103253, "Madiyar2006"))

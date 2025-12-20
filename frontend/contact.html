@@ -24,6 +24,9 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
 
+  <!-- Custom Animations CSS -->
+  <link rel="stylesheet" href="css/animations.css">
+
   <style>
     body {
       position: relative;
@@ -102,18 +105,35 @@
         </a>
       </div>
 
-      <button
-        class="inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 md:hidden">
+      <button id="mobileMenuBtn" class="mobile-menu-btn inline-flex items-center justify-center rounded-full border border-slate-700 p-2 text-slate-200 transition-all hover:border-indigo-400 hover:text-indigo-300 md:hidden">
         <span class="sr-only">Open menu</span>
-        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="h-5 w-5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
     </nav>
   </header>
 
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="mobile-menu hidden flex-col gap-6 p-6 md:hidden">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2">
+        <img src="assets/logo.png" alt="UniTalent logo" class="h-8 w-8 object-contain" />
+        <span class="text-base font-semibold text-slate-50">UniTalent</span>
+      </div>
+      <button class="mobile-menu-close text-slate-400 hover:text-slate-200 text-2xl">✕</button>
+    </div>
+    <nav class="flex flex-col gap-4">
+      <a href="index.html#how" class="text-lg font-medium text-slate-200 hover:text-indigo-300 transition-colors">How it works</a>
+      <a href="jobs.html" class="text-lg font-medium text-slate-200 hover:text-indigo-300 transition-colors">Jobs</a>
+      <a href="student-login.html" class="text-lg font-medium text-slate-200 hover:text-indigo-300 transition-colors">For students</a>
+      <a href="employer-login.html" class="text-lg font-medium text-slate-200 hover:text-indigo-300 transition-colors">For employers</a>
+      <a href="contact.html" class="text-lg font-medium text-indigo-300">Contact</a>
+    </nav>
+  </div>
+
   <main class="mx-auto flex min-h-[calc(100vh-72px-60px)] max-w-6xl flex-col justify-center px-4 py-10">
-    <div class="mb-6 text-xs text-slate-400">
+    <div class="mb-6 text-xs text-slate-400 fade-in-on-scroll">
       <a href="index.html" class="hover:text-indigo-300">Home</a>
       <span class="mx-1 text-slate-500">/</span>
       <span class="text-slate-300">Contact us</span>
@@ -139,7 +159,7 @@
       </div>
 
       <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-slate-900/70">
-        <form id="contactForm" class="space-y-4 text-sm">
+        <form id="contactForm" class="space-y-4 text-sm" novalidate>
           <div>
             <label for="contactName" class="mb-1 block text-slate-200">Name</label>
             <input id="contactName" type="text" required placeholder="Your name"
@@ -440,7 +460,51 @@
     })();
   </script>
 
+  <!-- Success Modal -->
+  <div id="successModal" class="modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content rounded-2xl bg-slate-900 p-6 max-w-md w-full mx-4">
+      <button class="modal-close float-right text-slate-400 hover:text-slate-200 text-xl mb-2">✕</button>
+      <div class="text-center">
+        <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/20 mb-4">
+          <svg class="h-8 w-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-slate-50 mb-2">Message Sent!</h3>
+        <p class="text-slate-300 mb-4">Thank you for contacting us. We'll get back to you soon.</p>
+        <button class="modal-close rounded-full bg-indigo-500 px-6 py-2 text-sm font-semibold text-white hover:bg-indigo-400">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  
+  <!-- jQuery Interactions -->
+  <script src="js/interactions.js"></script>
+
   <script type="module" src="js/auth.js"></script>
+
+  <!-- Show success modal on form submission -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('contactForm');
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          // Let the existing form handler process first
+          setTimeout(function() {
+            const messageEl = document.getElementById('contactMessageEl');
+            if (messageEl && messageEl.textContent.includes('Message received')) {
+              $('#successModal').fadeIn(300);
+            }
+          }, 500);
+        });
+      }
+    });
+  </script>
 </body>
 
 </html>

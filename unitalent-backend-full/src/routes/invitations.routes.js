@@ -4,11 +4,6 @@ import { auth, requireRole } from "../middleware/auth.js";
 
 const router = Router();
 
-/**
- * ✅ EMPLOYER sends invitation
- * POST /api/invitations
- * body: { studentId, jobId? }
- */
 router.post("/", auth, requireRole("EMPLOYER"), async (req, res) => {
   try {
     const { studentId, jobId } = req.body;
@@ -17,7 +12,6 @@ router.post("/", auth, requireRole("EMPLOYER"), async (req, res) => {
       return res.status(400).json({ message: "studentId required" });
     }
 
-    // Optional: validate student exists
     const student = await prisma.user.findUnique({
       where: { id: Number(studentId) },
       select: { id: true, role: true }
@@ -31,7 +25,6 @@ router.post("/", auth, requireRole("EMPLOYER"), async (req, res) => {
       return res.status(400).json({ message: "Target user is not a student" });
     }
 
-    // ✅ If jobId provided, ensure employer owns the job
     if (jobId) {
       const job = await prisma.job.findUnique({
         where: { id: Number(jobId) },
@@ -61,10 +54,6 @@ router.post("/", auth, requireRole("EMPLOYER"), async (req, res) => {
   }
 });
 
-/**
- * ✅ STUDENT reads my invitations
- * GET /api/invitations/my
- */
 router.get("/my", auth, requireRole("STUDENT"), async (req, res) => {
   try {
     const list = await prisma.invitation.findMany({
